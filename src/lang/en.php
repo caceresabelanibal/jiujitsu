@@ -1,0 +1,132 @@
+<?php
+return [
+    // General
+    'nav_home' => 'Home', 'nav_dashboard' => 'My panel', 'nav_tournaments' => 'Tournaments',
+    'nav_rankings' => 'Rankings', 'nav_admin' => 'Admin', 'nav_login' => 'Log in',
+    'nav_register' => 'Sign up', 'nav_logout' => 'Log out',
+    'male' => 'Male', 'female' => 'Female', 'actions' => 'Actions', 'save' => 'Save',
+    'cancel' => 'Cancel', 'delete' => 'Delete', 'edit' => 'Edit', 'create' => 'Create',
+    'back' => 'Back', 'yes' => 'Yes', 'no' => 'No', 'status' => 'Status', 'date' => 'Date',
+    'name' => 'Name', 'email' => 'Email', 'password' => 'Password', 'login_required' => 'You must log in.',
+    'forbidden' => 'You are not allowed to do that.', 'confirm_delete' => 'Are you sure you want to delete?',
+    'never' => 'Never', 'all' => 'All', 'none' => '—', 'total' => 'Total', 'close' => 'Close',
+
+    // Landing
+    'hero_title' => 'Your Jiu-Jitsu tournament platform',
+    'hero_sub' => 'Brackets, referee scoreboard, PDF certificates, rankings and more. Create your tournament in minutes.',
+    'hero_cta' => 'Create my tournament', 'open_tournaments' => 'Tournaments with open registration',
+    'feature_brackets' => 'Automatic or manual brackets', 'feature_score' => 'Referee scoreboard & timer',
+    'feature_certs' => 'PDF certificates by email', 'feature_rank' => 'Rankings by belt, weight & age',
+
+    // Auth
+    'login_title' => 'Log in', 'register_title' => 'Create account',
+    'invalid_credentials' => 'Wrong email or password.',
+    'email_taken' => 'An account with that email already exists.',
+    'email_not_verified' => 'Your email is not verified yet. Check your inbox.',
+    'account_created_check_email' => 'Account created! We sent you a verification email.',
+    'verify_ok' => 'Email verified! You can now log in.',
+    'verify_fail' => 'Invalid or already used verification link.',
+    'password_min' => 'Password must be at least 6 characters.',
+    'mail_verify_subject' => 'Verify your email',
+    'mail_verify_title' => 'Verify your email address',
+    'mail_verify_body' => 'Click the button to verify your email and activate your account.',
+    'mail_verify_button' => 'Verify my email',
+
+    // Tournaments
+    'my_tournaments' => 'My tournaments', 'create_tournament' => 'Create tournament',
+    'tournament' => 'Tournament', 'tournament_name' => 'Tournament name',
+    'tournament_type' => 'Tournament type', 'type_internal' => 'Internal (single academy)',
+    'type_open' => 'Open (multiple academies)', 'event_date' => 'Event date',
+    'max_participants' => 'Max participants', 'fight_duration_default' => 'Default fight duration (min)',
+    'logo' => 'Logo', 'academy_logo' => 'Your academy logo',
+    'weekly_limit_reached' => 'You already created a tournament this week. You can create a new one in 7 days.',
+    'tournament_created' => 'Tournament created. Share the registration link!',
+    'registration_link' => 'Registration link', 'copy_link' => 'Copy link', 'copied' => 'Copied!',
+    'academies' => 'Academies', 'academy' => 'Academy', 'academy_name' => 'Academy name',
+    'professors' => 'Professors / Venues', 'professor' => 'Professor', 'professor_name' => 'Professor name',
+    'sede' => 'Venue', 'add_academy' => 'Add academy', 'add_professor' => 'Add professor',
+    'registrations' => 'Registrations', 'verified' => 'Verified', 'pending' => 'Pending',
+    'divisions' => 'Divisions & brackets', 'generate_divisions' => 'Generate divisions',
+    'status_draft' => 'Draft', 'status_open' => 'Registration open', 'status_running' => 'Running',
+    'status_finished' => 'Finished', 'participants' => 'Participants',
+    'dashboard' => 'Dashboard', 'certificates' => 'Certificates', 'overview' => 'Overview',
+    'no_tournaments' => 'No tournaments yet.', 'belt' => 'Belt', 'age_division' => 'Age division',
+    'weight_class' => 'Weight class', 'weight_kg' => 'Weight (kg)', 'birthdate' => 'Birth date',
+    'category' => 'Category', 'gender' => 'Gender',
+
+    // Public registration
+    'register_for' => 'Registration for', 'submit_registration' => 'Register',
+    'reg_check_email' => 'Registration received! Check your email to confirm it.',
+    'reg_verified_ok' => 'Registration confirmed! Use your email and password to follow the tournament.',
+    'already_registered' => 'That email is already registered in this tournament.',
+    'tournament_full' => 'The tournament reached its maximum capacity.',
+    'registration_closed' => 'Registration is closed.',
+    'mail_reg_subject' => 'Confirm your registration',
+    'mail_reg_body' => 'Click to confirm your registration for the tournament',
+    'mail_reg_button' => 'Confirm registration',
+    'select_academy' => 'Choose your academy', 'select_professor' => 'Choose your professor / venue',
+    'your_category_auto' => 'Age and weight divisions are assigned automatically from your data.',
+    'set_password_hint' => 'Set a password to follow the tournament online (optional if you already have an account).',
+
+    // Brackets
+    'bracket' => 'Bracket', 'round' => 'Round', 'final' => 'Final', 'semifinal' => 'Semifinal',
+    'bronze_match' => 'Third place', 'seed_random' => '🎲 Random', 'save_bracket' => 'Save bracket',
+    'regenerate' => 'Regenerate bracket', 'competitors' => 'Competitors', 'no_competitors' => 'Not enough competitors (minimum 2).',
+    'division' => 'Division', 'duration' => 'Duration', 'projector_view' => '📺 Projector view',
+    'champion' => 'Champion', 'second_place' => '2nd place', 'third_place' => '3rd place',
+    'bye' => 'BYE', 'tbd' => 'TBD', 'manual_order_hint' => 'Order competitors for manual seeding and save, or use the random button.',
+    'bracket_generated' => 'Bracket generated.', 'need_two' => 'At least 2 competitors are needed.',
+    'winner_label' => 'Winner',
+
+    // Scoreboard
+    'operator' => 'Operator', 'score_operator' => 'Control desk', 'points' => 'Points',
+    'advantages' => 'Advantages', 'penalties' => 'Penalties', 'start' => 'Start', 'pause' => 'Pause',
+    'reset' => 'Reset', 'end_match' => 'End match', 'submission' => 'Submission',
+    'decision' => 'Decision', 'dq' => 'Disqualification', 'walkover' => 'W.O.', 'winner' => 'Winner',
+    'by_points' => 'By points', 'takedown' => 'Takedown', 'sweep' => 'Sweep', 'knee_on_belly' => 'Knee on belly',
+    'guard_pass' => 'Guard pass', 'mount' => 'Mount', 'back_control' => 'Back control',
+    'undo' => 'Undo', 'open_display' => 'Open scoreboard', 'match_ended' => 'Match ended.',
+    'select_winner' => 'Select the winner', 'method' => 'Method', 'vs' => 'vs',
+    'match' => 'Match', 'matches' => 'Matches', 'live' => 'LIVE', 'done' => 'Done',
+
+    // Rankings
+    'rankings_title' => 'Competitor rankings', 'filter' => 'Filter', 'position' => 'Pos.',
+    'competitor' => 'Competitor', 'points_col' => 'Points', 'golds' => 'Golds', 'silvers' => 'Silvers',
+    'bronzes' => 'Bronzes', 'wins' => 'Wins', 'subs' => 'Submissions',
+    'no_ranking_data' => 'No ranking data for that combination yet.',
+
+    // Tournament dashboard
+    'stats_winning_academy' => 'Winning academy', 'stats_most_fights' => 'Most fights',
+    'stats_mat_time' => 'Most mat time', 'stats_most_subs' => 'Top finisher',
+    'stats_wins_by_points' => 'Most wins by points', 'stats_most_losses' => 'Most losses',
+    'stats_fastest_sub' => 'Fastest submission', 'stats_most_points' => 'Most points scored',
+    'stats_most_adv' => 'Most advantages', 'total_fights' => 'Total fights', 'total_mat_time' => 'Total mat time',
+    'medal_table' => 'Medal table by academy', 'gold' => 'Gold', 'silver' => 'Silver', 'bronze' => 'Bronze',
+    'divisions_progress' => 'Divisions completed', 'by_submission' => 'By submission',
+    'by_decision' => 'By decision', 'by_advantages' => 'By advantages',
+
+    // Certificates
+    'send_certificates' => 'Send certificates', 'certs_podium' => 'Podium certificates (gold, silver, bronze)',
+    'certs_participation' => 'Participation certificates', 'certs_sent' => 'certificates generated and queued for delivery.',
+    'download' => 'Download', 'emailed' => 'Sent', 'generate' => 'Generate',
+
+    // Competitor panel
+    'my_panel' => 'My panel', 'my_registrations' => 'My registrations', 'my_matches' => 'My matches',
+    'next_opponent' => 'Next opponent', 'my_position' => 'Your bracket position',
+    'no_registrations' => 'You are not registered in any tournament yet.',
+    'upcoming' => 'Upcoming', 'result' => 'Result', 'won' => 'You won', 'lost' => 'You lost',
+
+    // Admin
+    'admin_panel' => 'Admin panel', 'users' => 'Users', 'role' => 'Role',
+    'settings' => 'Settings', 'settings_saved' => 'Settings saved.',
+    'scoring_config' => 'Scoreboard action points', 'ranking_config' => 'Ranking points',
+    'scheduler' => 'Schedulers / Cron', 'cron_tasks' => 'Scheduled tasks', 'task' => 'Task',
+    'last_run' => 'Last run', 'run_now' => 'Run now',
+    'user_saved' => 'User saved.', 'user_deleted' => 'User deleted.',
+    'new_user' => 'New user', 'weekly_limit' => 'Tournaments per week per user',
+    'rank_gold' => 'Points per gold', 'rank_silver' => 'Points per silver', 'rank_bronze' => 'Points per bronze',
+    'rank_win' => 'Points per win', 'rank_sub_bonus' => 'Submission bonus',
+    'cron_hint' => 'Add these lines to your server crontab:',
+    'emails_pending' => 'Pending emails', 'recompute_rankings' => 'Recompute rankings',
+    'site_name_setting' => 'Site name',
+];

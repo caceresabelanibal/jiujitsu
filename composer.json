@@ -1,0 +1,13 @@
+{
+    "name": "blucap/bjj-tournament-manager",
+    "description": "Plataforma de torneos de Jiu-Jitsu: llaves, scoreboard, certificados, rankings",
+    "type": "project",
+    "require": {
+        "php": ">=8.2",
+        "dompdf/dompdf": "^3.0",
+        "phpmailer/phpmailer": "^6.9"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

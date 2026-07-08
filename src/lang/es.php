@@ -1,0 +1,132 @@
+<?php
+return [
+    // General
+    'nav_home' => 'Inicio', 'nav_dashboard' => 'Mi panel', 'nav_tournaments' => 'Torneos',
+    'nav_rankings' => 'Rankings', 'nav_admin' => 'Administración', 'nav_login' => 'Ingresar',
+    'nav_register' => 'Crear cuenta', 'nav_logout' => 'Salir',
+    'male' => 'Masculino', 'female' => 'Femenino', 'actions' => 'Acciones', 'save' => 'Guardar',
+    'cancel' => 'Cancelar', 'delete' => 'Eliminar', 'edit' => 'Editar', 'create' => 'Crear',
+    'back' => 'Volver', 'yes' => 'Sí', 'no' => 'No', 'status' => 'Estado', 'date' => 'Fecha',
+    'name' => 'Nombre', 'email' => 'Email', 'password' => 'Contraseña', 'login_required' => 'Tenés que iniciar sesión.',
+    'forbidden' => 'No tenés permiso para esta acción.', 'confirm_delete' => '¿Seguro que querés eliminar?',
+    'never' => 'Nunca', 'all' => 'Todos', 'none' => '—', 'total' => 'Total', 'close' => 'Cerrar',
+
+    // Landing
+    'hero_title' => 'Tu plataforma de torneos de Jiu-Jitsu',
+    'hero_sub' => 'Llaves, marcador para árbitros, certificados en PDF, rankings y más. Creá tu torneo en minutos.',
+    'hero_cta' => 'Crear mi torneo', 'open_tournaments' => 'Torneos con inscripción abierta',
+    'feature_brackets' => 'Llaves automáticas o manuales', 'feature_score' => 'Marcador y timer para el árbitro',
+    'feature_certs' => 'Certificados en PDF por mail', 'feature_rank' => 'Rankings por cinturón, peso y edad',
+
+    // Auth
+    'login_title' => 'Iniciar sesión', 'register_title' => 'Crear cuenta',
+    'invalid_credentials' => 'Email o contraseña incorrectos.',
+    'email_taken' => 'Ya existe una cuenta con ese email.',
+    'email_not_verified' => 'Tu email todavía no está verificado. Revisá tu casilla.',
+    'account_created_check_email' => '¡Cuenta creada! Te enviamos un mail para verificar tu dirección.',
+    'verify_ok' => '¡Email verificado! Ya podés iniciar sesión.',
+    'verify_fail' => 'El enlace de verificación no es válido o ya fue usado.',
+    'password_min' => 'La contraseña debe tener al menos 6 caracteres.',
+    'mail_verify_subject' => 'Verificá tu email',
+    'mail_verify_title' => 'Verificá tu dirección de email',
+    'mail_verify_body' => 'Hacé clic en el botón para verificar tu email y activar tu cuenta.',
+    'mail_verify_button' => 'Verificar mi email',
+
+    // Torneos
+    'my_tournaments' => 'Mis torneos', 'create_tournament' => 'Crear torneo',
+    'tournament' => 'Torneo', 'tournament_name' => 'Nombre del torneo',
+    'tournament_type' => 'Tipo de torneo', 'type_internal' => 'Interno (una academia)',
+    'type_open' => 'Abierto / Open (varias academias)', 'event_date' => 'Fecha del evento',
+    'max_participants' => 'Cupo de participantes', 'fight_duration_default' => 'Duración de lucha por defecto (min)',
+    'logo' => 'Logo', 'academy_logo' => 'Logo de tu academia',
+    'weekly_limit_reached' => 'Ya creaste un torneo esta semana. Podés crear uno nuevo en 7 días.',
+    'tournament_created' => 'Torneo creado. ¡Compartí el link de inscripción!',
+    'registration_link' => 'Link de inscripción', 'copy_link' => 'Copiar link', 'copied' => '¡Copiado!',
+    'academies' => 'Academias', 'academy' => 'Academia', 'academy_name' => 'Nombre de la academia',
+    'professors' => 'Profesores / Sedes', 'professor' => 'Profesor', 'professor_name' => 'Nombre del profesor',
+    'sede' => 'Sede', 'add_academy' => 'Agregar academia', 'add_professor' => 'Agregar profesor',
+    'registrations' => 'Inscriptos', 'verified' => 'Verificado', 'pending' => 'Pendiente',
+    'divisions' => 'Divisiones y llaves', 'generate_divisions' => 'Generar divisiones',
+    'status_draft' => 'Borrador', 'status_open' => 'Inscripción abierta', 'status_running' => 'En curso',
+    'status_finished' => 'Finalizado', 'participants' => 'Participantes',
+    'dashboard' => 'Dashboard', 'certificates' => 'Certificados', 'overview' => 'Resumen',
+    'no_tournaments' => 'Todavía no hay torneos.', 'belt' => 'Cinturón', 'age_division' => 'Categoría de edad',
+    'weight_class' => 'Categoría de peso', 'weight_kg' => 'Peso (kg)', 'birthdate' => 'Fecha de nacimiento',
+    'category' => 'Categoría', 'gender' => 'Género',
+
+    // Inscripcion publica
+    'register_for' => 'Inscripción a', 'submit_registration' => 'Inscribirme',
+    'reg_check_email' => '¡Inscripción recibida! Revisá tu email para confirmarla.',
+    'reg_verified_ok' => '¡Inscripción confirmada! Con tu email y la contraseña que definas podés seguir el torneo.',
+    'already_registered' => 'Ese email ya está inscripto en este torneo.',
+    'tournament_full' => 'El torneo llegó al cupo máximo de participantes.',
+    'registration_closed' => 'La inscripción está cerrada.',
+    'mail_reg_subject' => 'Confirmá tu inscripción',
+    'mail_reg_body' => 'Hacé clic para confirmar tu inscripción al torneo',
+    'mail_reg_button' => 'Confirmar inscripción',
+    'select_academy' => 'Elegí tu academia', 'select_professor' => 'Elegí tu profesor / sede',
+    'your_category_auto' => 'La categoría de edad y peso se asigna automáticamente con tus datos.',
+    'set_password_hint' => 'Definí una contraseña para seguir el torneo online (opcional si ya tenés cuenta).',
+
+    // Llaves
+    'bracket' => 'Llave', 'round' => 'Ronda', 'final' => 'Final', 'semifinal' => 'Semifinal',
+    'bronze_match' => 'Tercer puesto', 'seed_random' => '🎲 Aleatorio', 'save_bracket' => 'Guardar llave',
+    'regenerate' => 'Regenerar llave', 'competitors' => 'Competidores', 'no_competitors' => 'Sin inscriptos suficientes (mínimo 2).',
+    'division' => 'División', 'duration' => 'Duración', 'projector_view' => '📺 Vista proyector',
+    'champion' => 'Campeón', 'second_place' => '2° puesto', 'third_place' => '3° puesto',
+    'bye' => 'BYE', 'tbd' => 'A definir', 'manual_order_hint' => 'Ordená los competidores para la siembra manual y guardá, o usá el botón aleatorio.',
+    'bracket_generated' => 'Llave generada.', 'need_two' => 'Se necesitan al menos 2 competidores.',
+    'winner_label' => 'Ganador',
+
+    // Scoreboard
+    'operator' => 'Operador', 'score_operator' => 'Mesa de control', 'points' => 'Puntos',
+    'advantages' => 'Ventajas', 'penalties' => 'Penalizaciones', 'start' => 'Iniciar', 'pause' => 'Pausa',
+    'reset' => 'Reiniciar', 'end_match' => 'Finalizar lucha', 'submission' => 'Finalización',
+    'decision' => 'Decisión', 'dq' => 'Descalificación', 'walkover' => 'W.O.', 'winner' => 'Ganador',
+    'by_points' => 'Por puntos', 'takedown' => 'Derribo', 'sweep' => 'Raspaje', 'knee_on_belly' => 'Rodilla en panza',
+    'guard_pass' => 'Pasaje de guardia', 'mount' => 'Montada', 'back_control' => 'Control de espalda',
+    'undo' => 'Deshacer', 'open_display' => 'Abrir marcador', 'match_ended' => 'Lucha finalizada.',
+    'select_winner' => 'Seleccioná el ganador', 'method' => 'Método', 'vs' => 'vs',
+    'match' => 'Lucha', 'matches' => 'Luchas', 'live' => 'EN VIVO', 'done' => 'Terminada',
+
+    // Rankings
+    'rankings_title' => 'Ranking de competidores', 'filter' => 'Filtrar', 'position' => 'Pos.',
+    'competitor' => 'Competidor', 'points_col' => 'Puntos', 'golds' => 'Oros', 'silvers' => 'Platas',
+    'bronzes' => 'Bronces', 'wins' => 'Victorias', 'subs' => 'Finalizaciones',
+    'no_ranking_data' => 'Todavía no hay datos de ranking para esa combinación.',
+
+    // Dashboard torneo
+    'stats_winning_academy' => 'Academia ganadora', 'stats_most_fights' => 'Más luchas',
+    'stats_mat_time' => 'Más minutos en tatami', 'stats_most_subs' => 'Más finalizador',
+    'stats_wins_by_points' => 'Más victorias por puntos', 'stats_most_losses' => 'Más derrotas',
+    'stats_fastest_sub' => 'Finalización más rápida', 'stats_most_points' => 'Más puntos anotados',
+    'stats_most_adv' => 'Más ventajas', 'total_fights' => 'Luchas totales', 'total_mat_time' => 'Tiempo total de tatami',
+    'medal_table' => 'Medallero por academia', 'gold' => 'Oro', 'silver' => 'Plata', 'bronze' => 'Bronce',
+    'divisions_progress' => 'Divisiones completadas', 'by_submission' => 'Por finalización',
+    'by_decision' => 'Por decisión', 'by_advantages' => 'Por ventajas',
+
+    // Certificados
+    'send_certificates' => 'Enviar certificados', 'certs_podium' => 'Certificados de podio (oro, plata, bronce)',
+    'certs_participation' => 'Certificados de participación', 'certs_sent' => 'certificados generados y encolados para envío.',
+    'download' => 'Descargar', 'emailed' => 'Enviado', 'generate' => 'Generar',
+
+    // Mi panel (competidor)
+    'my_panel' => 'Mi panel', 'my_registrations' => 'Mis inscripciones', 'my_matches' => 'Mis luchas',
+    'next_opponent' => 'Próximo rival', 'my_position' => 'Tu posición en la llave',
+    'no_registrations' => 'No estás inscripto en ningún torneo todavía.',
+    'upcoming' => 'Próxima', 'result' => 'Resultado', 'won' => 'Ganaste', 'lost' => 'Perdiste',
+
+    // Admin
+    'admin_panel' => 'Panel de administración', 'users' => 'Usuarios', 'role' => 'Rol',
+    'settings' => 'Configuración', 'settings_saved' => 'Configuración guardada.',
+    'scoring_config' => 'Puntaje de acciones (marcador)', 'ranking_config' => 'Puntaje de ranking',
+    'scheduler' => 'Schedulers / Cron', 'cron_tasks' => 'Tareas programadas', 'task' => 'Tarea',
+    'last_run' => 'Última ejecución', 'run_now' => 'Ejecutar ahora',
+    'user_saved' => 'Usuario guardado.', 'user_deleted' => 'Usuario eliminado.',
+    'new_user' => 'Nuevo usuario', 'weekly_limit' => 'Torneos por semana por usuario',
+    'rank_gold' => 'Puntos por oro', 'rank_silver' => 'Puntos por plata', 'rank_bronze' => 'Puntos por bronce',
+    'rank_win' => 'Puntos por victoria', 'rank_sub_bonus' => 'Bonus por finalización',
+    'cron_hint' => 'Agregá estas líneas al crontab del servidor:',
+    'emails_pending' => 'Mails pendientes', 'recompute_rankings' => 'Recalcular rankings',
+    'site_name_setting' => 'Nombre del sitio',
+];

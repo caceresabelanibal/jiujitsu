@@ -1,0 +1,88 @@
+<?php
+$m = row('SELECT m.*, r1.name red_name, r2.name blue_name, a1.name red_academy, a2.name blue_academy
+          FROM matches m
+          LEFT JOIN registrations r1 ON r1.id = m.red_reg_id
+          LEFT JOIN registrations r2 ON r2.id = m.blue_reg_id
+          LEFT JOIN tournament_academies a1 ON a1.id = r1.academy_id
+          LEFT JOIN tournament_academies a2 ON a2.id = r2.academy_id
+          WHERE m.id = ?', [(int)$params[0]]);
+if (!$m) { http_response_code(404); require BASE_PATH . '/src/pages/_404.php'; exit; }
+$t = require_tournament_owner((int)$m['tournament_id']);
+$d = row('SELECT * FROM divisions WHERE id = ?', [$m['division_id']]);
+$mid = (int)$m['id'];
+view_header(t('score_operator'));
+?>
+<div class="op">
+  <div class="flex spread mb">
+    <a href="<?= APP_URL ?>/division/<?= $m['division_id'] ?>">← <?= e(division_label($d)) ?></a>
+    <a class="btn secondary" href="<?= APP_URL ?>/match/<?= $mid ?>/display" target="_blank"><?= t('open_display') ?> 📺</a>
+  </div>
+
+  <div class="op-timerband">
+    <span class="op-clock" data-sb="timer"><?= fmt_time((int)$m['timer_remaining']) ?></span>
+    <?php if ($m['status'] !== 'done'): ?>
+    <button class="btn green" data-sb="startbtn" data-start="▶ <?= t('start') ?>" data-pause="⏸ <?= t('pause') ?>" onclick="sbToggleTimer()">▶ <?= t('start') ?></button>
+    <button class="btn secondary" onclick="sbAction('reset')">↺ <?= t('reset') ?></button>
+    <button class="btn secondary" onclick="sbAction('undo')">↩ <?= t('undo') ?></button>
+    <?php endif; ?>
+  </div>
+
+  <div class="sb-winnerbar" data-sb="winnerbar" data-label="<?= t('winner') ?>" style="display:none;border-radius:12px;margin-bottom:14px"></div>
+
+  <div class="op-sides">
+    <?php foreach ([['red', $m['red_name'], $m['red_academy']], ['blue', $m['blue_name'], $m['blue_academy']]] as [$side, $name, $academy]): ?>
+    <div class="op-side <?= $side ?>">
+      <h3><?= e($name ?? t('tbd')) ?> <small class="muted"><?= e($academy ?? '') ?></small></h3>
+      <div class="flex spread">
+        <span class="op-score" data-sb="<?= $side ?>_points">0</span>
+        <span><span class="badge gold" style="font-size:1rem">A: <span data-sb="<?= $side ?>_adv">0</span></span>
+              <span class="badge red" style="font-size:1rem">P: <span data-sb="<?= $side ?>_pen">0</span></span></span>
+      </div>
+      <?php if ($m['status'] !== 'done'): ?>
+      <div class="op-btns">
+        <button class="btn secondary" onclick="sbAction('score','<?= $side ?>','takedown')"><?= t('takedown') ?> +2</button>
+        <button class="btn secondary" onclick="sbAction('score','<?= $side ?>','sweep')"><?= t('sweep') ?> +2</button>
+        <button class="btn secondary" onclick="sbAction('score','<?= $side ?>','knee_on_belly')"><?= t('knee_on_belly') ?> +2</button>
+        <button class="btn secondary" onclick="sbAction('score','<?= $side ?>','guard_pass')"><?= t('guard_pass') ?> +3</button>
+        <button class="btn secondary" onclick="sbAction('score','<?= $side ?>','mount')"><?= t('mount') ?> +4</button>
+        <button class="btn secondary" onclick="sbAction('score','<?= $side ?>','back_control')"><?= t('back_control') ?> +4</button>
+      </div>
+      <div class="op-avpen">
+        <button class="btn warn sm" onclick="sbAction('score','<?= $side ?>','advantage')">+ <?= t('advantages') ?></button>
+        <button class="btn danger sm" onclick="sbAction('score','<?= $side ?>','penalty')">+ <?= t('penalties') ?></button>
+      </div>
+      <?php endif; ?>
+    </div>
+    <?php endforeach; ?>
+  </div>
+
+  <?php if ($m['status'] !== 'done'): ?>
+  <div class="card mt">
+    <h3><?= t('end_match') ?></h3>
+    <p class="muted"><?= t('select_winner') ?> · <?= t('method') ?></p>
+    <div class="flex">
+      <button class="btn" onclick="sbAction('end', null)"><?= t('by_points') ?> (auto)</button>
+      <button class="btn green" onclick="sbAction('end','red','submission')"><?= t('submission') ?> 🔴</button>
+      <button class="btn green" onclick="sbAction('end','blue','submission')"><?= t('submission') ?> 🔵</button>
+      <button class="btn secondary" onclick="sbAction('end','red','decision')"><?= t('decision') ?> 🔴</button>
+      <button class="btn secondary" onclick="sbAction('end','blue','decision')"><?= t('decision') ?> 🔵</button>
+      <button class="btn danger" onclick="sbAction('end','blue','dq')"><?= t('dq') ?> 🔴</button>
+      <button class="btn danger" onclick="sbAction('end','red','dq')"><?= t('dq') ?> 🔵</button>
+      <button class="btn secondary" onclick="sbAction('end','red','wo')">W.O. → 🔴</button>
+      <button class="btn secondary" onclick="sbAction('end','blue','wo')">W.O. → 🔵</button>
+    </div>
+  </div>
+  <?php else: ?>
+  <div class="flash flash-success mt"><?= t('match_ended') ?></div>
+  <?php endif; ?>
+</div>
+<script>
+window.SB = {
+  matchId: <?= $mid ?>,
+  apiUrl: '<?= APP_URL ?>/api/match/<?= $mid ?>',
+  isOperator: true,
+  csrf: '<?= e($_SESSION['csrf']) ?>'
+};
+</script>
+<script src="<?= APP_URL ?>/assets/js/scoreboard.js"></script>
+<?php view_footer();

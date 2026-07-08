@@ -1,0 +1,7 @@
+vendor/
+storage/certificates/*
+public/uploads/*
+!public/uploads/.gitkeep
+!storage/certificates/.gitkeep
+.env
+composer.lock
