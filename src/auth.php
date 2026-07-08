@@ -29,11 +29,16 @@ function require_admin(): array {
     return $u;
 }
 
-/** El dueño del torneo o un admin */
+/** True si el usuario es personal (arbitro/mesa) del torneo */
+function is_tournament_staff(int $tournamentId, int $userId): bool {
+    return (bool)row('SELECT id FROM tournament_staff WHERE tournament_id = ? AND user_id = ?', [$tournamentId, $userId]);
+}
+
+/** Dueño del torneo, personal del torneo o admin del sitio */
 function require_tournament_owner(int $tournamentId): array {
     $u = require_login();
     $t = row('SELECT * FROM tournaments WHERE id = ?', [$tournamentId]);
-    if (!$t || ($t['user_id'] != $u['id'] && $u['role'] !== 'admin')) {
+    if (!$t || ($t['user_id'] != $u['id'] && $u['role'] !== 'admin' && !is_tournament_staff($tournamentId, (int)$u['id']))) {
         http_response_code(403);
         die(t('forbidden'));
     }

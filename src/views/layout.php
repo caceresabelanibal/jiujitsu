@@ -9,6 +9,14 @@ function view_header(string $title, bool $bare = false): void {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?= e($title) ?> · <?= e($site) ?></title>
+<script>
+// Tema antes del primer render (evita flash)
+(function () {
+  var t = localStorage.getItem('theme');
+  if (!t) t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  document.documentElement.dataset.theme = t;
+})();
+</script>
 <link rel="stylesheet" href="<?= APP_URL ?>/assets/css/app.css">
 <link rel="icon" href="data:image/svg+xml,<text y='0.9em' font-size='90'>🥋</text>">
 </head>
@@ -31,6 +39,7 @@ function view_header(string $title, bool $bare = false): void {
     <span class="langswitch">
       <a href="?lang=es" class="<?= $l === 'es' ? 'active' : '' ?>">ES</a>·<a href="?lang=en" class="<?= $l === 'en' ? 'active' : '' ?>">EN</a>
     </span>
+    <button class="themetoggle" type="button" onclick="toggleTheme(this)" title="<?= t('theme') ?>">◐</button>
   </nav>
 </header>
 <?php endif; ?>
@@ -53,13 +62,14 @@ function view_footer(bool $bare = false): void {
 /** Tabs de gestion de un torneo */
 function tournament_tabs(array $t, string $active): void {
     $tabs = [
-        'overview'      => ['', t('overview')],
+        'overview'      => ['', '🎛️ ' . t('operation')],
         'academies'     => ['/academies', t('academies')],
         'registrations' => ['/registrations', t('registrations')],
         'divisions'     => ['/divisions', t('divisions')],
         'matches'       => ['/matches', t('matches')],
         'dashboard'     => ['/dashboard', t('dashboard')],
         'certificates'  => ['/certificates', t('certificates')],
+        'settings'      => ['/settings', '⚙️ ' . t('settings')],
     ];
     echo '<div class="tabs">';
     foreach ($tabs as $key => [$suffix, $label]) {

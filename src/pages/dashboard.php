@@ -11,9 +11,31 @@ $regs = rows('SELECT r.*, t.name t_name, t.slug, t.status t_status, t.event_date
               JOIN weight_classes wc ON wc.id = r.weight_class_id
               WHERE r.user_id = ? OR r.email = ? ORDER BY r.created_at DESC', [$u['id'], $u['email']]);
 $isEn = lang() === 'en';
+
+// Torneos que este usuario opera (dueño o personal): acceso directo al desarrollo
+$operate = is_admin()
+    ? rows('SELECT * FROM tournaments WHERE status != "finished" ORDER BY created_at DESC LIMIT 6')
+    : rows('SELECT DISTINCT t.* FROM tournaments t LEFT JOIN tournament_staff s ON s.tournament_id = t.id
+            WHERE t.user_id = ? OR s.user_id = ? ORDER BY t.created_at DESC LIMIT 6', [$u['id'], $u['id']]);
+
 view_header(t('my_panel'));
 ?>
 <h1><?= t('my_panel') ?> · <?= e($u['name']) ?></h1>
+
+<?php if ($operate): ?>
+<div class="grid cols3 mb">
+  <?php foreach ($operate as $ot): ?>
+  <div class="card" style="margin:0">
+    <div class="flex spread">
+      <h3 style="margin:0"><?php if ($ot['logo']): ?><img class="logo-sm" src="<?= APP_URL . '/' . e($ot['logo']) ?>" alt=""> <?php endif; ?><?= e($ot['name']) ?></h3>
+      <span class="badge <?= ['draft'=>'grey','open'=>'green','running'=>'blue','finished'=>'gold'][$ot['status']] ?>"><?= t('status_' . $ot['status']) ?></span>
+    </div>
+    <p class="muted" style="margin:6px 0 12px"><?= $ot['event_date'] ? '📅 ' . date('d/m/Y', strtotime($ot['event_date'])) : '' ?></p>
+    <a class="btn" style="width:100%" href="<?= APP_URL ?>/tournament/<?= $ot['id'] ?>">▶ <?= t('go_to_tournament') ?></a>
+  </div>
+  <?php endforeach; ?>
+</div>
+<?php endif; ?>
 <?php if (!$regs): ?>
 <div class="card center muted"><?= t('no_registrations') ?></div>
 <?php endif; ?>

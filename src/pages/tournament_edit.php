@@ -10,4 +10,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
          max(60, (int)($_POST['duration_min'] ?? 5) * 60), $logo, $t['id']]);
     flash('success', t('settings_saved'));
 }
-redirect('/tournament/' . $t['id']);
+redirect('/tournament/' . $t['id'] . '/settings');

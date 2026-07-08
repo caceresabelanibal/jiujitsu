@@ -14,3 +14,10 @@ document.querySelectorAll('[data-confirm]').forEach((f) => {
     if (!confirm(f.dataset.confirm)) e.preventDefault();
   });
 });
+
+// Tema claro / oscuro
+function toggleTheme() {
+  const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+  document.documentElement.dataset.theme = next;
+  localStorage.setItem('theme', next);
+}

@@ -1,8 +1,11 @@
 <?php
 $u = require_login();
+// Propios + torneos donde el usuario es personal (arbitro/mesa)
 $mine = is_admin()
     ? rows('SELECT t.*, u.name owner, (SELECT COUNT(*) FROM registrations r WHERE r.tournament_id=t.id AND r.verified=1) regs FROM tournaments t JOIN users u ON u.id=t.user_id ORDER BY t.created_at DESC')
-    : rows('SELECT t.*, (SELECT COUNT(*) FROM registrations r WHERE r.tournament_id=t.id AND r.verified=1) regs FROM tournaments t WHERE t.user_id=? ORDER BY t.created_at DESC', [$u['id']]);
+    : rows('SELECT DISTINCT t.*, (SELECT COUNT(*) FROM registrations r WHERE r.tournament_id=t.id AND r.verified=1) regs
+            FROM tournaments t LEFT JOIN tournament_staff s ON s.tournament_id = t.id
+            WHERE t.user_id = ? OR s.user_id = ? ORDER BY t.created_at DESC', [$u['id'], $u['id']]);
 view_header(t('my_tournaments'));
 ?>
 <div class="flex spread mb">
@@ -23,7 +26,10 @@ view_header(t('my_tournaments'));
     <td><?= (int)$tt['regs'] ?></td>
     <td><span class="badge <?= ['draft'=>'grey','open'=>'green','running'=>'blue','finished'=>'gold'][$tt['status']] ?>"><?= t('status_' . $tt['status']) ?></span></td>
     <?= is_admin() ? '<td>' . e($tt['owner'] ?? '') . '</td>' : '' ?>
-    <td><a class="btn sm" href="<?= APP_URL ?>/tournament/<?= $tt['id'] ?>"><?= t('edit') ?></a></td>
+    <td style="white-space:nowrap">
+      <a class="btn sm" href="<?= APP_URL ?>/tournament/<?= $tt['id'] ?>">▶ <?= t('go_to_tournament') ?></a>
+      <a class="btn sm secondary" href="<?= APP_URL ?>/tournament/<?= $tt['id'] ?>/settings" title="<?= t('settings') ?>">⚙️</a>
+    </td>
   </tr>
   <?php endforeach; ?>
 </table>

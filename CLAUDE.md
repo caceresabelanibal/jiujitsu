@@ -12,6 +12,8 @@ Plataforma de torneos de Jiu-Jitsu: PHP 8.3 puro (sin framework) + MySQL 8 + Doc
 - `public/cron.php?task=emails|rankings|cleanup&key=CRON_KEY` — tareas programadas; se listan en `/admin/scheduler`.
 - Settings clave-valor JSON en tabla `settings` (`setting()`/`set_setting()`): `scoring`, `ranking`, `tournament_weekly_limit`.
 - Timer del marcador vive en el servidor (`matches.timer_remaining` + `timer_started_at`); el JS solo interpola. API en `/api/match/{id}`.
+- `/tournament/{id}` es el **centro de operación** ("Ir al torneo": luchas en vivo, próximas, divisiones); la edición vive en `/tournament/{id}/settings`. `require_tournament_owner()` acepta dueño, admin **y personal del torneo** (`tournament_staff`, se agrega por email en Configuración).
+- Tema claro/oscuro por `localStorage` + `data-theme` en `<html>` (script inline en `view_header` evita flash); el scoreboard `.sb` queda siempre oscuro (proyector).
 
 ## Comandos
 

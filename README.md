@@ -36,6 +36,8 @@ docker compose exec app php scripts/seed_demo.php
 - **Ranking global** por combinación género + cinturón + edad + peso, con puntaje configurable desde el admin.
 - **Dashboard del torneo**: academia ganadora, medallero, más luchas, más minutos en tatami, más finalizador, finalización más rápida, etc.
 - **Panel admin**: usuarios (crear/editar/eliminar), configuración de puntajes, página de schedulers.
+- **Personal del torneo**: el organizador agrega árbitros/mesa por email (Configuración del torneo); ellos ven "▶ Ir al torneo" en su panel y operan llaves, timer y resultados desde sus computadoras.
+- **Tema claro/oscuro** con toggle (◐) y transiciones suaves entre páginas.
 
 ## Cron
 
