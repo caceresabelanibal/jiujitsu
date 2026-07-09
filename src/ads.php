@@ -18,8 +18,11 @@ function ads_for_tournament(int $tournamentId): array {
     return rows("SELECT * FROM ads WHERE active = 1 AND $where ORDER BY sort, id", $args);
 }
 
-/** Barra fija inferior con la rotacion de publicidades (no imprime nada si no hay) */
-function render_ads_bar(int $tournamentId): void {
+/**
+ * Barra fija con la rotacion de publicidades (no imprime nada si no hay).
+ * $double: cinta arriba Y abajo (para el marcador proyectado, por si el proyector recorta).
+ */
+function render_ads_bar(int $tournamentId, bool $double = false): void {
     $ads = ads_for_tournament($tournamentId);
     if (!$ads) return;
     $payload = array_map(fn($a) => [
@@ -30,7 +33,8 @@ function render_ads_bar(int $tournamentId): void {
         'duration' => max(3, (int)$a['duration_sec']),
         'animation' => $a['animation'],
     ], $ads);
-    echo '<div class="adsbar" id="adsbar"></div>';
+    if ($double) echo '<div class="adsbar top"></div>';
+    echo '<div class="adsbar"></div>';
     echo '<script>window.ADS = ' . json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) . ';</script>';
     echo '<script src="' . APP_URL . '/assets/js/ads.js"></script>';
 }

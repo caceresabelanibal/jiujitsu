@@ -189,18 +189,22 @@ html[data-theme="light"] .badge.gold { background: #f8efd4; color: #96721a; }
 .podium .p.b { border-color: var(--bronze); }
 
 /* ===== Scoreboard ===== */
-.sb { display: flex; flex-direction: column; height: 100vh; background: #000; }
-.sb-timer { text-align: center; font-size: clamp(3rem, 14vw, 9rem); font-weight: 900; font-variant-numeric: tabular-nums; padding: 4px 0; color: #fff; background: #0a0a0a; border-bottom: 3px solid #222; }
+.sb { display: flex; flex-direction: column; height: 100vh; background: #000; box-sizing: border-box; }
+/* El reloj ocupa la mitad de la pantalla */
+.sb-timer { flex: 0 0 50%; display: flex; align-items: center; justify-content: center; text-align: center;
+            font-size: min(38vh, 30vw); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums;
+            color: #fff; background: #0a0a0a; border-bottom: 3px solid #222; }
+body.has-ads .sb-timer { font-size: min(30vh, 28vw); }
 .sb-timer.warning { color: var(--accent2); }
 .sb-timer.danger { color: var(--red); animation: blink 1s infinite; }
 @keyframes blink { 50% { opacity: .4; } }
-.sb-sides { flex: 1; display: flex; }
+.sb-sides { flex: 1 1 50%; display: flex; min-height: 0; }
 .sb-side { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 12px; }
 .sb-side.red { background: linear-gradient(160deg, #3d1215, #6e1e24); }
 .sb-side.blue { background: linear-gradient(160deg, #10203d, #1e3a6e); }
 .sb-name { font-size: clamp(1.1rem, 3.5vw, 2.2rem); font-weight: 800; color: #fff; text-align: center; }
 .sb-academy { color: rgba(255,255,255,.65); font-size: clamp(.8rem, 2vw, 1.1rem); }
-.sb-points { font-size: clamp(4rem, 18vw, 13rem); font-weight: 900; color: #fff; line-height: 1; font-variant-numeric: tabular-nums; }
+.sb-points { font-size: min(22vh, 16vw); font-weight: 900; color: #fff; line-height: 1; font-variant-numeric: tabular-nums; }
 .sb-extras { display: flex; gap: 26px; color: #fff; font-size: clamp(1rem, 3vw, 1.8rem); font-weight: 700; }
 .sb-extras .adv { color: var(--accent2); }
 .sb-extras .pen { color: #ff8a8e; }
@@ -241,7 +245,10 @@ html[data-theme="light"] .badge.gold { background: #f8efd4; color: #96721a; }
 @keyframes adTicker { from { transform: translateX(0); } to { transform: translateX(calc(-100vw - 100%)); } }
 .ad-out { animation: adOut .4s ease both !important; }
 @keyframes adOut { to { opacity: 0; transform: translateY(14px); } }
-body.has-ads .sb { height: calc(100vh - 84px); }
+/* Cinta superior duplicada (marcador proyectado, por si el proyector recorta) */
+.adsbar.top { top: 0; bottom: auto; border-top: none; border-bottom: 2px solid #c9252c; }
+body.has-ads .sb { height: 100vh; padding-bottom: 84px; }
+body.has-ads.dual-ads .sb { padding-top: 84px; }
 body.has-ads .bare-main, body.has-ads main.container { padding-bottom: 100px; }
 
 /* Certificados list, misc */

@@ -5,9 +5,10 @@
  */
 (function () {
   const ads = window.ADS || [];
-  const bar = document.getElementById('adsbar');
-  if (!ads.length || !bar) return;
+  const bars = document.querySelectorAll('.adsbar');
+  if (!ads.length || !bars.length) return;
   document.body.classList.add('has-ads');
+  if (bars.length > 1) document.body.classList.add('dual-ads');
   let i = -1;
 
   function build(ad) {
@@ -40,13 +41,15 @@
   function next() {
     i = (i + 1) % ads.length;
     const ad = ads[i];
-    const el = build(ad);
-    const old = bar.firstElementChild;
-    if (old) {
-      old.classList.add('ad-out');
-      setTimeout(() => old.remove(), 450);
-    }
-    bar.appendChild(el);
+    bars.forEach((bar) => {
+      const el = build(ad);
+      const old = bar.firstElementChild;
+      if (old) {
+        old.classList.add('ad-out');
+        setTimeout(() => old.remove(), 450);
+      }
+      bar.appendChild(el);
+    });
     setTimeout(next, ad.duration * 1000);
   }
 
