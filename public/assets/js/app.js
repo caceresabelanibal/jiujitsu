@@ -21,3 +21,34 @@ function toggleTheme() {
   document.documentElement.dataset.theme = next;
   localStorage.setItem('theme', next);
 }
+
+// Aparicion al hacer scroll (landing)
+const revealEls = document.querySelectorAll('.reveal');
+if (revealEls.length && 'IntersectionObserver' in window) {
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  revealEls.forEach((el) => io.observe(el));
+} else {
+  revealEls.forEach((el) => el.classList.add('in'));
+}
+
+// Contador animado de estadisticas
+document.querySelectorAll('[data-count]').forEach((el) => {
+  const target = parseInt(el.dataset.count, 10) || 0;
+  if (target < 5) return;
+  const dur = 1200;
+  const t0 = performance.now();
+  el.textContent = '0';
+  function tick(now) {
+    const p = Math.min(1, (now - t0) / dur);
+    el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))).toLocaleString();
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+});

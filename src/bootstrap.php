@@ -20,6 +20,7 @@ require_once __DIR__ . '/certificates.php';
 require_once __DIR__ . '/stats.php';
 require_once __DIR__ . '/ads.php';
 require_once __DIR__ . '/views/icons.php';
+require_once __DIR__ . '/views/illustrations.php';
 require_once __DIR__ . '/views/layout.php';
 require_once __DIR__ . '/views/bracket_render.php';
 
