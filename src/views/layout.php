@@ -18,12 +18,12 @@ function view_header(string $title, bool $bare = false): void {
 })();
 </script>
 <link rel="stylesheet" href="<?= APP_URL ?>/assets/css/app.css">
-<link rel="icon" href="data:image/svg+xml,<text y='0.9em' font-size='90'>🥋</text>">
+<link rel="icon" type="image/svg+xml" href="<?= APP_URL ?>/assets/img/logo.svg">
 </head>
 <body class="<?= $bare ? 'bare' : '' ?>">
 <?php if (!$bare): ?>
 <header class="topnav">
-  <a class="brand" href="<?= APP_URL ?>/">🥋 <?= e($site) ?></a>
+  <a class="brand" href="<?= APP_URL ?>/"><img class="brandlogo" src="<?= APP_URL ?>/assets/img/logo.svg" alt=""> <?= e($site) ?></a>
   <button class="navtoggle" onclick="document.querySelector('.navlinks').classList.toggle('show')">☰</button>
   <nav class="navlinks">
     <a href="<?= APP_URL ?>/rankings"><?= t('nav_rankings') ?></a>
@@ -52,7 +52,7 @@ function view_header(string $title, bool $bare = false): void {
 function view_footer(bool $bare = false): void {
     ?></main>
 <?php if (!$bare): ?>
-<footer class="footer">🥋 BJJ Tournament Manager · <?= date('Y') ?></footer>
+<footer class="footer"><img class="brandlogo" src="<?= APP_URL ?>/assets/img/logo.svg" alt="" style="height:18px;vertical-align:-4px"> <?= e((string)setting('site_name', 'Taninzu')) ?> · taninzu.com · <?= date('Y') ?></footer>
 <?php endif; ?>
 <script src="<?= APP_URL ?>/assets/js/app.js"></script>
 </body>

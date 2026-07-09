@@ -39,4 +39,5 @@ view_header('Scoreboard', true);
 window.SB = { matchId: <?= $mid ?>, apiUrl: '<?= APP_URL ?>/api/match/<?= $mid ?>', isOperator: false, csrf: '' };
 </script>
 <script src="<?= APP_URL ?>/assets/js/scoreboard.js"></script>
-<?php view_footer(true);
+<?php render_ads_bar((int)$m['tournament_id']);
+view_footer(true);

@@ -1,6 +1,6 @@
-# 🥋 BJJ Tournament Manager
+# 🥋 Taninzu — taninzu.com
 
-Plataforma web (desktop + mobile) para torneos de Jiu-Jitsu brasileño: llaves, marcador para árbitros con timer, certificados PDF por mail, rankings y dashboard. Disponible en **español e inglés** (detección automática por navegador).
+Plataforma web (desktop + mobile) para torneos de Jiu-Jitsu brasileño: llaves, marcador para árbitros con timer, certificados PDF por mail, rankings, dashboard y publicidad en pantalla. Disponible en **español e inglés** (detección automática por navegador).
 
 ## Stack
 
@@ -32,7 +32,8 @@ docker compose exec app php scripts/seed_demo.php
 - **Categorías**: infantiles, juveniles, adultos y Master 1–6, femenino y masculino, cinturones IBJJF (adultos e infantiles) y categorías de peso IBJJF — todo en base de datos, editable.
 - **Llaves**: eliminación simple con byes, siembra manual o botón 🎲 aleatorio por división, lucha por el 3er puesto, vista proyector que se auto-refresca.
 - **Marcador/timer**: mesa de operador (puntos 2/3/4, ventajas, penalizaciones, deshacer) + display público a pantalla completa para monitor. El ganador se infiere por puntos→ventajas→penalizaciones o lo define el operador (finalización, decisión, DQ, W.O.).
-- **Certificados PDF** con medalla, cinturón, academia, torneo y cantidad de luchas; se envían por mail a oro/plata/bronce y participación.
+- **Certificados PDF estilo diploma**: letra gótica y caligráfica, patrón de seguridad guilloche con microtexto, cinturón dibujado, sello Taninzu y código de verificación único (HMAC); se envían por mail a oro/plata/bronce y participación.
+- **Publicidad en pantalla**: la admin general carga avisos (imagen/banner o texto) globales o por torneo; rotan en la barra inferior de llaves proyectadas y marcadores con animación configurable (carrusel, fundido, zoom o cinta continua) y tiempo por aviso. Cada torneo elige su modo: generales + propias, solo propias, solo generales o sin publicidad.
 - **Ranking global** por combinación género + cinturón + edad + peso, con puntaje configurable desde el admin.
 - **Dashboard del torneo**: academia ganadora, medallero, más luchas, más minutos en tatami, más finalizador, finalización más rápida, etc.
 - **Panel admin**: usuarios (crear/editar/eliminar), configuración de puntajes, página de schedulers.

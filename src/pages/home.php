@@ -4,7 +4,8 @@ $open = rows('SELECT t.*, (SELECT COUNT(*) FROM registrations r WHERE r.tourname
 view_header(t('nav_home'));
 ?>
 <div class="hero">
-  <h1>🥋 <?= t('hero_title') ?></h1>
+  <img src="<?= APP_URL ?>/assets/img/logo.svg" alt="Taninzu" style="height:96px">
+  <h1><?= t('hero_title') ?></h1>
   <p><?= t('hero_sub') ?></p>
   <a class="btn xl" href="<?= APP_URL ?>/tournaments/create"><?= t('hero_cta') ?></a>
   <div class="features">

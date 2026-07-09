@@ -69,6 +69,7 @@ CREATE TABLE IF NOT EXISTS tournaments (
   default_duration_sec INT NOT NULL DEFAULT 300,
   status ENUM('draft','open','running','finished') NOT NULL DEFAULT 'open',
   certs_requested TINYINT(1) NOT NULL DEFAULT 0,
+  ads_mode ENUM('none','tournament','general','both') NOT NULL DEFAULT 'both',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -205,6 +206,7 @@ CREATE TABLE IF NOT EXISTS certificates (
   tournament_id INT NOT NULL,
   registration_id INT NOT NULL,
   type ENUM('gold','silver','bronze','participation') NOT NULL,
+  code VARCHAR(20) NULL,
   pdf_path VARCHAR(255) NOT NULL,
   emailed_at DATETIME NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -233,6 +235,23 @@ CREATE TABLE IF NOT EXISTS ranking_points (
   FOREIGN KEY (belt_id) REFERENCES belts(id),
   FOREIGN KEY (age_division_id) REFERENCES age_divisions(id),
   FOREIGN KEY (weight_class_id) REFERENCES weight_classes(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Publicidad: banners/textos que rotan en llaves proyectadas y marcadores
+CREATE TABLE IF NOT EXISTS ads (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  scope ENUM('global','tournament') NOT NULL DEFAULT 'global',
+  tournament_id INT NULL,
+  type ENUM('image','text') NOT NULL DEFAULT 'text',
+  title VARCHAR(120) NULL,
+  text_content VARCHAR(500) NULL,
+  image VARCHAR(255) NULL,
+  duration_sec INT NOT NULL DEFAULT 8,          -- tiempo en pantalla
+  animation ENUM('slide','fade','zoom','ticker') NOT NULL DEFAULT 'slide',
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  sort INT NOT NULL DEFAULT 0,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (tournament_id) REFERENCES tournaments(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS cron_log (
@@ -313,4 +332,5 @@ INSERT INTO settings (k, v) VALUES
 ('scoring', '{"takedown":2,"sweep":2,"knee_on_belly":2,"guard_pass":3,"mount":4,"back_control":4}'),
 ('ranking', '{"gold":9,"silver":3,"bronze":1,"win":2,"submission_bonus":1}'),
 ('tournament_weekly_limit', '1'),
-('site_name', 'BJJ Tournament Manager');
+('site_name', 'Taninzu'),
+('ads_default_duration', '8');

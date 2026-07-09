@@ -19,6 +19,7 @@ view_header(t('admin_panel'));
 <div class="flex">
   <a class="btn" href="<?= APP_URL ?>/admin/users">👤 <?= t('users') ?></a>
   <a class="btn" href="<?= APP_URL ?>/admin/settings">⚙️ <?= t('settings') ?></a>
+  <a class="btn" href="<?= APP_URL ?>/admin/ads">📣 <?= t('ads') ?></a>
   <a class="btn" href="<?= APP_URL ?>/admin/scheduler">⏰ <?= t('scheduler') ?></a>
 </div>
 <?php view_footer();

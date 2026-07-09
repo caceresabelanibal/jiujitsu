@@ -59,8 +59,9 @@ main.bare-main { padding: 0; flex: 1; animation: pageIn .32s ease; }
 .themetoggle { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 999px;
                width: 34px; height: 34px; font-size: 1rem; cursor: pointer; transition: all .25s ease; }
 .themetoggle:hover { color: var(--text); border-color: var(--accent); transform: rotate(40deg); }
-.brand { font-weight: 800; font-size: 1.1rem; color: var(--text); }
+.brand { font-weight: 800; font-size: 1.15rem; color: var(--text); letter-spacing: .02em; }
 .brand:hover { text-decoration: none; }
+.brandlogo { height: 28px; vertical-align: -8px; }
 .navlinks { display: flex; gap: 18px; align-items: center; margin-left: auto; flex-wrap: wrap; }
 .navlinks a { color: var(--muted); font-weight: 600; }
 .navlinks a:hover { color: var(--text); text-decoration: none; }
@@ -207,6 +208,28 @@ html[data-theme="light"] .badge.gold { background: #f8efd4; color: #96721a; }
 .op-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
 .op-btns .btn { padding: 12px 8px; font-size: .85rem; }
 .op-avpen { display: flex; gap: 8px; margin-top: 8px; }
+
+/* ===== Publicidad (barra inferior en llaves y marcadores) ===== */
+.adsbar { position: fixed; bottom: 0; left: 0; right: 0; height: 84px; z-index: 40;
+          background: rgba(8, 10, 18, .88); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+          border-top: 2px solid #c9252c; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.adsbar .ad { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 16px; padding: 0 24px; }
+.adsbar img { max-height: 68px; max-width: 60vw; border-radius: 6px; }
+.adsbar .ad-cap { color: #fff; font-weight: 700; font-size: 1.1rem; }
+.adsbar .ad-text { color: #fff; font-weight: 800; font-size: clamp(1.1rem, 2.6vw, 1.7rem); white-space: nowrap; }
+.ad-slide { animation: adSlide .55s cubic-bezier(.2,.8,.25,1) both; }
+@keyframes adSlide { from { transform: translateX(100%); opacity: .2; } to { transform: none; opacity: 1; } }
+.ad-fade { animation: adFade .9s ease both; }
+@keyframes adFade { from { opacity: 0; filter: blur(6px); } to { opacity: 1; filter: none; } }
+.ad-zoom { animation: adZoom .5s cubic-bezier(.2,.8,.3,1.2) both; }
+@keyframes adZoom { from { transform: scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+.ad-ticker { justify-content: flex-start; }
+.ad-ticker .ad-text { position: absolute; left: 100%; animation-name: adTicker; animation-timing-function: linear; animation-fill-mode: both; }
+@keyframes adTicker { from { transform: translateX(0); } to { transform: translateX(calc(-100vw - 100%)); } }
+.ad-out { animation: adOut .4s ease both !important; }
+@keyframes adOut { to { opacity: 0; transform: translateY(14px); } }
+body.has-ads .sb { height: calc(100vh - 84px); }
+body.has-ads .bare-main, body.has-ads main.container { padding-bottom: 100px; }
 
 /* Certificados list, misc */
 .medal-ico { font-size: 1.2rem; }

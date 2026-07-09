@@ -1,6 +1,6 @@
-# BJJ Tournament Manager
+# Taninzu (taninzu.com)
 
-Plataforma de torneos de Jiu-Jitsu: PHP 8.3 puro (sin framework) + MySQL 8 + Docker. UI bilingüe es/en.
+Plataforma de torneos de Jiu-Jitsu: PHP 8.3 puro (sin framework) + MySQL 8 + Docker. UI bilingüe es/en. Logo: cinturón rojo (`public/assets/img/logo.svg`; versión PNG para PDFs se genera con GD en `taninzu_logo_png()`).
 
 ## Arquitectura
 
@@ -14,6 +14,8 @@ Plataforma de torneos de Jiu-Jitsu: PHP 8.3 puro (sin framework) + MySQL 8 + Doc
 - Timer del marcador vive en el servidor (`matches.timer_remaining` + `timer_started_at`); el JS solo interpola. API en `/api/match/{id}`.
 - `/tournament/{id}` es el **centro de operación** ("Ir al torneo": luchas en vivo, próximas, divisiones); la edición vive en `/tournament/{id}/settings`. `require_tournament_owner()` acepta dueño, admin **y personal del torneo** (`tournament_staff`, se agrega por email en Configuración).
 - Tema claro/oscuro por `localStorage` + `data-theme` en `<html>` (script inline en `view_header` evita flash); el scoreboard `.sb` queda siempre oscuro (proyector).
+- **Publicidad**: tabla `ads` (global o por torneo) + `tournaments.ads_mode`; se administra en `/admin/ads`. `render_ads_bar($tid)` (src/ads.php) imprime la barra en `division_view` y `match_display`; `ads.js` rota con animaciones slide/fade/zoom/ticker y duración por aviso.
+- **Certificados**: dompdf con fuentes en `public/assets/fonts` (gótica + caligráfica, OFL), font cache en `storage/fonts`, patrón guilloche y logo generados con GD (cacheados como `storage/certificates/_pattern.png` y `_logo.png` — borrarlos para regenerar), código de verificación HMAC en `certificates.code`.
 
 ## Comandos
 

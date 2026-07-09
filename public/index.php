@@ -33,6 +33,7 @@ $routes = [
     '#^/admin$#'                         => 'admin_home',
     '#^/admin/users$#'                   => 'admin_users',
     '#^/admin/settings$#'                => 'admin_settings',
+    '#^/admin/ads$#'                     => 'admin_ads',
     '#^/admin/scheduler$#'               => 'admin_scheduler',
     '#^/certificate/(\d+)/download$#'    => 'certificate_download',
 ];

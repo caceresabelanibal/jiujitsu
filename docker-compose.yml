@@ -22,8 +22,8 @@ services:
       SMTP_USER: ""
       SMTP_PASS: ""
       SMTP_SECURE: ""
-      MAIL_FROM: torneos@bjjmanager.local
-      MAIL_FROM_NAME: BJJ Tournament Manager
+      MAIL_FROM: torneos@taninzu.com
+      MAIL_FROM_NAME: Taninzu
     depends_on:
       db:
         condition: service_healthy
