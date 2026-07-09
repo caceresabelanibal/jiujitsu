@@ -14,7 +14,7 @@ if (isset($_GET['_fragment'])) {
 
 view_header(division_label($d), true, 'proj');
 ?>
-<script src="<?= APP_URL ?>/assets/js/bracket.js"></script>
+<script src="<?= asset('/assets/js/bracket.js') ?>"></script>
 <div class="proj-page">
   <div class="projector-header">
     <?php if ($t['logo']): ?><img class="tlogo" src="<?= APP_URL . '/' . e($t['logo']) ?>" alt=""><?php endif; ?>

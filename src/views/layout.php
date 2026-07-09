@@ -17,7 +17,7 @@ function view_header(string $title, bool $bare = false, string $bodyClass = ''):
   document.documentElement.dataset.theme = t;
 })();
 </script>
-<link rel="stylesheet" href="<?= APP_URL ?>/assets/css/app.css">
+<link rel="stylesheet" href="<?= asset('/assets/css/app.css') ?>">
 <link rel="icon" type="image/svg+xml" href="<?= APP_URL ?>/assets/img/logo.svg">
 </head>
 <body class="<?= trim(($bare ? 'bare' : '') . ' ' . $bodyClass) ?>">
@@ -55,7 +55,7 @@ function view_footer(bool $bare = false): void {
 <?php if (!$bare): ?>
 <footer class="footer"><img class="brandlogo" src="<?= APP_URL ?>/assets/img/logo.svg" alt="" style="height:18px;vertical-align:-4px"> <?= e((string)setting('site_name', 'Taninzu')) ?> · taninzu.com · <?= date('Y') ?></footer>
 <?php endif; ?>
-<script src="<?= APP_URL ?>/assets/js/app.js"></script>
+<script src="<?= asset('/assets/js/app.js') ?>"></script>
 </body>
 </html><?php
 }

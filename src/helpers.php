@@ -3,6 +3,18 @@ function e(?string $s): string {
     return htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
 }
 
+/**
+ * URL de un asset estatico (css/js) con cache-busting: le agrega
+ * ?v=<fecha de modificacion> para que el navegador (sobre todo en celulares,
+ * que cachean bastante mas agresivo) baje la version nueva apenas se
+ * modifica el archivo, sin depender de que el usuario borre cache a mano.
+ */
+function asset(string $path): string {
+    $file = BASE_PATH . '/public' . $path;
+    $v = file_exists($file) ? filemtime($file) : time();
+    return APP_URL . $path . '?v=' . $v;
+}
+
 function redirect(string $path): never {
     header('Location: ' . (str_starts_with($path, 'http') ? $path : APP_URL . $path));
     exit;

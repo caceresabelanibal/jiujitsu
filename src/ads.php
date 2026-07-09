@@ -36,5 +36,5 @@ function render_ads_bar(int $tournamentId, bool $double = false): void {
     if ($double) echo '<div class="adsbar top"></div>';
     echo '<div class="adsbar"></div>';
     echo '<script>window.ADS = ' . json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) . ';</script>';
-    echo '<script src="' . APP_URL . '/assets/js/ads.js"></script>';
+    echo '<script src="' . asset('/assets/js/ads.js') . '"></script>';
 }

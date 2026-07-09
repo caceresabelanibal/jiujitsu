@@ -89,5 +89,5 @@ window.SB = {
   reopenBlocked: '<?= e(t('reopen_blocked')) ?>'
 };
 </script>
-<script src="<?= APP_URL ?>/assets/js/scoreboard.js"></script>
+<script src="<?= asset('/assets/js/scoreboard.js') ?>"></script>
 <?php view_footer();
