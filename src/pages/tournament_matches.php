@@ -42,6 +42,8 @@ view_header(t('matches'));
     <td class="right" style="white-space:nowrap">
       <?php if ($m['status'] !== 'done'): ?>
       <a class="btn sm" href="<?= APP_URL ?>/match/<?= $m['id'] ?>/operator"><?= icon('timer', 14) ?> <?= t('operator') ?></a>
+      <?php else: ?>
+      <a class="btn sm secondary" href="<?= APP_URL ?>/match/<?= $m['id'] ?>/operator" title="<?= t('edit_result') ?>"><?= icon('edit', 14) ?> <?= t('edit_result') ?></a>
       <?php endif; ?>
       <a class="btn sm secondary" href="<?= APP_URL ?>/match/<?= $m['id'] ?>/display" target="_blank"><?= icon('screen', 14) ?></a>
     </td>

@@ -80,11 +80,18 @@ function render_bracket_match(array $m, bool $manage, bool $isBronze = false): v
         if ($isWinner) echo ' ' . icon('trophy', 13, 'ic-gold');
         echo '</div>';
     }
-    if ($manage && $m['red_reg_id'] && $m['blue_reg_id'] && $m['status'] !== 'done') {
-        echo '<a class="mlink" href="' . APP_URL . '/match/' . $m['id'] . '/operator">' . icon('timer', 12) . ' ' . t('operator') . '</a>';
-    }
-    if ($m['status'] === 'done' && $m['method'] && $m['method'] !== 'wo') {
-        echo '<a class="mlink muted">' . e(t($m['method'] === 'points' ? 'by_points' : $m['method'])) . '</a>';
+    $methodLabel = ($m['status'] === 'done' && $m['method'] && $m['method'] !== 'wo')
+        ? e(t($m['method'] === 'points' ? 'by_points' : $m['method'])) : null;
+    if ($manage && $m['red_reg_id'] && $m['blue_reg_id']) {
+        if ($m['status'] !== 'done') {
+            echo '<a class="mlink" href="' . APP_URL . '/match/' . $m['id'] . '/operator">' . icon('timer', 12) . ' ' . t('operator') . '</a>';
+        } else {
+            // Lucha ya cerrada: se puede volver a entrar a corregir el resultado.
+            echo '<a class="mlink" href="' . APP_URL . '/match/' . $m['id'] . '/operator" title="' . t('edit_result') . '">'
+                . icon('edit', 12) . ' ' . ($methodLabel ?? t('edit_result')) . '</a>';
+        }
+    } elseif ($methodLabel) {
+        echo '<a class="mlink muted">' . $methodLabel . '</a>';
     }
     echo '</div>';
 }
