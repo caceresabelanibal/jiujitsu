@@ -58,7 +58,10 @@ function stat_tile(string $label, ?array $data, string $valueKey, string $suffix
   <div class="table-wrap"><table>
     <tr><th>#</th><th><?= t('academy') ?></th><th><?= icon('award', 13, 'ic-gold') ?> <?= t('gold') ?></th><th><?= icon('award', 13, 'ic-silver') ?> <?= t('silver') ?></th><th><?= icon('award', 13, 'ic-bronze') ?> <?= t('bronze') ?></th></tr>
     <?php foreach ($s['medals_by_academy'] as $i => $a): ?>
-    <tr><td><?= $i + 1 ?></td><td><b><?= e($a['name']) ?></b></td><td><?= (int)$a['gold'] ?></td><td><?= (int)$a['silver'] ?></td><td><?= (int)$a['bronze'] ?></td></tr>
+    <tr><td><?= $i + 1 ?></td><td><b><?= e($a['name']) ?></b></td>
+      <td data-label="<?= t('gold') ?>"><?= (int)$a['gold'] ?></td>
+      <td data-label="<?= t('silver') ?>"><?= (int)$a['silver'] ?></td>
+      <td data-label="<?= t('bronze') ?>"><?= (int)$a['bronze'] ?></td></tr>
     <?php endforeach; ?>
   </table></div>
 </div>

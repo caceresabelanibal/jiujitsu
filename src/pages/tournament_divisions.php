@@ -39,8 +39,8 @@ view_header(t('divisions'));
     <td><?= e($isEn ? $d['a_en'] : $d['a_es']) ?></td>
     <td><span class="belt-chip" style="background:<?= e($d['color_hex']) ?>"></span><?= e($isEn ? $d['b_en'] : $d['b_es']) ?></td>
     <td><?= e($isEn ? $d['w_en'] : $d['w_es']) ?></td>
-    <td><b><?= $n ?></b></td>
-    <td><?= fmt_time((int)$d['duration_sec']) ?></td>
+    <td data-label="<?= t('competitors') ?>"><b><?= $n ?></b></td>
+    <td data-label="<?= t('duration') ?>"><?= fmt_time((int)$d['duration_sec']) ?></td>
     <td><span class="badge <?= ['pending'=>'grey','bracketed'=>'blue','done'=>'gold'][$d['status']] ?>"><?= $d['has_bracket'] ? ($d['status'] === 'done' ? t('done') : t('bracket')) : t('pending') ?></span></td>
     <td class="right">
       <a class="btn sm" href="<?= APP_URL ?>/division/<?= $d['id'] ?>"><?= icon('bracket', 13) ?> <?= t('bracket') ?></a>
