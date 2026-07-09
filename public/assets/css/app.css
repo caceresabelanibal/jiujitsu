@@ -105,6 +105,12 @@ main.bare-main { padding: 0; flex: 1; animation: pageIn .32s ease; }
 .grid.cols2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
 .grid.cols3 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 .grid.cols4 { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+@media (max-width: 480px) {
+  /* En pantallas muy angostas, auto-fit puede terminar armando columnas mas
+     chicas que su propio minimo (ej. dos de ~170px con minmax 220px), lo que
+     desborda el contenido de cada tarjeta. Se fuerza una sola columna. */
+  .grid.cols2, .grid.cols3, .grid.cols4 { grid-template-columns: 1fr; }
+}
 
 /* Forms */
 label { display: block; margin: 10px 0 4px; color: var(--muted); font-size: .9rem; font-weight: 600; }
@@ -139,6 +145,15 @@ th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--bor
 th { color: var(--muted); text-transform: uppercase; font-size: .75rem; letter-spacing: .06em; }
 tr:hover td { background: rgba(255,255,255,.02); }
 
+/* Mobile: tablas anchas -> filas apiladas como tarjetas (evita el scroll horizontal forzado) */
+@media (max-width: 680px) {
+  .table-wrap table, .table-wrap tbody, .table-wrap tr, .table-wrap td { display: block; width: 100%; }
+  .table-wrap table tr:has(th) { display: none; } /* la fila de encabezado no aporta apilada */
+  .table-wrap tr { border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; margin-bottom: 10px; background: var(--card2); }
+  .table-wrap tr:hover td { background: none; }
+  .table-wrap td { border: none; padding: 5px 0; text-align: left; white-space: normal !important; }
+}
+
 /* Badges */
 .badge { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: .75rem; font-weight: 700; }
 .badge.green { background: #143c2b; color: #7ee2b0; }
@@ -153,10 +168,15 @@ html[data-theme="light"] .badge.gold { background: #f8efd4; color: #96721a; }
 .belt-chip { display: inline-block; width: 34px; height: 12px; border-radius: 3px; border: 1px solid #000; vertical-align: middle; margin-right: 6px; }
 
 /* Tabs */
-.tabs { display: flex; gap: 4px; margin: 14px 0 20px; border-bottom: 1px solid var(--border); overflow-x: auto; }
+.tabs { display: flex; gap: 4px; margin: 14px 0 20px; border-bottom: 1px solid var(--border); overflow-x: auto;
+        -webkit-mask-image: linear-gradient(to right, #000 94%, transparent 100%);
+        mask-image: linear-gradient(to right, #000 94%, transparent 100%); }
 .tab { padding: 9px 16px; color: var(--muted); font-weight: 700; border-radius: 8px 8px 0 0; white-space: nowrap; transition: color .2s ease, background .2s ease; }
 .tab.active { background: var(--card); color: var(--text); border: 1px solid var(--border); border-bottom-color: var(--card); }
 .tab:hover { text-decoration: none; color: var(--text); background: color-mix(in srgb, var(--card) 55%, transparent); }
+@media (max-width: 680px) {
+  .tab { padding: 8px 12px; font-size: .85rem; }
+}
 
 /* ===== Landing ===== */
 .landing { position: relative; }

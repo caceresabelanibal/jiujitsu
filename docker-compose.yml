@@ -14,7 +14,7 @@ services:
       DB_NAME: bjj
       DB_USER: bjj
       DB_PASS: bjjsecret
-      APP_URL: http://localhost:8080
+      # APP_URL: https://taninzu.com   # fijar solo en produccion; en dev se autodetecta por request (localhost, IP de LAN, etc.)
       APP_ENV: dev
       CRON_KEY: changeme-cron-key
       SMTP_HOST: mailhog

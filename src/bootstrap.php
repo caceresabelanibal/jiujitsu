@@ -2,8 +2,28 @@
 declare(strict_types=1);
 
 define('BASE_PATH', dirname(__DIR__));
-define('APP_URL', rtrim(getenv('APP_URL') ?: 'http://localhost:8080', '/'));
+define('APP_URL', resolve_app_url());
 define('CRON_KEY', getenv('CRON_KEY') ?: 'changeme-cron-key');
+
+/**
+ * URL base de la app. Si APP_URL esta seteada por env (produccion, ej.
+ * https://taninzu.com) se usa esa; si no, se detecta del host real de
+ * cada request (asi funciona igual desde localhost, una IP de LAN, etc.
+ * sin que los links/redirects queden pegados a un dominio fijo).
+ * En CLI (scripts, seeders) no hay request, se cae al valor por defecto.
+ */
+function resolve_app_url(): string {
+    $env = getenv('APP_URL');
+    if ($env) {
+        return rtrim($env, '/');
+    }
+    if (PHP_SAPI !== 'cli' && !empty($_SERVER['HTTP_HOST'])) {
+        $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+              || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+        return ($https ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'];
+    }
+    return 'http://localhost:8080';
+}
 
 if (file_exists(BASE_PATH . '/vendor/autoload.php')) {
     require_once BASE_PATH . '/vendor/autoload.php';
