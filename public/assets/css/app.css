@@ -268,6 +268,11 @@ html[data-theme="light"] .art-fighters.tint-mono { opacity: .38; }
    sin scroll vertical; 1 = tamaño normal. Se aplica en #bracket-region asi
    cascada tanto a .bracket como al podio. */
 /* Fondo tipo tatami: grilla muy sutil de costuras */
+/* Fila: llave (flexible, scrollea horizontal si hace falta) + podio a la
+   derecha (si la division ya termino) — asi el podio no suma alto extra
+   y no reactiva el scroll vertical de la vista proyector. */
+.bracket-layout { display: flex; align-items: stretch; gap: calc(20px * var(--bz, 1)); min-height: 0; }
+.bracket-layout .bracket-scroll { flex: 1 1 auto; min-width: 0; }
 .bracket-scroll { overflow-x: auto; overflow-y: hidden; border-radius: 20px;
   padding: calc(22px * var(--bz, 1)) calc(16px * var(--bz, 1)) calc(26px * var(--bz, 1));
   background-color: color-mix(in srgb, var(--bg2) 60%, transparent);
@@ -302,15 +307,19 @@ html[data-theme="light"] .art-fighters.tint-mono { opacity: .38; }
 .b-match.b-bronze { border-left-color: var(--bronze); }
 .b-bronze-label { background: none; border: none; box-shadow: none; text-align: center; margin-bottom: -8px; }
 .b-bronze-label h5 { margin: 0; padding: 4px 10px; color: var(--bronze); font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; font-weight: 800; }
-.podium { display: flex; justify-content: center; flex-wrap: wrap;
-  gap: calc(18px * var(--bz, 1)); margin: calc(28px * var(--bz, 1)) 0 calc(6px * var(--bz, 1)); }
-.podium .p { text-align: center; background: linear-gradient(160deg, var(--card), color-mix(in srgb, var(--card) 82%, black 8%));
+.podium-side { flex: 0 0 auto; display: flex; flex-direction: column; justify-content: center;
+  gap: calc(14px * var(--bz, 1)); min-width: calc(180px * var(--bz, 1)); }
+.podium-side .p { text-align: center; background: linear-gradient(160deg, var(--card), color-mix(in srgb, var(--card) 82%, black 8%));
   border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,.28);
-  padding: calc(20px * var(--bz, 1)) calc(28px * var(--bz, 1)); min-width: calc(165px * var(--bz, 1)); }
-.podium .p .medal { margin-bottom: 4px; }
-.podium .p.g { border-color: var(--gold); box-shadow: 0 4px 22px rgba(212,175,55,.25); }
-.podium .p.s { border-color: var(--silver); }
-.podium .p.b { border-color: var(--bronze); }
+  padding: calc(16px * var(--bz, 1)) calc(20px * var(--bz, 1)); }
+.podium-side .p .medal { margin-bottom: 4px; }
+.podium-side .p.g { border-color: var(--gold); box-shadow: 0 4px 22px rgba(212,175,55,.25); }
+.podium-side .p.s { border-color: var(--silver); }
+.podium-side .p.b { border-color: var(--bronze); }
+@media (max-width: 900px) {
+  .bracket-layout { flex-direction: column; }
+  .podium-side { flex-direction: row; flex-wrap: wrap; justify-content: center; min-width: 0; }
+}
 
 /* Vista proyector de llaves: todo encaja en el viewport, solo la llave scrollea internamente */
 body.proj { height: 100vh; overflow: hidden; }

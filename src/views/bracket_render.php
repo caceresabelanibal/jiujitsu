@@ -27,6 +27,9 @@ function render_bracket(int $divisionId, bool $manage = false): void {
         $maxRound = max($maxRound, (int)$m['round']);
     }
 
+    [$g, $s, $b] = division_podium($divisionId);
+
+    echo '<div class="bracket-layout">';
     echo '<div class="bracket-scroll"><div class="bracket" id="bracket-svg-root">';
     echo '<svg class="bracket-lines" id="bracket-lines"></svg>';
     $ri = 0;
@@ -44,18 +47,20 @@ function render_bracket(int $divisionId, bool $manage = false): void {
         $ri++;
     }
     echo '</div></div>';
-    echo '<script>if (window.fitBracket) fitBracket();</script>';
 
-    [$g, $s, $b] = division_podium($divisionId);
+    // Podio a la derecha (no debajo) para no sumar alto y forzar scroll
+    // cuando la division termina.
     if ($g) {
-        echo '<div class="podium">';
+        echo '<div class="podium-side">';
         foreach ([['g', 'ic-gold', t('champion'), $g], ['s', 'ic-silver', t('second_place'), $s], ['b', 'ic-bronze', t('third_place'), $b]] as [$cls, $medalCls, $label, $regId]) {
             if (!$regId) continue;
             $reg = row('SELECT r.name, a.name academy FROM registrations r LEFT JOIN tournament_academies a ON a.id=r.academy_id WHERE r.id=?', [$regId]);
-            echo '<div class="p ' . $cls . '"><div class="medal">' . icon('award', 30, $medalCls) . '</div><b>' . e($reg['name']) . '</b><br><small class="muted">' . e($reg['academy'] ?? '') . '</small><br><small>' . e($label) . '</small></div>';
+            echo '<div class="p ' . $cls . '"><div class="medal">' . icon('award', 26, $medalCls) . '</div><b>' . e($reg['name']) . '</b><br><small class="muted">' . e($reg['academy'] ?? '') . '</small><br><small>' . e($label) . '</small></div>';
         }
         echo '</div>';
     }
+    echo '</div>';
+    echo '<script>if (window.fitBracket) fitBracket();</script>';
 }
 
 function render_bracket_match(array $m, bool $manage, bool $isBronze = false): void {
