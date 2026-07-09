@@ -7,6 +7,7 @@
   const S = window.SB;
   let state = null;
   let lastSync = 0;
+  let wbarVisible = false;
 
   function fmt(sec) {
     sec = Math.max(0, Math.round(sec));
@@ -38,11 +39,20 @@
     }
     const wbar = document.querySelector('[data-sb="winnerbar"]');
     if (wbar) {
-      if (state.status === 'done' && state.winner_name) {
+      const shouldShow = state.status === 'done' && !!state.winner_name;
+      if (shouldShow) {
         wbar.style.display = '';
         wbar.textContent = wbar.dataset.label + ': ' + state.winner_name + (state.method_label ? ' (' + state.method_label + ')' : '');
       } else {
         wbar.style.display = 'none';
+      }
+      // Reservamos su alto real en --wbar-h para que el timer/puntos se
+      // reajusten y no quede nada tapado cuando aparece.
+      if (shouldShow !== wbarVisible) {
+        wbarVisible = shouldShow;
+        requestAnimationFrame(() => {
+          document.documentElement.style.setProperty('--wbar-h', (shouldShow ? wbar.getBoundingClientRect().height : 0) + 'px');
+        });
       }
     }
     document.querySelectorAll('[data-sb="startbtn"]').forEach((el) => {

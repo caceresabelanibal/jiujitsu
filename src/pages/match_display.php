@@ -9,7 +9,7 @@ $m = row('SELECT m.*, r1.name red_name, r2.name blue_name, a1.name red_academy, 
           WHERE m.id = ?', [(int)$params[0]]);
 if (!$m) { http_response_code(404); exit('Not found'); }
 $mid = (int)$m['id'];
-view_header('Scoreboard', true);
+view_header('Scoreboard', true, 'sbpage');
 ?>
 <div class="sb">
   <div class="sb-timer" data-sb="timer"><?= fmt_time((int)$m['timer_remaining']) ?></div>

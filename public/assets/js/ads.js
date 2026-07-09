@@ -9,6 +9,10 @@
   if (!ads.length || !bars.length) return;
   document.body.classList.add('has-ads');
   if (bars.length > 1) document.body.classList.add('dual-ads');
+  // Alto real ocupado por las cintas, para que el timer/marcador (que usa
+  // vh) pueda restarlo con calc() en vez de desbordar la pantalla.
+  const adsSpace = bars[0].getBoundingClientRect().height * bars.length;
+  document.documentElement.style.setProperty('--ads-h', adsSpace + 'px');
   let i = -1;
 
   function build(ad) {
