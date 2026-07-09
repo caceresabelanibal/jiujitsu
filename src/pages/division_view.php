@@ -15,5 +15,5 @@ view_header(division_label($d), true);
 <div style="padding:0 24px 24px">
   <?php render_bracket((int)$d['id']); ?>
 </div>
-<?php render_ads_bar((int)$t['id']);
+<?php render_ads_bar((int)$t['id'], true);
 view_footer(true);

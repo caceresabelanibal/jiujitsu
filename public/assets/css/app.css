@@ -350,6 +350,7 @@ body.has-ads .sb-timer { font-size: min(30vh, 28vw); }
 body.has-ads .sb { height: 100vh; padding-bottom: 84px; }
 body.has-ads.dual-ads .sb { padding-top: 84px; }
 body.has-ads .bare-main, body.has-ads main.container { padding-bottom: 100px; }
+body.has-ads.dual-ads .bare-main { padding-top: 90px; }
 
 /* Certificados list, misc */
 .medal-ico { font-size: 1.2rem; }
