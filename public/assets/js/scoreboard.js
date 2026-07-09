@@ -77,10 +77,15 @@
     if (side) body.set('side', side);
     if (type) body.set('type', type);
     const r = await fetch(S.apiUrl, { method: 'POST', body });
-    state = await r.json();
+    const data = await r.json();
+    if (data.error === 'downstream_started') {
+      alert(S.reopenBlocked || 'No se puede editar: la siguiente lucha ya avanzó.');
+      return;
+    }
+    state = data;
     lastSync = Date.now();
     render();
-    if (state.status === 'done' && action === 'end') location.reload();
+    if ((state.status === 'done' && action === 'end') || action === 'reopen') location.reload();
   };
 
   window.sbToggleTimer = function () {

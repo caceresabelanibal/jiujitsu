@@ -35,9 +35,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 // POST: solo dueno del torneo o admin
 $t = require_tournament_owner((int)$m['tournament_id']);
 if (($_POST['csrf'] ?? '') !== ($_SESSION['csrf'] ?? null)) json_out(['error' => 'csrf'], 419);
-if ($m['status'] === 'done') json_out(match_state($m));
-
 $action = $_POST['action'] ?? '';
+if ($m['status'] === 'done' && $action !== 'reopen') json_out(match_state($m));
+
 $side = ($_POST['side'] ?? '') === 'blue' ? 'blue' : 'red';
 $scoring = setting('scoring', ['takedown' => 2, 'sweep' => 2, 'knee_on_belly' => 2, 'guard_pass' => 3, 'mount' => 4, 'back_control' => 4]);
 
@@ -118,6 +118,32 @@ switch ($action) {
             [$winnerReg, $method, $remaining, $elapsed, $mid]);
         advance_winner($mid);
         propagate_byes((int)$m['division_id']);
+        break;
+
+    case 'reopen':
+        if ($m['status'] !== 'done') break;
+        // Seguridad: no reabrir si el ganador (o el perdedor, via bronce) ya
+        // avanzo a una lucha que empezo o termino - ahi habria que corregir
+        // esa lucha primero.
+        $nextBusy = $m['next_match_id']
+            ? (scalar('SELECT status FROM matches WHERE id = ?', [$m['next_match_id']]) !== 'pending') : false;
+        $bronzeBusy = $m['bronze_match_id']
+            ? (scalar('SELECT status FROM matches WHERE id = ?', [$m['bronze_match_id']]) !== 'pending') : false;
+        if ($nextBusy || $bronzeBusy) {
+            json_out(['error' => 'downstream_started', 'state' => match_state($m)], 422);
+        }
+        // Limpia el avance previo; se vuelve a completar al re-cerrar la lucha.
+        if ($m['next_match_id']) {
+            $col = $m['next_slot'] === 'red' ? 'red_reg_id' : 'blue_reg_id';
+            q("UPDATE matches SET $col = NULL WHERE id = ?", [$m['next_match_id']]);
+        }
+        if ($m['bronze_match_id']) {
+            $col = $m['bronze_slot'] === 'red' ? 'red_reg_id' : 'blue_reg_id';
+            q("UPDATE matches SET $col = NULL WHERE id = ?", [$m['bronze_match_id']]);
+        }
+        q('UPDATE matches SET status = "live", winner_reg_id = NULL, method = NULL WHERE id = ?', [$mid]);
+        q('INSERT INTO match_events (match_id, type) VALUES (?, "reopen")', [$mid]);
+        check_division_done((int)$m['division_id']);
         break;
 }
 

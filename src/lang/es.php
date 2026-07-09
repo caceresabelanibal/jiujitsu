@@ -104,6 +104,9 @@ return [
     'by_points' => 'Por puntos', 'takedown' => 'Derribo', 'sweep' => 'Raspaje', 'knee_on_belly' => 'Rodilla en panza',
     'guard_pass' => 'Pasaje de guardia', 'mount' => 'Montada', 'back_control' => 'Control de espalda',
     'undo' => 'Deshacer', 'open_display' => 'Abrir marcador', 'match_ended' => 'Lucha finalizada.',
+    'edit_result' => 'Editar resultado',
+    'confirm_reopen' => '¿Reabrir esta lucha para corregir el resultado? Vas a poder elegir el ganador y el método de nuevo.',
+    'reopen_blocked' => 'No se puede editar: la siguiente lucha (o la de bronce) ya empezó o terminó. Corregí esa lucha primero.',
     'select_winner' => 'Seleccioná el ganador', 'method' => 'Método', 'vs' => 'vs',
     'match' => 'Lucha', 'matches' => 'Luchas', 'live' => 'EN VIVO', 'done' => 'Terminada',
 

@@ -104,6 +104,9 @@ return [
     'by_points' => 'By points', 'takedown' => 'Takedown', 'sweep' => 'Sweep', 'knee_on_belly' => 'Knee on belly',
     'guard_pass' => 'Guard pass', 'mount' => 'Mount', 'back_control' => 'Back control',
     'undo' => 'Undo', 'open_display' => 'Open scoreboard', 'match_ended' => 'Match ended.',
+    'edit_result' => 'Edit result',
+    'confirm_reopen' => 'Reopen this match to correct the result? You will be able to pick the winner and method again.',
+    'reopen_blocked' => 'Cannot edit: the next match (or the bronze match) already started or finished. Fix that one first.',
     'select_winner' => 'Select the winner', 'method' => 'Method', 'vs' => 'vs',
     'match' => 'Match', 'matches' => 'Matches', 'live' => 'LIVE', 'done' => 'Done',
 

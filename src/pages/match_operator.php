@@ -74,6 +74,9 @@ view_header(t('score_operator'));
   </div>
   <?php else: ?>
   <div class="flash flash-success mt"><?= t('match_ended') ?></div>
+  <?php if ($m['red_reg_id'] && $m['blue_reg_id']): ?>
+  <button class="btn secondary mt" onclick="if(confirm(window.SB.confirmReopen)) sbAction('reopen')"><?= icon('edit', 15) ?> <?= t('edit_result') ?></button>
+  <?php endif; ?>
   <?php endif; ?>
 </div>
 <script>
@@ -81,7 +84,9 @@ window.SB = {
   matchId: <?= $mid ?>,
   apiUrl: '<?= APP_URL ?>/api/match/<?= $mid ?>',
   isOperator: true,
-  csrf: '<?= e($_SESSION['csrf']) ?>'
+  csrf: '<?= e($_SESSION['csrf']) ?>',
+  confirmReopen: '<?= e(t('confirm_reopen')) ?>',
+  reopenBlocked: '<?= e(t('reopen_blocked')) ?>'
 };
 </script>
 <script src="<?= APP_URL ?>/assets/js/scoreboard.js"></script>
