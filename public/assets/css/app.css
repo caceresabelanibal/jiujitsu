@@ -202,8 +202,6 @@ html[data-theme="light"] .blob.b3 { opacity: .12; }
 .grad2 { background: linear-gradient(92deg, #e03a41, #ffb347);
          -webkit-background-clip: text; background-clip: text; color: transparent; display: inline-block; }
 
-.pill { display: inline-block; padding: 6px 16px; border-radius: 999px; font-weight: 700; font-size: .85rem;
-        border: 1px solid var(--border); background: color-mix(in srgb, var(--card) 70%, transparent); margin-bottom: 18px; }
 .btn.glow { box-shadow: 0 0 26px rgba(201, 37, 44, .45); background: linear-gradient(120deg, #c9252c, #e03a41); }
 .btn.glow:hover { box-shadow: 0 0 38px rgba(201, 37, 44, .65); }
 

@@ -17,7 +17,6 @@ view_header(t('nav_home'));
   <!-- HERO -->
   <section class="hero2">
     <div class="hero2-text">
-      <span class="pill"><img src="<?= asset('/assets/img/logo.png') ?>" alt="" style="height:24px;vertical-align:-7px"> Taninzu · Brazilian Jiu-Jitsu</span>
       <h1 class="grad"><?= t('hero_title') ?></h1>
       <p class="lead"><?= t('hero_sub') ?></p>
       <div class="flex" style="gap:14px">
