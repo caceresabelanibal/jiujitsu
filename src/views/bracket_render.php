@@ -44,7 +44,7 @@ function render_bracket(int $divisionId, bool $manage = false): void {
         $ri++;
     }
     echo '</div></div>';
-    echo '<script>if (window.drawBracketLines) drawBracketLines();</script>';
+    echo '<script>if (window.fitBracket) fitBracket();</script>';
 
     [$g, $s, $b] = division_podium($divisionId);
     if ($g) {

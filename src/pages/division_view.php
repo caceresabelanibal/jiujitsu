@@ -32,7 +32,7 @@ view_header(division_label($d), true, 'proj');
     try {
       const html = await (await fetch(location.pathname + '?_fragment=1')).text();
       region.innerHTML = html;
-      if (window.drawBracketLines) drawBracketLines();
+      if (window.fitBracket) fitBracket();
     } catch (e) { /* reintenta en el proximo ciclo */ }
   }
   setInterval(refresh, 15000);

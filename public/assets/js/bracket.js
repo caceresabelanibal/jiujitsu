@@ -1,9 +1,25 @@
 /**
- * Dibuja las lineas de conexion entre partidos de una llave con SVG,
- * midiendo la posicion real de cada tarjeta (no depende de alturas fijas,
- * asi funciona con cualquier cantidad de rondas/partidos y contenido variable).
+ * Ajusta el tamaño de la llave para que entre sin scroll vertical
+ * (variable CSS --bz en #bracket-region, usada por app.css via calc()) y
+ * dibuja las lineas de conexion entre partidos con SVG, midiendo la
+ * posicion real de cada tarjeta (no depende de alturas fijas, asi funciona
+ * con cualquier cantidad de rondas/partidos y contenido variable).
  */
-function drawBracketLines() {
+function fitBracket() {
+  const region = document.getElementById('bracket-region');
+  if (!region) { drawBracketLines(1); return; }
+
+  region.style.setProperty('--bz', 1);
+  const available = region.clientHeight;
+  const natural = region.scrollHeight;
+  let factor = available > 0 && natural > available ? available / natural : 1;
+  factor = Math.max(0.55, Math.min(1, factor));
+  region.style.setProperty('--bz', factor);
+  drawBracketLines(factor);
+}
+
+function drawBracketLines(zoom) {
+  zoom = zoom || 1;
   const root = document.getElementById('bracket-svg-root');
   const svg = document.getElementById('bracket-lines');
   if (!root || !svg) return;
@@ -33,7 +49,8 @@ function drawBracketLines() {
     const a = rectOf(fromEl);
     const b = rectOf(toEl);
     const midX = a.right + (b.left - a.right) / 2;
-    const radius = Math.min(14, Math.abs(b.midY - a.midY) / 2 || 14);
+    const maxRadius = Math.max(5, 14 * zoom);
+    const radius = Math.min(maxRadius, Math.abs(b.midY - a.midY) / 2 || maxRadius);
     const dir = b.midY > a.midY ? 1 : b.midY < a.midY ? -1 : 0;
     let d;
     if (dir === 0) {
@@ -49,6 +66,7 @@ function drawBracketLines() {
     path.setAttribute('d', d);
     path.setAttribute('class', 'bracket-line' + (bronze ? ' bracket-line-bronze' : ''));
     path.setAttribute('stroke', color);
+    path.setAttribute('stroke-width', Math.max(1.5, 2.5 * zoom));
     svg.appendChild(path);
   }
 
@@ -61,5 +79,6 @@ function drawBracketLines() {
 }
 
 window.drawBracketLines = drawBracketLines;
-window.addEventListener('resize', () => { clearTimeout(window._brT); window._brT = setTimeout(drawBracketLines, 150); });
-window.addEventListener('load', drawBracketLines);
+window.fitBracket = fitBracket;
+window.addEventListener('resize', () => { clearTimeout(window._brT); window._brT = setTimeout(fitBracket, 150); });
+window.addEventListener('load', fitBracket);

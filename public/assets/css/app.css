@@ -264,27 +264,36 @@ html[data-theme="light"] .art-fighters.tint-mono { opacity: .38; }
 .stat .sub { color: var(--muted); font-size: .85rem; }
 
 /* ===== Bracket ===== */
+/* --bz: factor de ajuste automatico (bracket.js) para que la llave entre
+   sin scroll vertical; 1 = tamaño normal. Se aplica en #bracket-region asi
+   cascada tanto a .bracket como al podio. */
 /* Fondo tipo tatami: grilla muy sutil de costuras */
-.bracket-scroll { overflow-x: auto; overflow-y: hidden; padding: 22px 16px 26px; border-radius: 20px;
+.bracket-scroll { overflow-x: auto; overflow-y: hidden; border-radius: 20px;
+  padding: calc(22px * var(--bz, 1)) calc(16px * var(--bz, 1)) calc(26px * var(--bz, 1));
   background-color: color-mix(in srgb, var(--bg2) 60%, transparent);
   background-image:
     repeating-linear-gradient(0deg, color-mix(in srgb, var(--text) 5%, transparent) 0 1px, transparent 1px 44px),
     repeating-linear-gradient(90deg, color-mix(in srgb, var(--text) 5%, transparent) 0 1px, transparent 1px 44px); }
-.bracket { position: relative; display: flex; gap: 60px; align-items: stretch; min-width: fit-content; padding: 6px 30px; }
+.bracket { position: relative; display: flex; align-items: stretch; min-width: fit-content;
+  gap: calc(60px * var(--bz, 1)); padding: calc(6px * var(--bz, 1)) calc(30px * var(--bz, 1)); }
 .bracket-lines { position: absolute; top: 0; left: 0; z-index: 0; pointer-events: none; overflow: visible; }
 .bracket-line { fill: none; stroke-width: 2.5px; opacity: .8; stroke-linecap: round; }
-.b-round { position: relative; z-index: 1; display: flex; flex-direction: column; justify-content: space-around; gap: 24px; min-width: 240px; }
-.b-round h4 { text-align: center; color: var(--accent, var(--muted)); margin: 0 0 6px; text-transform: uppercase; font-size: .78rem; letter-spacing: .1em; font-weight: 800; }
+.b-round { position: relative; z-index: 1; display: flex; flex-direction: column; justify-content: space-around;
+  gap: calc(24px * var(--bz, 1)); min-width: calc(240px * var(--bz, 1)); }
+.b-round h4 { text-align: center; color: var(--accent, var(--muted)); margin: 0 0 calc(6px * var(--bz, 1)); text-transform: uppercase;
+  font-size: calc(.78rem * var(--bz, 1)); letter-spacing: .1em; font-weight: 800; }
 .b-match { position: relative; z-index: 1; background: linear-gradient(160deg, color-mix(in srgb, var(--card) 94%, var(--accent, var(--border)) 6%), var(--card));
   border: 1px solid var(--border); border-left: 4px solid var(--accent, var(--border)); border-radius: 14px; overflow: hidden;
   box-shadow: 0 3px 14px rgba(0,0,0,.28); transition: transform .18s ease, box-shadow .18s ease; }
 .b-match:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.38); }
 .b-match.live { outline: 2px solid var(--accent2); animation: liveGlow 1.7s ease-in-out infinite; }
 @keyframes liveGlow { 50% { box-shadow: 0 0 0 7px rgba(255,179,71,.22); } }
-.b-side { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--border); min-height: 42px; }
+.b-side { display: flex; align-items: center; border-bottom: 1px solid var(--border);
+  gap: calc(8px * var(--bz, 1)); padding: calc(10px * var(--bz, 1)) calc(14px * var(--bz, 1)); min-height: calc(42px * var(--bz, 1)); }
 .b-side:last-child { border-bottom: none; }
-.b-side .who { flex: 1; font-weight: 600; font-size: .94rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px; }
-.b-side .who small { display: block; color: var(--muted); font-weight: 400; font-size: .74rem; }
+.b-side .who { flex: 1; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-size: calc(.94rem * var(--bz, 1)); max-width: calc(210px * var(--bz, 1)); }
+.b-side .who small { display: block; color: var(--muted); font-weight: 400; font-size: .78em; }
 .b-side .pts { font-weight: 800; min-width: 22px; text-align: right; }
 .b-side.winner { background: linear-gradient(90deg, rgba(48,164,108,.18), transparent); }
 .b-side.winner .who { color: #7ee2b0; font-weight: 700; }
@@ -293,9 +302,11 @@ html[data-theme="light"] .art-fighters.tint-mono { opacity: .38; }
 .b-match.b-bronze { border-left-color: var(--bronze); }
 .b-bronze-label { background: none; border: none; box-shadow: none; text-align: center; margin-bottom: -8px; }
 .b-bronze-label h5 { margin: 0; padding: 4px 10px; color: var(--bronze); font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; font-weight: 800; }
-.podium { display: flex; gap: 18px; justify-content: center; margin: 28px 0 6px; flex-wrap: wrap; }
+.podium { display: flex; justify-content: center; flex-wrap: wrap;
+  gap: calc(18px * var(--bz, 1)); margin: calc(28px * var(--bz, 1)) 0 calc(6px * var(--bz, 1)); }
 .podium .p { text-align: center; background: linear-gradient(160deg, var(--card), color-mix(in srgb, var(--card) 82%, black 8%));
-  border: 1px solid var(--border); border-radius: 16px; padding: 20px 28px; min-width: 165px; box-shadow: 0 4px 16px rgba(0,0,0,.28); }
+  border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 4px 16px rgba(0,0,0,.28);
+  padding: calc(20px * var(--bz, 1)) calc(28px * var(--bz, 1)); min-width: calc(165px * var(--bz, 1)); }
 .podium .p .medal { margin-bottom: 4px; }
 .podium .p.g { border-color: var(--gold); box-shadow: 0 4px 22px rgba(212,175,55,.25); }
 .podium .p.s { border-color: var(--silver); }
