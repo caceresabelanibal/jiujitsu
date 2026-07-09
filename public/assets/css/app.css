@@ -188,14 +188,12 @@ html[data-theme="light"] .blob.b3 { opacity: .12; }
 .float { animation: floaty 6s ease-in-out infinite; }
 @keyframes floaty { 50% { transform: translateY(-12px); } }
 
-/* Ilustraciones */
-.art { width: 100%; height: auto; display: block; }
-.art .fig-a { color: var(--text); }
-.art .fig-b { color: #4f8cff; }
-.art .belt-r { stroke: #c9252c; stroke-linecap: round; }
-.art .belt-d { stroke: #10141f; stroke-linecap: round; }
-html[data-theme="light"] .art .belt-d { stroke: #38445e; }
-.art .mat { fill: color-mix(in srgb, var(--text) 9%, transparent); }
+/* Ilustracion: silueta de luchadores (fill: currentColor -> se tinta por CSS) */
+.art-fighters { width: 100%; height: auto; display: block; filter: drop-shadow(0 18px 26px rgba(0,0,0,.35)); }
+.art-fighters.tint-red { color: #c9252c; opacity: .88; }
+.art-fighters.tint-mono { color: var(--text); opacity: .5; }
+.art-fighters.flip { transform: scaleX(-1); }
+html[data-theme="light"] .art-fighters.tint-mono { opacity: .38; }
 
 .statstrip { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin: 12px 0 54px; }
 .statb { display: flex; align-items: center; gap: 14px; padding: 18px 20px; }

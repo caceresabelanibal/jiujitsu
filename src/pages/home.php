@@ -26,7 +26,7 @@ view_header(t('nav_home'));
       </div>
     </div>
     <div class="hero2-art glass float">
-      <?= svg_gi_throw() ?>
+      <?= svg_fighters('tint-red') ?>
     </div>
   </section>
 
@@ -66,7 +66,7 @@ view_header(t('nav_home'));
   <!-- COMO FUNCIONA -->
   <section class="how">
     <div class="how-art glass float reveal">
-      <?= svg_nogi_grapple() ?>
+      <?= svg_fighters('tint-mono flip') ?>
     </div>
     <div class="how-steps">
       <h2 class="grad2 reveal"><?= t('how_title') ?></h2>
