@@ -63,9 +63,12 @@ view_header(t('rankings_title'));
       <span class="belt-chip" style="background:<?= e($r['color_hex']) ?>"></span>
       <?= ($r['gender'] === 'M' ? t('male') : t('female')) . ' · ' . e($isEn ? $r['a_en'] : $r['a_es']) . ' · ' . e($isEn ? $r['b_en'] : $r['b_es']) . ' · ' . e($isEn ? $r['w_en'] : $r['w_es']) ?>
     </td>
-    <td><b style="color:var(--accent2)"><?= (int)$r['points'] ?></b></td>
-    <td><?= (int)$r['golds'] ?></td><td><?= (int)$r['silvers'] ?></td><td><?= (int)$r['bronzes'] ?></td>
-    <td><?= (int)$r['wins'] ?></td><td><?= (int)$r['submissions'] ?></td>
+    <td data-label="<?= t('points_col') ?>"><b style="color:var(--accent2)"><?= (int)$r['points'] ?></b></td>
+    <td data-label="<?= t('golds') ?>"><?= (int)$r['golds'] ?></td>
+    <td data-label="<?= t('silvers') ?>"><?= (int)$r['silvers'] ?></td>
+    <td data-label="<?= t('bronzes') ?>"><?= (int)$r['bronzes'] ?></td>
+    <td data-label="<?= t('wins') ?>"><?= (int)$r['wins'] ?></td>
+    <td data-label="<?= t('subs') ?>"><?= (int)$r['submissions'] ?></td>
   </tr>
   <?php endforeach; ?>
 </table>

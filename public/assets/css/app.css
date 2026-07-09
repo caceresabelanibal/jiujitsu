@@ -152,6 +152,12 @@ tr:hover td { background: rgba(255,255,255,.02); }
   .table-wrap tr { border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; margin-bottom: 10px; background: var(--card2); }
   .table-wrap tr:hover td { background: none; }
   .table-wrap td { border: none; padding: 5px 0; text-align: left; white-space: normal !important; }
+  /* Celdas numericas con data-label (ej. ranking): en vez de un numero
+     suelto por linea, se muestran como chips "Etiqueta: valor" que se
+     acomodan en fila, asi se entiende que representa cada numero. */
+  .table-wrap td[data-label] { display: inline-flex; align-items: center; gap: 4px; width: auto;
+    margin: 3px 6px 3px 0; padding: 3px 10px; background: var(--card); border: 1px solid var(--border); border-radius: 999px; font-size: .82rem; }
+  .table-wrap td[data-label]::before { content: attr(data-label) ':'; color: var(--muted); font-weight: 600; }
 }
 
 /* Badges */
