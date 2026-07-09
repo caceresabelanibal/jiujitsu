@@ -39,28 +39,9 @@ function certificate_pattern_png(): string {
     return $path;
 }
 
-/** Logo Taninzu (cinturon rojo) rasterizado para el PDF (cacheado) */
+/** Logo Taninzu (cinturon rojo + cascos) para el sello del PDF */
 function taninzu_logo_png(): string {
-    $path = BASE_PATH . '/storage/certificates/_logo.png';
-    if (file_exists($path)) return $path;
-    $s = 8;
-    $im = imagecreatetruecolor(64 * $s, 64 * $s);
-    imagesavealpha($im, true);
-    imagefill($im, 0, 0, imagecolorallocatealpha($im, 0, 0, 0, 127));
-    $red   = imagecolorallocate($im, 201, 37, 44);
-    $dark  = imagecolorallocate($im, 156, 27, 33);
-    $mid   = imagecolorallocate($im, 224, 58, 65);
-    $black = imagecolorallocate($im, 28, 28, 30);
-    imagefilledrectangle($im, 2 * $s, 25 * $s, 62 * $s, 39 * $s, $red);          // banda
-    imagefilledrectangle($im, 50 * $s, 25 * $s, 57 * $s, 39 * $s, $black);       // barra de graduacion
-    imagefilledpolygon($im, [29*$s,37*$s, 21*$s,60*$s, 30*$s,60*$s, 33*$s,40*$s], $red);   // punta izq
-    imagefilledpolygon($im, [35*$s,37*$s, 43*$s,60*$s, 34*$s,60*$s, 31*$s,40*$s], $dark);  // punta der
-    imagefilledrectangle($im, 23 * $s, 23 * $s, 41 * $s, 41 * $s, $dark);        // nudo
-    imagefilledpolygon($im, [25*$s,25*$s, 32*$s,32*$s, 26*$s,39*$s], $mid);
-    imagefilledpolygon($im, [39*$s,25*$s, 32*$s,32*$s, 38*$s,39*$s], $mid);
-    if (!is_dir(dirname($path))) mkdir(dirname($path), 0775, true);
-    imagepng($im, $path);
-    return $path;
+    return BASE_PATH . '/public/assets/img/logo.png';
 }
 
 function img_data_uri(string $path): string {

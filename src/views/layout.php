@@ -18,13 +18,13 @@ function view_header(string $title, bool $bare = false, string $bodyClass = ''):
 })();
 </script>
 <link rel="stylesheet" href="<?= asset('/assets/css/app.css') ?>">
-<link rel="icon" type="image/svg+xml" href="<?= APP_URL ?>/assets/img/logo.svg">
+<link rel="icon" type="image/png" href="<?= asset('/assets/img/logo.png') ?>">
 </head>
 <body class="<?= trim(($bare ? 'bare' : '') . ' ' . $bodyClass) ?>">
 <?php icons_sprite(); ?>
 <?php if (!$bare): ?>
 <header class="topnav">
-  <a class="brand" href="<?= APP_URL ?>/"><img class="brandlogo" src="<?= APP_URL ?>/assets/img/logo.svg" alt=""> <?= e($site) ?></a>
+  <a class="brand" href="<?= APP_URL ?>/"><img class="brandlogo" src="<?= asset('/assets/img/logo.png') ?>" alt=""> <?= e($site) ?></a>
   <button class="navtoggle" onclick="document.querySelector('.navlinks').classList.toggle('show')">☰</button>
   <nav class="navlinks">
     <a href="<?= APP_URL ?>/rankings"><?= t('nav_rankings') ?></a>
@@ -53,7 +53,7 @@ function view_header(string $title, bool $bare = false, string $bodyClass = ''):
 function view_footer(bool $bare = false): void {
     ?></main>
 <?php if (!$bare): ?>
-<footer class="footer"><img class="brandlogo" src="<?= APP_URL ?>/assets/img/logo.svg" alt="" style="height:18px;vertical-align:-4px"> <?= e((string)setting('site_name', 'Taninzu')) ?> · taninzu.com · <?= date('Y') ?></footer>
+<footer class="footer"><img class="brandlogo" src="<?= asset('/assets/img/logo.png') ?>" alt="" style="height:18px;vertical-align:-4px"> <?= e((string)setting('site_name', 'Taninzu')) ?> · taninzu.com · <?= date('Y') ?></footer>
 <?php endif; ?>
 <script src="<?= asset('/assets/js/app.js') ?>"></script>
 </body>

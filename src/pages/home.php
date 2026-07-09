@@ -17,7 +17,7 @@ view_header(t('nav_home'));
   <!-- HERO -->
   <section class="hero2">
     <div class="hero2-text">
-      <span class="pill"><img src="<?= APP_URL ?>/assets/img/logo.svg" alt="" style="height:20px;vertical-align:-5px"> Taninzu · Brazilian Jiu-Jitsu</span>
+      <span class="pill"><img src="<?= asset('/assets/img/logo.png') ?>" alt="" style="height:24px;vertical-align:-7px"> Taninzu · Brazilian Jiu-Jitsu</span>
       <h1 class="grad"><?= t('hero_title') ?></h1>
       <p class="lead"><?= t('hero_sub') ?></p>
       <div class="flex" style="gap:14px">
@@ -98,7 +98,7 @@ view_header(t('nav_home'));
 
   <!-- CTA FINAL -->
   <section class="ctaband glass reveal">
-    <img src="<?= APP_URL ?>/assets/img/logo.svg" alt="" style="height:64px">
+    <img src="<?= asset('/assets/img/logo.png') ?>" alt="" style="height:92px">
     <h2><?= t('cta_title') ?></h2>
     <p class="muted"><?= t('cta_sub') ?></p>
     <a class="btn xl glow" href="<?= APP_URL ?>/register"><?= t('nav_register') ?> <?= icon('arrow-right', 18) ?></a>
