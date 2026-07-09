@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $users = rows('SELECT u.*, (SELECT COUNT(*) FROM tournaments t WHERE t.user_id=u.id) tcount FROM users u ORDER BY u.created_at DESC');
 view_header(t('users'));
 ?>
-<h1>👤 <?= t('users') ?></h1>
+<h1><?= icon('user', 24) ?> <?= t('users') ?></h1>
 
 <div class="card">
   <h3><?= t('new_user') ?></h3>
@@ -58,15 +58,15 @@ view_header(t('users'));
     <td><input type="text" name="name" value="<?= e($u['name']) ?>" style="min-width:120px"></td>
     <td class="muted"><?= e($u['email']) ?></td>
     <td><select name="role"><option value="user" <?= $u['role'] === 'user' ? 'selected' : '' ?>>user</option><option value="admin" <?= $u['role'] === 'admin' ? 'selected' : '' ?>>admin</option></select></td>
-    <td><?= $u['verified_at'] ? '<span class="badge green">✓</span>' : '<span class="badge grey">✕</span>' ?></td>
+    <td><?= $u['verified_at'] ? '<span class="badge green">' . icon('check', 11) . '</span>' : '<span class="badge grey">' . icon('x', 11) . '</span>' ?></td>
     <td><?= (int)$u['tcount'] ?></td>
     <td style="white-space:nowrap">
       <?= csrf_field() ?>
       <input type="hidden" name="id" value="<?= $u['id'] ?>">
       <input type="password" name="password" placeholder="••••" style="width:80px;display:inline-block">
       <button class="btn sm" name="do" value="update"><?= t('save') ?></button>
-      <?php if (!$u['verified_at']): ?><button class="btn sm green" name="do" value="verify">✓</button><?php endif; ?>
-      <?php if ($u['id'] != $me['id']): ?><button class="btn sm danger" name="do" value="delete" onclick="return confirm('<?= t('confirm_delete') ?>')">✕</button><?php endif; ?>
+      <?php if (!$u['verified_at']): ?><button class="btn sm green" name="do" value="verify"><?= icon('check', 13) ?></button><?php endif; ?>
+      <?php if ($u['id'] != $me['id']): ?><button class="btn sm danger" name="do" value="delete" onclick="return confirm('<?= t('confirm_delete') ?>')"><?= icon('x', 13) ?></button><?php endif; ?>
     </td>
     </form>
   </tr>

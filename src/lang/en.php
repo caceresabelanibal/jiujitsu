@@ -76,9 +76,9 @@ return [
 
     // Brackets
     'bracket' => 'Bracket', 'round' => 'Round', 'final' => 'Final', 'semifinal' => 'Semifinal',
-    'bronze_match' => 'Third place', 'seed_random' => '🎲 Random', 'save_bracket' => 'Save bracket',
+    'bronze_match' => 'Third place', 'seed_random' => 'Random', 'save_bracket' => 'Save bracket',
     'regenerate' => 'Regenerate bracket', 'competitors' => 'Competitors', 'no_competitors' => 'Not enough competitors (minimum 2).',
-    'division' => 'Division', 'duration' => 'Duration', 'projector_view' => '📺 Projector view',
+    'division' => 'Division', 'duration' => 'Duration', 'projector_view' => 'Projector view',
     'champion' => 'Champion', 'second_place' => '2nd place', 'third_place' => '3rd place',
     'bye' => 'BYE', 'tbd' => 'TBD', 'manual_order_hint' => 'Order competitors for manual seeding and save, or use the random button.',
     'bracket_generated' => 'Bracket generated.', 'need_two' => 'At least 2 competitors are needed.',

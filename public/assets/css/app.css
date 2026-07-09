@@ -62,6 +62,19 @@ main.bare-main { padding: 0; flex: 1; animation: pageIn .32s ease; }
 .brand { font-weight: 800; font-size: 1.15rem; color: var(--text); letter-spacing: .02em; }
 .brand:hover { text-decoration: none; }
 .brandlogo { height: 28px; vertical-align: -8px; }
+
+/* Iconos SVG minimalistas */
+.ic { vertical-align: -2.5px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.ic-gold { color: var(--gold); }
+.ic-silver { color: var(--silver); }
+.ic-bronze { color: var(--bronze); }
+.ic-red { color: var(--red); }
+.ic-muted { color: var(--muted); }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; vertical-align: 1px; }
+.dot.red { background: var(--red); }
+.dot.blue { background: var(--blue); }
+.dot.live { background: var(--red); animation: livepulse 1.2s infinite; }
+@keyframes livepulse { 50% { opacity: .35; } }
 .navlinks { display: flex; gap: 18px; align-items: center; margin-left: auto; flex-wrap: wrap; }
 .navlinks a { color: var(--muted); font-weight: 600; }
 .navlinks a:hover { color: var(--text); text-decoration: none; }

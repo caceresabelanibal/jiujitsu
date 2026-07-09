@@ -43,8 +43,8 @@ view_header(t('divisions'));
     <td><?= fmt_time((int)$d['duration_sec']) ?></td>
     <td><span class="badge <?= ['pending'=>'grey','bracketed'=>'blue','done'=>'gold'][$d['status']] ?>"><?= $d['has_bracket'] ? ($d['status'] === 'done' ? t('done') : t('bracket')) : t('pending') ?></span></td>
     <td class="right">
-      <a class="btn sm" href="<?= APP_URL ?>/division/<?= $d['id'] ?>"><?= t('bracket') ?></a>
-      <a class="btn sm secondary" href="<?= APP_URL ?>/division/<?= $d['id'] ?>/view" target="_blank">📺</a>
+      <a class="btn sm" href="<?= APP_URL ?>/division/<?= $d['id'] ?>"><?= icon('bracket', 13) ?> <?= t('bracket') ?></a>
+      <a class="btn sm secondary" href="<?= APP_URL ?>/division/<?= $d['id'] ?>/view" target="_blank"><?= icon('screen', 13) ?></a>
     </td>
   </tr>
   <?php endforeach; ?>

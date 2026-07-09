@@ -40,7 +40,7 @@
     if (wbar) {
       if (state.status === 'done' && state.winner_name) {
         wbar.style.display = '';
-        wbar.textContent = '🏆 ' + wbar.dataset.label + ': ' + state.winner_name + (state.method_label ? ' (' + state.method_label + ')' : '');
+        wbar.textContent = wbar.dataset.label + ': ' + state.winner_name + (state.method_label ? ' (' + state.method_label + ')' : '');
       } else {
         wbar.style.display = 'none';
       }

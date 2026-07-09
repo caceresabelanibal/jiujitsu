@@ -15,15 +15,15 @@ view_header(t('score_operator'));
 <div class="op">
   <div class="flex spread mb">
     <a href="<?= APP_URL ?>/division/<?= $m['division_id'] ?>">← <?= e(division_label($d)) ?></a>
-    <a class="btn secondary" href="<?= APP_URL ?>/match/<?= $mid ?>/display" target="_blank"><?= t('open_display') ?> 📺</a>
+    <a class="btn secondary" href="<?= APP_URL ?>/match/<?= $mid ?>/display" target="_blank"><?= icon('screen', 15) ?> <?= t('open_display') ?></a>
   </div>
 
   <div class="op-timerband">
     <span class="op-clock" data-sb="timer"><?= fmt_time((int)$m['timer_remaining']) ?></span>
     <?php if ($m['status'] !== 'done'): ?>
-    <button class="btn green" data-sb="startbtn" data-start="▶ <?= t('start') ?>" data-pause="⏸ <?= t('pause') ?>" onclick="sbToggleTimer()">▶ <?= t('start') ?></button>
-    <button class="btn secondary" onclick="sbAction('reset')">↺ <?= t('reset') ?></button>
-    <button class="btn secondary" onclick="sbAction('undo')">↩ <?= t('undo') ?></button>
+    <button class="btn green" data-sb="startbtn" data-start="▶ <?= t('start') ?>" data-pause="❚❚ <?= t('pause') ?>" onclick="sbToggleTimer()">▶ <?= t('start') ?></button>
+    <button class="btn secondary" onclick="sbAction('reset')"><?= icon('reset', 14) ?> <?= t('reset') ?></button>
+    <button class="btn secondary" onclick="sbAction('undo')"><?= icon('undo', 14) ?> <?= t('undo') ?></button>
     <?php endif; ?>
   </div>
 
@@ -62,14 +62,14 @@ view_header(t('score_operator'));
     <p class="muted"><?= t('select_winner') ?> · <?= t('method') ?></p>
     <div class="flex">
       <button class="btn" onclick="sbAction('end', null)"><?= t('by_points') ?> (auto)</button>
-      <button class="btn green" onclick="sbAction('end','red','submission')"><?= t('submission') ?> 🔴</button>
-      <button class="btn green" onclick="sbAction('end','blue','submission')"><?= t('submission') ?> 🔵</button>
-      <button class="btn secondary" onclick="sbAction('end','red','decision')"><?= t('decision') ?> 🔴</button>
-      <button class="btn secondary" onclick="sbAction('end','blue','decision')"><?= t('decision') ?> 🔵</button>
-      <button class="btn danger" onclick="sbAction('end','blue','dq')"><?= t('dq') ?> 🔴</button>
-      <button class="btn danger" onclick="sbAction('end','red','dq')"><?= t('dq') ?> 🔵</button>
-      <button class="btn secondary" onclick="sbAction('end','red','wo')">W.O. → 🔴</button>
-      <button class="btn secondary" onclick="sbAction('end','blue','wo')">W.O. → 🔵</button>
+      <button class="btn green" onclick="sbAction('end','red','submission')"><?= t('submission') ?> <span class="dot red"></span></button>
+      <button class="btn green" onclick="sbAction('end','blue','submission')"><?= t('submission') ?> <span class="dot blue"></span></button>
+      <button class="btn secondary" onclick="sbAction('end','red','decision')"><?= t('decision') ?> <span class="dot red"></span></button>
+      <button class="btn secondary" onclick="sbAction('end','blue','decision')"><?= t('decision') ?> <span class="dot blue"></span></button>
+      <button class="btn danger" onclick="sbAction('end','blue','dq')"><?= t('dq') ?> <span class="dot red"></span></button>
+      <button class="btn danger" onclick="sbAction('end','red','dq')"><?= t('dq') ?> <span class="dot blue"></span></button>
+      <button class="btn secondary" onclick="sbAction('end','red','wo')">W.O. → <span class="dot red"></span></button>
+      <button class="btn secondary" onclick="sbAction('end','blue','wo')">W.O. → <span class="dot blue"></span></button>
     </div>
   </div>
   <?php else: ?>

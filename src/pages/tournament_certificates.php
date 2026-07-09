@@ -26,7 +26,7 @@ view_header(t('certificates'));
     <?= csrf_field() ?>
     <label class="flex" style="margin:0"><input type="checkbox" name="podium" checked style="width:auto"> <?= t('certs_podium') ?></label>
     <label class="flex" style="margin:0"><input type="checkbox" name="participation" checked style="width:auto"> <?= t('certs_participation') ?></label>
-    <button class="btn">📨 <?= t('send_certificates') ?></button>
+    <button class="btn"><?= icon('mail', 14) ?> <?= t('send_certificates') ?></button>
   </form>
 </div>
 
@@ -34,14 +34,15 @@ view_header(t('certificates'));
 <div class="card table-wrap">
 <table>
   <tr><th></th><th><?= t('name') ?></th><th><?= t('email') ?></th><th><?= t('emailed') ?></th><th></th></tr>
-  <?php $icons = ['gold' => '🥇', 'silver' => '🥈', 'bronze' => '🥉', 'participation' => '🎖'];
+  <?php $icons = ['gold' => icon('award', 18, 'ic-gold'), 'silver' => icon('award', 18, 'ic-silver'),
+                  'bronze' => icon('award', 18, 'ic-bronze'), 'participation' => icon('star', 18, 'ic-muted')];
   foreach ($certs as $c): ?>
   <tr>
     <td class="medal-ico"><?= $icons[$c['type']] ?></td>
     <td><b><?= e($c['reg_name']) ?></b></td>
     <td class="muted"><?= e($c['email']) ?></td>
     <td><?= $c['emailed_at'] ? '<span class="badge green">' . date('d/m H:i', strtotime($c['emailed_at'])) . '</span>' : '<span class="badge grey">' . t('pending') . '</span>' ?></td>
-    <td class="right"><a class="btn sm secondary" href="<?= APP_URL ?>/certificate/<?= $c['id'] ?>/download">⬇ <?= t('download') ?></a></td>
+    <td class="right"><a class="btn sm secondary" href="<?= APP_URL ?>/certificate/<?= $c['id'] ?>/download"><?= icon('download', 13) ?> <?= t('download') ?></a></td>
   </tr>
   <?php endforeach; ?>
 </table>

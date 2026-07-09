@@ -25,7 +25,7 @@ view_header(t('matches'));
   <tr>
     <td class="muted" style="font-size:.82rem">
       <?= ($m['gender'] === 'M' ? t('male') : t('female')) . ' · ' . e($isEn ? $m['ad_en'] : $m['ad_es']) . ' · ' . e($isEn ? $m['b_en'] : $m['b_es']) . ' · ' . e($isEn ? $m['w_en'] : $m['w_es']) ?>
-      <?= $m['is_bronze'] ? '<span class="badge grey">🥉</span>' : '' ?>
+      <?= $m['is_bronze'] ? '<span class="badge grey">' . icon('award', 11, 'ic-bronze') . '</span>' : '' ?>
     </td>
     <td><b><?= e($m['red_name']) ?></b> <span class="muted"><?= t('vs') ?></span> <b><?= e($m['blue_name']) ?></b></td>
     <td>
@@ -36,14 +36,14 @@ view_header(t('matches'));
     <td>
       <?php if ($m['status'] === 'done'): ?>
         <?= (int)$m['red_points'] ?>-<?= (int)$m['blue_points'] ?>
-        <span class="muted">· 🏆 <?= e($m['winner_reg_id'] == $m['red_reg_id'] ? $m['red_name'] : $m['blue_name']) ?></span>
+        <span class="muted">· <?= icon('trophy', 12, 'ic-gold') ?> <?= e($m['winner_reg_id'] == $m['red_reg_id'] ? $m['red_name'] : $m['blue_name']) ?></span>
       <?php endif; ?>
     </td>
     <td class="right" style="white-space:nowrap">
       <?php if ($m['status'] !== 'done'): ?>
-      <a class="btn sm" href="<?= APP_URL ?>/match/<?= $m['id'] ?>/operator">⏱ <?= t('operator') ?></a>
+      <a class="btn sm" href="<?= APP_URL ?>/match/<?= $m['id'] ?>/operator"><?= icon('timer', 14) ?> <?= t('operator') ?></a>
       <?php endif; ?>
-      <a class="btn sm secondary" href="<?= APP_URL ?>/match/<?= $m['id'] ?>/display" target="_blank">📺</a>
+      <a class="btn sm secondary" href="<?= APP_URL ?>/match/<?= $m['id'] ?>/display" target="_blank"><?= icon('screen', 14) ?></a>
     </td>
   </tr>
   <?php endforeach; ?>

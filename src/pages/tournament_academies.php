@@ -50,14 +50,14 @@ view_header(t('academies'));
       <h3><?php if ($a['logo']): ?><img class="logo-sm" src="<?= APP_URL . '/' . e($a['logo']) ?>" alt=""> <?php endif; ?><?= e($a['name']) ?></h3>
       <form method="post" data-confirm="<?= t('confirm_delete') ?>">
         <?= csrf_field() ?><input type="hidden" name="do" value="del_academy"><input type="hidden" name="id" value="<?= $a['id'] ?>">
-        <button class="btn sm danger">✕</button>
+        <button class="btn sm danger"><?= icon('x', 13) ?></button>
       </form>
     </div>
     <h4 class="muted"><?= t('professors') ?></h4>
     <?php foreach ($profs as $p): ?>
       <div class="flex spread" style="padding:5px 0;border-bottom:1px solid var(--border)">
         <span><?= e($p['name']) ?><?= $p['sede'] ? ' <span class="muted">· ' . e($p['sede']) . '</span>' : '' ?></span>
-        <form method="post"><?= csrf_field() ?><input type="hidden" name="do" value="del_professor"><input type="hidden" name="id" value="<?= $p['id'] ?>"><button class="btn sm secondary">✕</button></form>
+        <form method="post"><?= csrf_field() ?><input type="hidden" name="do" value="del_professor"><input type="hidden" name="id" value="<?= $p['id'] ?>"><button class="btn sm secondary"><?= icon('x', 12) ?></button></form>
       </div>
     <?php endforeach; ?>
     <form method="post" class="flex mt">

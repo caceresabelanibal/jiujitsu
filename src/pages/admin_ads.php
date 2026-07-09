@@ -40,7 +40,7 @@ $tournaments = rows('SELECT id, name, ads_mode FROM tournaments ORDER BY created
 $anims = ['slide' => t('anim_slide'), 'fade' => t('anim_fade'), 'zoom' => t('anim_zoom'), 'ticker' => t('anim_ticker')];
 view_header(t('ads'));
 ?>
-<h1>📣 <?= t('ads') ?></h1>
+<h1><?= icon('megaphone', 24) ?> <?= t('ads') ?></h1>
 <p class="muted"><?= t('ads_hint') ?></p>
 
 <div class="card">
@@ -106,7 +106,7 @@ view_header(t('ads'));
         <?php if ($a['type'] === 'image' && $a['image']): ?>
           <img src="<?= APP_URL . '/' . e($a['image']) ?>" alt="" style="height:36px;border-radius:4px">
         <?php else: ?>
-          <span class="muted" style="font-size:.85rem">💬 <?= e(mb_substr((string)$a['text_content'], 0, 40)) ?></span>
+          <span class="muted" style="font-size:.85rem"><?= icon('message', 13) ?> <?= e(mb_substr((string)$a['text_content'], 0, 40)) ?></span>
         <?php endif; ?>
       </td>
       <td><?= $a['scope'] === 'global' ? '<span class="badge blue">' . t('ad_scope_global') . '</span>' : '<span class="badge gold">' . e($a['t_name'] ?? '?') . '</span>' ?></td>
@@ -115,8 +115,8 @@ view_header(t('ads'));
       <td><?= (int)$a['duration_sec'] ?>s</td>
       <td><span class="badge <?= $a['active'] ? 'green' : 'grey' ?>"><?= $a['active'] ? 'ON' : 'OFF' ?></span></td>
       <td style="white-space:nowrap">
-        <form class="inline-form" method="post"><?= csrf_field() ?><input type="hidden" name="do" value="toggle"><input type="hidden" name="id" value="<?= $a['id'] ?>"><button class="btn sm secondary"><?= $a['active'] ? '⏸' : '▶' ?></button></form>
-        <form class="inline-form" method="post" data-confirm="<?= t('confirm_delete') ?>"><?= csrf_field() ?><input type="hidden" name="do" value="delete"><input type="hidden" name="id" value="<?= $a['id'] ?>"><button class="btn sm danger">✕</button></form>
+        <form class="inline-form" method="post"><?= csrf_field() ?><input type="hidden" name="do" value="toggle"><input type="hidden" name="id" value="<?= $a['id'] ?>"><button class="btn sm secondary"><?= icon($a['active'] ? 'pause' : 'play', 12) ?></button></form>
+        <form class="inline-form" method="post" data-confirm="<?= t('confirm_delete') ?>"><?= csrf_field() ?><input type="hidden" name="do" value="delete"><input type="hidden" name="id" value="<?= $a['id'] ?>"><button class="btn sm danger"><?= icon('x', 13) ?></button></form>
       </td>
     </tr>
     <?php endforeach; ?>

@@ -76,9 +76,9 @@ return [
 
     // Llaves
     'bracket' => 'Llave', 'round' => 'Ronda', 'final' => 'Final', 'semifinal' => 'Semifinal',
-    'bronze_match' => 'Tercer puesto', 'seed_random' => '🎲 Aleatorio', 'save_bracket' => 'Guardar llave',
+    'bronze_match' => 'Tercer puesto', 'seed_random' => 'Aleatorio', 'save_bracket' => 'Guardar llave',
     'regenerate' => 'Regenerar llave', 'competitors' => 'Competidores', 'no_competitors' => 'Sin inscriptos suficientes (mínimo 2).',
-    'division' => 'División', 'duration' => 'Duración', 'projector_view' => '📺 Vista proyector',
+    'division' => 'División', 'duration' => 'Duración', 'projector_view' => 'Vista proyector',
     'champion' => 'Campeón', 'second_place' => '2° puesto', 'third_place' => '3° puesto',
     'bye' => 'BYE', 'tbd' => 'A definir', 'manual_order_hint' => 'Ordená los competidores para la siembra manual y guardá, o usá el botón aleatorio.',
     'bracket_generated' => 'Llave generada.', 'need_two' => 'Se necesitan al menos 2 competidores.',

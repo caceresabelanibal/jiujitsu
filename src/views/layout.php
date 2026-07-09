@@ -21,6 +21,7 @@ function view_header(string $title, bool $bare = false): void {
 <link rel="icon" type="image/svg+xml" href="<?= APP_URL ?>/assets/img/logo.svg">
 </head>
 <body class="<?= $bare ? 'bare' : '' ?>">
+<?php icons_sprite(); ?>
 <?php if (!$bare): ?>
 <header class="topnav">
   <a class="brand" href="<?= APP_URL ?>/"><img class="brandlogo" src="<?= APP_URL ?>/assets/img/logo.svg" alt=""> <?= e($site) ?></a>
@@ -62,19 +63,19 @@ function view_footer(bool $bare = false): void {
 /** Tabs de gestion de un torneo */
 function tournament_tabs(array $t, string $active): void {
     $tabs = [
-        'overview'      => ['', '🎛️ ' . t('operation')],
-        'academies'     => ['/academies', t('academies')],
-        'registrations' => ['/registrations', t('registrations')],
-        'divisions'     => ['/divisions', t('divisions')],
-        'matches'       => ['/matches', t('matches')],
-        'dashboard'     => ['/dashboard', t('dashboard')],
-        'certificates'  => ['/certificates', t('certificates')],
-        'settings'      => ['/settings', '⚙️ ' . t('settings')],
+        'overview'      => ['', t('operation'), 'timer'],
+        'academies'     => ['/academies', t('academies'), 'flag'],
+        'registrations' => ['/registrations', t('registrations'), 'clipboard'],
+        'divisions'     => ['/divisions', t('divisions'), 'bracket'],
+        'matches'       => ['/matches', t('matches'), 'swords'],
+        'dashboard'     => ['/dashboard', t('dashboard'), 'chart'],
+        'certificates'  => ['/certificates', t('certificates'), 'award'],
+        'settings'      => ['/settings', t('settings'), 'settings'],
     ];
     echo '<div class="tabs">';
-    foreach ($tabs as $key => [$suffix, $label]) {
+    foreach ($tabs as $key => [$suffix, $label, $ic]) {
         $cls = $key === $active ? 'tab active' : 'tab';
-        echo '<a class="' . $cls . '" href="' . APP_URL . '/tournament/' . $t['id'] . $suffix . '">' . e($label) . '</a>';
+        echo '<a class="' . $cls . '" href="' . APP_URL . '/tournament/' . $t['id'] . $suffix . '">' . icon($ic, 15) . ' ' . e($label) . '</a>';
     }
     echo '</div>';
 }

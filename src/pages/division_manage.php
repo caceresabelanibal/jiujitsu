@@ -34,7 +34,7 @@ view_header(t('division'));
 <p><a href="<?= APP_URL ?>/tournament/<?= $t['id'] ?>/divisions">← <?= t('back') ?></a></p>
 <div class="flex spread">
   <h1><?= e(division_label($d)) ?></h1>
-  <a class="btn secondary" href="<?= APP_URL ?>/division/<?= $did ?>/view" target="_blank"><?= t('projector_view') ?></a>
+  <a class="btn secondary" href="<?= APP_URL ?>/division/<?= $did ?>/view" target="_blank"><?= icon('screen', 15) ?> <?= t('projector_view') ?></a>
 </div>
 
 <div class="grid cols2 mb">
@@ -58,7 +58,7 @@ view_header(t('division'));
       <?php endforeach; ?>
       <div class="flex mt">
         <button class="btn"><?= $hasBracket ? t('regenerate') : t('save_bracket') ?></button>
-        <button class="btn warn" name="do" value="random"><?= t('seed_random') ?></button>
+        <button class="btn warn" name="do" value="random"><?= icon('shuffle', 14) ?> <?= t('seed_random') ?></button>
       </div>
     </form>
     <?php endif; ?>

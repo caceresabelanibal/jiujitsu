@@ -27,8 +27,8 @@ view_header(t('my_tournaments'));
     <td><span class="badge <?= ['draft'=>'grey','open'=>'green','running'=>'blue','finished'=>'gold'][$tt['status']] ?>"><?= t('status_' . $tt['status']) ?></span></td>
     <?= is_admin() ? '<td>' . e($tt['owner'] ?? '') . '</td>' : '' ?>
     <td style="white-space:nowrap">
-      <a class="btn sm" href="<?= APP_URL ?>/tournament/<?= $tt['id'] ?>">▶ <?= t('go_to_tournament') ?></a>
-      <a class="btn sm secondary" href="<?= APP_URL ?>/tournament/<?= $tt['id'] ?>/settings" title="<?= t('settings') ?>">⚙️</a>
+      <a class="btn sm" href="<?= APP_URL ?>/tournament/<?= $tt['id'] ?>"><?= icon('play', 12) ?> <?= t('go_to_tournament') ?></a>
+      <a class="btn sm secondary" href="<?= APP_URL ?>/tournament/<?= $tt['id'] ?>/settings" title="<?= t('settings') ?>"><?= icon('settings', 14) ?></a>
     </td>
   </tr>
   <?php endforeach; ?>

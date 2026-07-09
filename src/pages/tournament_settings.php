@@ -29,7 +29,7 @@ view_header(t('settings'));
 <?php tournament_tabs($t, 'settings'); ?>
 
 <div class="card">
-  <h3>🔗 <?= t('registration_link') ?></h3>
+  <h3><?= icon('link', 16) ?> <?= t('registration_link') ?></h3>
   <div class="copybox">
     <input type="text" id="reglink" value="<?= e($link) ?>" readonly>
     <button class="btn secondary" data-copied="<?= t('copied') ?>" onclick="copyLink('reglink', this)"><?= t('copy_link') ?></button>
@@ -38,7 +38,7 @@ view_header(t('settings'));
 
 <div class="grid cols2">
   <div class="card">
-    <h3>⚙️ <?= t('settings') ?></h3>
+    <h3><?= icon('settings', 16) ?> <?= t('settings') ?></h3>
     <form method="post" action="<?= APP_URL ?>/tournament/<?= $tid ?>/edit" enctype="multipart/form-data">
       <?= csrf_field() ?>
       <label><?= t('tournament_name') ?></label>
@@ -62,7 +62,7 @@ view_header(t('settings'));
   </div>
 
   <div class="card">
-    <h3>🧑‍⚖️ <?= t('staff') ?></h3>
+    <h3><?= icon('user-check', 16) ?> <?= t('staff') ?></h3>
     <p class="muted"><?= t('staff_hint') ?></p>
     <form method="post" class="flex">
       <?= csrf_field() ?>
@@ -75,7 +75,7 @@ view_header(t('settings'));
       <span><b><?= e($s['name']) ?></b> <span class="muted"><?= e($s['email']) ?></span></span>
       <form method="post" data-confirm="<?= t('confirm_delete') ?>">
         <?= csrf_field() ?><input type="hidden" name="do" value="del_staff"><input type="hidden" name="id" value="<?= $s['id'] ?>">
-        <button class="btn sm danger">✕</button>
+        <button class="btn sm danger"><?= icon('x', 13) ?></button>
       </form>
     </div>
     <?php endforeach; ?>

@@ -28,7 +28,7 @@ $weights = rows('SELECT * FROM weight_classes ' . (in_array($fg, ['M','F']) ? "W
 $isEn = lang() === 'en';
 view_header(t('rankings_title'));
 ?>
-<h1>📊 <?= t('rankings_title') ?></h1>
+<h1><?= icon('chart', 26) ?> <?= t('rankings_title') ?></h1>
 <div class="card">
   <form method="get" class="flex">
     <div><label><?= t('gender') ?></label>
@@ -54,10 +54,10 @@ view_header(t('rankings_title'));
 <div class="card table-wrap">
 <table>
   <tr><th><?= t('position') ?></th><th><?= t('competitor') ?></th><th><?= t('category') ?></th>
-      <th><?= t('points_col') ?></th><th>🥇</th><th>🥈</th><th>🥉</th><th><?= t('wins') ?></th><th><?= t('subs') ?></th></tr>
+      <th><?= t('points_col') ?></th><th><?= icon('award', 14, 'ic-gold') ?></th><th><?= icon('award', 14, 'ic-silver') ?></th><th><?= icon('award', 14, 'ic-bronze') ?></th><th><?= t('wins') ?></th><th><?= t('subs') ?></th></tr>
   <?php foreach ($ranks as $i => $r): ?>
   <tr>
-    <td><b><?= $i + 1 ?></b><?= $i === 0 ? ' 👑' : '' ?></td>
+    <td><b><?= $i + 1 ?></b><?= $i === 0 ? ' ' . icon('crown', 14, 'ic-gold') : '' ?></td>
     <td><b><?= e($r['name']) ?></b></td>
     <td class="muted" style="font-size:.82rem">
       <span class="belt-chip" style="background:<?= e($r['color_hex']) ?>"></span>

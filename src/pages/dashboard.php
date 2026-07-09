@@ -30,8 +30,8 @@ view_header(t('my_panel'));
       <h3 style="margin:0"><?php if ($ot['logo']): ?><img class="logo-sm" src="<?= APP_URL . '/' . e($ot['logo']) ?>" alt=""> <?php endif; ?><?= e($ot['name']) ?></h3>
       <span class="badge <?= ['draft'=>'grey','open'=>'green','running'=>'blue','finished'=>'gold'][$ot['status']] ?>"><?= t('status_' . $ot['status']) ?></span>
     </div>
-    <p class="muted" style="margin:6px 0 12px"><?= $ot['event_date'] ? '📅 ' . date('d/m/Y', strtotime($ot['event_date'])) : '' ?></p>
-    <a class="btn" style="width:100%" href="<?= APP_URL ?>/tournament/<?= $ot['id'] ?>">▶ <?= t('go_to_tournament') ?></a>
+    <p class="muted" style="margin:6px 0 12px"><?= $ot['event_date'] ? icon('calendar', 13) . ' ' . date('d/m/Y', strtotime($ot['event_date'])) : '' ?></p>
+    <a class="btn" style="width:100%" href="<?= APP_URL ?>/tournament/<?= $ot['id'] ?>"><?= icon('play', 13) ?> <?= t('go_to_tournament') ?></a>
   </div>
   <?php endforeach; ?>
 </div>
@@ -56,15 +56,15 @@ view_header(t('my_panel'));
     <span class="badge <?= ['draft'=>'grey','open'=>'green','running'=>'blue','finished'=>'gold'][$r['t_status']] ?>"><?= t('status_' . $r['t_status']) ?></span>
   </div>
   <p class="muted">
-    <?= $r['event_date'] ? '📅 ' . date('d/m/Y', strtotime($r['event_date'])) . ' · ' : '' ?>
+    <?= $r['event_date'] ? icon('calendar', 13) . ' ' . date('d/m/Y', strtotime($r['event_date'])) . ' · ' : '' ?>
     <?= ($r['gender'] === 'M' ? t('male') : t('female')) . ' · ' . e($isEn ? $r['a_en'] : $r['a_es']) . ' · ' . e($isEn ? $r['b_en'] : $r['b_es']) . ' · ' . e($isEn ? $r['w_en'] : $r['w_es']) ?>
     · <?= $r['verified'] ? '<span class="badge green">' . t('verified') . '</span>' : '<span class="badge grey">' . t('pending') . '</span>' ?>
   </p>
 
   <?php if ($next): ?>
   <div class="flash flash-warning">
-    ⚔️ <?= t('next_opponent') ?>: <b><?= e($next['red_reg_id'] == $r['id'] ? $next['blue_name'] : $next['red_name']) ?></b>
-    (<?= t('round') ?> <?= (int)$next['round'] ?><?= $next['is_bronze'] ? ' · 🥉' : '' ?>)
+    <?= icon('swords', 15) ?> <?= t('next_opponent') ?>: <b><?= e($next['red_reg_id'] == $r['id'] ? $next['blue_name'] : $next['red_name']) ?></b>
+    (<?= t('round') ?> <?= (int)$next['round'] ?><?= $next['is_bronze'] ? ' · ' . icon('award', 12, 'ic-bronze') : '' ?>)
   </div>
   <?php endif; ?>
 
@@ -73,7 +73,7 @@ view_header(t('my_panel'));
     <tr><th><?= t('round') ?></th><th><?= t('match') ?></th><th><?= t('result') ?></th></tr>
     <?php foreach ($myMatches as $mm): if (!$mm['red_reg_id'] && !$mm['blue_reg_id']) continue; ?>
     <tr>
-      <td><?= $mm['is_bronze'] ? '🥉' : (int)$mm['round'] ?></td>
+      <td><?= $mm['is_bronze'] ? icon('award', 13, 'ic-bronze') : (int)$mm['round'] ?></td>
       <td><?= e($mm['red_name'] ?? t('tbd')) ?> <span class="muted"><?= t('vs') ?></span> <?= e($mm['blue_name'] ?? t('tbd')) ?></td>
       <td>
         <?php if ($mm['status'] === 'done' && $mm['winner_reg_id']): ?>
@@ -87,7 +87,7 @@ view_header(t('my_panel'));
   <?php endif; ?>
 
   <?php if ($div): ?>
-  <p class="mt"><a class="btn sm secondary" href="<?= APP_URL ?>/division/<?= $div['id'] ?>/view" target="_blank"><?= t('my_position') ?> 📺</a></p>
+  <p class="mt"><a class="btn sm secondary" href="<?= APP_URL ?>/division/<?= $div['id'] ?>/view" target="_blank"><?= icon('screen', 13) ?> <?= t('my_position') ?></a></p>
   <?php endif; ?>
 </div>
 <?php endforeach; ?>

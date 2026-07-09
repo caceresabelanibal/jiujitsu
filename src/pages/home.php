@@ -9,10 +9,10 @@ view_header(t('nav_home'));
   <p><?= t('hero_sub') ?></p>
   <a class="btn xl" href="<?= APP_URL ?>/tournaments/create"><?= t('hero_cta') ?></a>
   <div class="features">
-    <div class="feature"><span>🏆</span><?= t('feature_brackets') ?></div>
-    <div class="feature"><span>⏱️</span><?= t('feature_score') ?></div>
-    <div class="feature"><span>📜</span><?= t('feature_certs') ?></div>
-    <div class="feature"><span>📊</span><?= t('feature_rank') ?></div>
+    <div class="feature"><span><?= icon('bracket', 30) ?></span><?= t('feature_brackets') ?></div>
+    <div class="feature"><span><?= icon('timer', 30) ?></span><?= t('feature_score') ?></div>
+    <div class="feature"><span><?= icon('award', 30) ?></span><?= t('feature_certs') ?></div>
+    <div class="feature"><span><?= icon('chart', 30) ?></span><?= t('feature_rank') ?></div>
   </div>
 </div>
 <?php if ($open): ?>

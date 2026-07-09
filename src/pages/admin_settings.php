@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 view_header(t('settings'));
 ?>
-<h1>⚙️ <?= t('settings') ?></h1>
+<h1><?= icon('settings', 24) ?> <?= t('settings') ?></h1>
 <form method="post">
   <?= csrf_field() ?>
   <div class="grid cols2">

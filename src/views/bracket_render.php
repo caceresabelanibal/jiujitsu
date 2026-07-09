@@ -26,7 +26,7 @@ function render_bracket(int $divisionId, bool $manage = false): void {
         foreach ($ms as $m) render_bracket_match($m, $manage);
         // Bronce junto a la final
         if ($rnum === $maxRound && $bronze) {
-            echo '<div class="b-match b-bronze"><h5>🥉 ' . t('bronze_match') . '</h5></div>';
+            echo '<div class="b-match b-bronze"><h5>' . icon('award', 13, 'ic-bronze') . ' ' . t('bronze_match') . '</h5></div>';
             render_bracket_match($bronze, $manage, true);
         }
         echo '</div>';
@@ -36,10 +36,10 @@ function render_bracket(int $divisionId, bool $manage = false): void {
     [$g, $s, $b] = division_podium($divisionId);
     if ($g) {
         echo '<div class="podium">';
-        foreach ([['g', '🥇', t('champion'), $g], ['s', '🥈', t('second_place'), $s], ['b', '🥉', t('third_place'), $b]] as [$cls, $medal, $label, $regId]) {
+        foreach ([['g', 'ic-gold', t('champion'), $g], ['s', 'ic-silver', t('second_place'), $s], ['b', 'ic-bronze', t('third_place'), $b]] as [$cls, $medalCls, $label, $regId]) {
             if (!$regId) continue;
             $reg = row('SELECT r.name, a.name academy FROM registrations r LEFT JOIN tournament_academies a ON a.id=r.academy_id WHERE r.id=?', [$regId]);
-            echo '<div class="p ' . $cls . '"><div class="medal">' . $medal . '</div><b>' . e($reg['name']) . '</b><br><small class="muted">' . e($reg['academy'] ?? '') . '</small><br><small>' . e($label) . '</small></div>';
+            echo '<div class="p ' . $cls . '"><div class="medal">' . icon('award', 34, $medalCls) . '</div><b>' . e($reg['name']) . '</b><br><small class="muted">' . e($reg['academy'] ?? '') . '</small><br><small>' . e($label) . '</small></div>';
         }
         echo '</div>';
     }
@@ -56,11 +56,11 @@ function render_bracket_match(array $m, bool $manage, bool $isBronze = false): v
         if ($m['status'] === 'done' && $regId && $m['red_reg_id'] && $m['blue_reg_id']) {
             echo '<span class="pts">' . (int)$pts . '</span>';
         }
-        if ($isWinner) echo ' 🏆';
+        if ($isWinner) echo ' ' . icon('trophy', 13, 'ic-gold');
         echo '</div>';
     }
     if ($manage && $m['red_reg_id'] && $m['blue_reg_id'] && $m['status'] !== 'done') {
-        echo '<a class="mlink" href="' . APP_URL . '/match/' . $m['id'] . '/operator">⏱ ' . t('operator') . '</a>';
+        echo '<a class="mlink" href="' . APP_URL . '/match/' . $m['id'] . '/operator">' . icon('timer', 12) . ' ' . t('operator') . '</a>';
     }
     if ($m['status'] === 'done' && $m['method'] && $m['method'] !== 'wo') {
         echo '<a class="mlink muted">' . e(t($m['method'] === 'points' ? 'by_points' : $m['method'])) . '</a>';

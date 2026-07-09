@@ -45,9 +45,9 @@ view_header(t('registrations'));
     <td><span class="badge <?= $r['verified'] ? 'green' : 'grey' ?>"><?= $r['verified'] ? t('verified') : t('pending') ?></span></td>
     <td class="right" style="white-space:nowrap">
       <?php if (!$r['verified']): ?>
-      <form class="inline-form" method="post"><?= csrf_field() ?><input type="hidden" name="do" value="verify"><input type="hidden" name="id" value="<?= $r['id'] ?>"><button class="btn sm green">✓</button></form>
+      <form class="inline-form" method="post"><?= csrf_field() ?><input type="hidden" name="do" value="verify"><input type="hidden" name="id" value="<?= $r['id'] ?>"><button class="btn sm green"><?= icon('check', 13) ?></button></form>
       <?php endif; ?>
-      <form class="inline-form" method="post" data-confirm="<?= t('confirm_delete') ?>"><?= csrf_field() ?><input type="hidden" name="do" value="delete"><input type="hidden" name="id" value="<?= $r['id'] ?>"><button class="btn sm danger">✕</button></form>
+      <form class="inline-form" method="post" data-confirm="<?= t('confirm_delete') ?>"><?= csrf_field() ?><input type="hidden" name="do" value="delete"><input type="hidden" name="id" value="<?= $r['id'] ?>"><button class="btn sm danger"><?= icon('x', 13) ?></button></form>
     </td>
   </tr>
   <?php endforeach; ?>
