@@ -1,5 +1,5 @@
 <?php
-function view_header(string $title, bool $bare = false): void {
+function view_header(string $title, bool $bare = false, string $bodyClass = ''): void {
     $site = (string)setting('site_name', 'BJJ Tournament Manager');
     $u = current_user();
     $l = lang();
@@ -20,7 +20,7 @@ function view_header(string $title, bool $bare = false): void {
 <link rel="stylesheet" href="<?= APP_URL ?>/assets/css/app.css">
 <link rel="icon" type="image/svg+xml" href="<?= APP_URL ?>/assets/img/logo.svg">
 </head>
-<body class="<?= $bare ? 'bare' : '' ?>">
+<body class="<?= trim(($bare ? 'bare' : '') . ' ' . $bodyClass) ?>">
 <?php icons_sprite(); ?>
 <?php if (!$bare): ?>
 <header class="topnav">

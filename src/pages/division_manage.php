@@ -31,6 +31,7 @@ $regs = division_registrations($did);
 $hasBracket = (int)scalar('SELECT COUNT(*) FROM matches WHERE division_id = ?', [$did]) > 0;
 view_header(t('division'));
 ?>
+<script src="<?= APP_URL ?>/assets/js/bracket.js"></script>
 <p><a href="<?= APP_URL ?>/tournament/<?= $t['id'] ?>/divisions">← <?= t('back') ?></a></p>
 <div class="flex spread">
   <h1><?= e(division_label($d)) ?></h1>

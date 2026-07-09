@@ -1,5 +1,13 @@
 <?php
-/** Renderiza la llave de una division (usada en gestion y en vista proyector) */
+/** Paleta de acentos por ronda (se repite si hay mas rondas que colores) */
+const BRACKET_PALETTE = ['#4f8cff', '#c9252c', '#ffb347', '#30a46c', '#a855f7', '#14b8a6'];
+
+/**
+ * Renderiza la llave de una division (usada en gestion y en vista proyector).
+ * Emite data-id/data-next/data-bronze en cada partido para que bracket.js
+ * dibuje las lineas de conexion con SVG (independiente del alto real de
+ * cada tarjeta, que varia segun el contenido).
+ */
 function render_bracket(int $divisionId, bool $manage = false): void {
     $matches = rows('SELECT m.*, r1.name red_name, r2.name blue_name, a1.name red_academy, a2.name blue_academy
                      FROM matches m
@@ -8,7 +16,7 @@ function render_bracket(int $divisionId, bool $manage = false): void {
                      LEFT JOIN tournament_academies a1 ON a1.id = r1.academy_id
                      LEFT JOIN tournament_academies a2 ON a2.id = r2.academy_id
                      WHERE m.division_id = ? ORDER BY m.round, m.is_bronze, m.slot', [$divisionId]);
-    if (!$matches) { echo '<p class="muted">' . t('no_competitors') . '</p>'; return; }
+    if (!$matches) { echo '<p class="muted center">' . t('no_competitors') . '</p>'; return; }
 
     $rounds = [];
     $bronze = null;
@@ -19,19 +27,24 @@ function render_bracket(int $divisionId, bool $manage = false): void {
         $maxRound = max($maxRound, (int)$m['round']);
     }
 
-    echo '<div class="bracket-scroll"><div class="bracket">';
+    echo '<div class="bracket-scroll"><div class="bracket" id="bracket-svg-root">';
+    echo '<svg class="bracket-lines" id="bracket-lines"></svg>';
+    $ri = 0;
     foreach ($rounds as $rnum => $ms) {
         $label = $rnum === $maxRound ? t('final') : ($rnum === $maxRound - 1 ? t('semifinal') : t('round') . ' ' . $rnum);
-        echo '<div class="b-round"><h4>' . e($label) . '</h4>';
+        $accent = BRACKET_PALETTE[$ri % count(BRACKET_PALETTE)];
+        echo '<div class="b-round" style="--accent:' . $accent . '"><h4>' . e($label) . '</h4>';
         foreach ($ms as $m) render_bracket_match($m, $manage);
         // Bronce junto a la final
         if ($rnum === $maxRound && $bronze) {
-            echo '<div class="b-match b-bronze"><h5>' . icon('award', 13, 'ic-bronze') . ' ' . t('bronze_match') . '</h5></div>';
+            echo '<div class="b-match b-bronze-label"><h5>' . icon('award', 13, 'ic-bronze') . ' ' . t('bronze_match') . '</h5></div>';
             render_bracket_match($bronze, $manage, true);
         }
         echo '</div>';
+        $ri++;
     }
     echo '</div></div>';
+    echo '<script>if (window.drawBracketLines) drawBracketLines();</script>';
 
     [$g, $s, $b] = division_podium($divisionId);
     if ($g) {
@@ -39,7 +52,7 @@ function render_bracket(int $divisionId, bool $manage = false): void {
         foreach ([['g', 'ic-gold', t('champion'), $g], ['s', 'ic-silver', t('second_place'), $s], ['b', 'ic-bronze', t('third_place'), $b]] as [$cls, $medalCls, $label, $regId]) {
             if (!$regId) continue;
             $reg = row('SELECT r.name, a.name academy FROM registrations r LEFT JOIN tournament_academies a ON a.id=r.academy_id WHERE r.id=?', [$regId]);
-            echo '<div class="p ' . $cls . '"><div class="medal">' . icon('award', 34, $medalCls) . '</div><b>' . e($reg['name']) . '</b><br><small class="muted">' . e($reg['academy'] ?? '') . '</small><br><small>' . e($label) . '</small></div>';
+            echo '<div class="p ' . $cls . '"><div class="medal">' . icon('award', 30, $medalCls) . '</div><b>' . e($reg['name']) . '</b><br><small class="muted">' . e($reg['academy'] ?? '') . '</small><br><small>' . e($label) . '</small></div>';
         }
         echo '</div>';
     }
@@ -47,7 +60,10 @@ function render_bracket(int $divisionId, bool $manage = false): void {
 
 function render_bracket_match(array $m, bool $manage, bool $isBronze = false): void {
     $live = $m['status'] === 'live';
-    echo '<div class="b-match' . ($live ? ' live' : '') . ($isBronze ? ' b-bronze' : '') . '">';
+    $attrs = ' data-id="' . (int)$m['id'] . '"';
+    if (!empty($m['next_match_id'])) $attrs .= ' data-next="' . (int)$m['next_match_id'] . '"';
+    if (!empty($m['bronze_match_id'])) $attrs .= ' data-bronze="' . (int)$m['bronze_match_id'] . '"';
+    echo '<div class="b-match' . ($live ? ' live' : '') . ($isBronze ? ' b-bronze' : '') . '"' . $attrs . '>';
     foreach ([['red', $m['red_reg_id'], $m['red_name'], $m['red_academy'], $m['red_points']],
               ['blue', $m['blue_reg_id'], $m['blue_name'], $m['blue_academy'], $m['blue_points']]] as [$side, $regId, $name, $academy, $pts]) {
         $isWinner = $m['winner_reg_id'] && $m['winner_reg_id'] == $regId;

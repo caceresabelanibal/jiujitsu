@@ -264,29 +264,49 @@ html[data-theme="light"] .art-fighters.tint-mono { opacity: .38; }
 .stat .sub { color: var(--muted); font-size: .85rem; }
 
 /* ===== Bracket ===== */
-.bracket-scroll { overflow-x: auto; padding-bottom: 12px; }
-.bracket { display: flex; gap: 40px; align-items: stretch; min-width: fit-content; }
-.b-round { display: flex; flex-direction: column; justify-content: space-around; gap: 18px; min-width: 230px; }
-.b-round h4 { text-align: center; color: var(--muted); margin: 0 0 4px; text-transform: uppercase; font-size: .78rem; letter-spacing: .08em; }
-.b-match { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,.35); }
-.b-match.live { outline: 2px solid var(--accent2); }
-.b-side { display: flex; align-items: center; gap: 8px; padding: 9px 12px; border-bottom: 1px solid var(--border); min-height: 40px; }
+/* Fondo tipo tatami: grilla muy sutil de costuras */
+.bracket-scroll { overflow-x: auto; overflow-y: hidden; padding: 22px 16px 26px; border-radius: 20px;
+  background-color: color-mix(in srgb, var(--bg2) 60%, transparent);
+  background-image:
+    repeating-linear-gradient(0deg, color-mix(in srgb, var(--text) 5%, transparent) 0 1px, transparent 1px 44px),
+    repeating-linear-gradient(90deg, color-mix(in srgb, var(--text) 5%, transparent) 0 1px, transparent 1px 44px); }
+.bracket { position: relative; display: flex; gap: 60px; align-items: stretch; min-width: fit-content; padding: 6px 30px; }
+.bracket-lines { position: absolute; top: 0; left: 0; z-index: 0; pointer-events: none; overflow: visible; }
+.bracket-line { fill: none; stroke-width: 2.5px; opacity: .8; stroke-linecap: round; }
+.b-round { position: relative; z-index: 1; display: flex; flex-direction: column; justify-content: space-around; gap: 24px; min-width: 240px; }
+.b-round h4 { text-align: center; color: var(--accent, var(--muted)); margin: 0 0 6px; text-transform: uppercase; font-size: .78rem; letter-spacing: .1em; font-weight: 800; }
+.b-match { position: relative; z-index: 1; background: linear-gradient(160deg, color-mix(in srgb, var(--card) 94%, var(--accent, var(--border)) 6%), var(--card));
+  border: 1px solid var(--border); border-left: 4px solid var(--accent, var(--border)); border-radius: 14px; overflow: hidden;
+  box-shadow: 0 3px 14px rgba(0,0,0,.28); transition: transform .18s ease, box-shadow .18s ease; }
+.b-match:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.38); }
+.b-match.live { outline: 2px solid var(--accent2); animation: liveGlow 1.7s ease-in-out infinite; }
+@keyframes liveGlow { 50% { box-shadow: 0 0 0 7px rgba(255,179,71,.22); } }
+.b-side { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--border); min-height: 42px; }
 .b-side:last-child { border-bottom: none; }
-.b-side .who { flex: 1; font-weight: 600; font-size: .92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 190px; }
+.b-side .who { flex: 1; font-weight: 600; font-size: .94rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 210px; }
 .b-side .who small { display: block; color: var(--muted); font-weight: 400; font-size: .74rem; }
 .b-side .pts { font-weight: 800; min-width: 22px; text-align: right; }
-.b-side.winner { background: rgba(48,164,108,.14); }
-.b-side.winner .who { color: #7ee2b0; }
+.b-side.winner { background: linear-gradient(90deg, rgba(48,164,108,.18), transparent); }
+.b-side.winner .who { color: #7ee2b0; font-weight: 700; }
 .b-side.empty .who { color: var(--muted); font-style: italic; }
-.b-match .mlink { position: absolute; top: 4px; right: 6px; font-size: .7rem; }
-.b-bronze { border-color: var(--bronze); }
-.b-bronze h5 { margin: 0; padding: 4px 10px; color: var(--bronze); font-size: .72rem; text-transform: uppercase; }
-.podium { display: flex; gap: 14px; justify-content: center; margin: 22px 0; flex-wrap: wrap; }
-.podium .p { text-align: center; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 22px; min-width: 150px; }
-.podium .p .medal { font-size: 2rem; }
-.podium .p.g { border-color: var(--gold); }
+.b-match .mlink { position: absolute; top: 4px; right: 6px; font-size: .7rem; z-index: 2; }
+.b-match.b-bronze { border-left-color: var(--bronze); }
+.b-bronze-label { background: none; border: none; box-shadow: none; text-align: center; margin-bottom: -8px; }
+.b-bronze-label h5 { margin: 0; padding: 4px 10px; color: var(--bronze); font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; font-weight: 800; }
+.podium { display: flex; gap: 18px; justify-content: center; margin: 28px 0 6px; flex-wrap: wrap; }
+.podium .p { text-align: center; background: linear-gradient(160deg, var(--card), color-mix(in srgb, var(--card) 82%, black 8%));
+  border: 1px solid var(--border); border-radius: 16px; padding: 20px 28px; min-width: 165px; box-shadow: 0 4px 16px rgba(0,0,0,.28); }
+.podium .p .medal { margin-bottom: 4px; }
+.podium .p.g { border-color: var(--gold); box-shadow: 0 4px 22px rgba(212,175,55,.25); }
 .podium .p.s { border-color: var(--silver); }
 .podium .p.b { border-color: var(--bronze); }
+
+/* Vista proyector de llaves: todo encaja en el viewport, solo la llave scrollea internamente */
+body.proj { height: 100vh; overflow: hidden; }
+body.proj .bare-main { display: flex; flex-direction: column; height: 100%; box-sizing: border-box; }
+.proj-page { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; width: 100%; }
+.proj-page .projector-header { flex: 0 0 auto; }
+.bracket-region { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 0 20px; }
 
 /* ===== Scoreboard ===== */
 .sb { display: flex; flex-direction: column; height: 100vh; background: #000; box-sizing: border-box; }
@@ -367,3 +387,7 @@ body.has-ads.dual-ads .bare-main { padding-top: 90px; }
 img.tlogo { height: 60px; border-radius: 8px; }
 .projector-header { text-align: center; padding: 18px; }
 .projector-header h1 { margin: 4px 0; }
+.proj-page .projector-header { padding: 8px 18px 4px; }
+.proj-page .projector-header img.tlogo { height: 38px; }
+.proj-page .projector-header h1 { margin: 2px 0; font-size: clamp(1.2rem, 2.8vw, 1.8rem); }
+.proj-page .projector-header h2 { margin: 0 0 2px; font-size: clamp(.82rem, 1.8vw, 1rem); font-weight: 600; }
