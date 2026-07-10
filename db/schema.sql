@@ -70,6 +70,9 @@ CREATE TABLE IF NOT EXISTS tournaments (
   status ENUM('draft','open','running','finished') NOT NULL DEFAULT 'open',
   certs_requested TINYINT(1) NOT NULL DEFAULT 0,
   ads_mode ENUM('none','tournament','general','both') NOT NULL DEFAULT 'both',
+  division_order TEXT NULL, -- JSON: orden de corrida por categoria/cinturon; NULL = usa el general de /admin/settings
+  belt_durations TEXT NULL, -- JSON: duracion de lucha (segundos) por cinturon/infantil-juvenil; NULL = usa el general de /admin/settings
+  age_thresholds TEXT NULL, -- JSON: hasta que edad es infantil/juvenil (adulto empieza despues); NULL = usa el general de /admin/settings
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

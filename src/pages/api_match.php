@@ -118,6 +118,8 @@ switch ($action) {
             [$winnerReg, $method, $remaining, $elapsed, $mid]);
         advance_winner($mid);
         propagate_byes((int)$m['division_id']);
+        $tournamentJustFinished = $t['status'] !== 'finished'
+            && scalar('SELECT status FROM tournaments WHERE id = ?', [$t['id']]) === 'finished';
         break;
 
     case 'reopen':
@@ -147,4 +149,9 @@ switch ($action) {
         break;
 }
 
-json_out(match_state(row('SELECT * FROM matches WHERE id = ?', [$mid])));
+$outState = match_state(row('SELECT * FROM matches WHERE id = ?', [$mid]));
+if (!empty($tournamentJustFinished)) {
+    $outState['tournament_finished'] = true;
+    $outState['tournament_name'] = $t['name'];
+}
+json_out($outState);

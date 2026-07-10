@@ -1,6 +1,26 @@
 <?php
 use PHPMailer\PHPMailer\PHPMailer;
 
+/**
+ * Config SMTP: primero lo que haya guardado el admin en /admin/settings
+ * (tabla settings, clave "smtp"); si no configuro nada todavia, cae a las
+ * variables de entorno del docker-compose (asi sigue andando con MailHog
+ * en dev sin que haga falta tocar nada).
+ */
+function smtp_config(): array {
+    $defaults = [
+        'host' => getenv('SMTP_HOST') ?: 'mailhog',
+        'port' => (int)(getenv('SMTP_PORT') ?: 1025),
+        'user' => getenv('SMTP_USER') ?: '',
+        'pass' => getenv('SMTP_PASS') ?: '',
+        'secure' => getenv('SMTP_SECURE') ?: '',
+        'from' => getenv('MAIL_FROM') ?: 'torneos@taninzu.com',
+        'from_name' => getenv('MAIL_FROM_NAME') ?: 'Taninzu',
+    ];
+    $stored = setting('smtp', null);
+    return is_array($stored) ? array_merge($defaults, $stored) : $defaults;
+}
+
 /** Encola un mail (lo procesa el cron o el envio inmediato best-effort) */
 function queue_mail(string $to, ?string $toName, string $subject, string $bodyHtml, ?string $attachment = null): int {
     q('INSERT INTO email_queue (to_email, to_name, subject, body_html, attachment_path) VALUES (?,?,?,?,?)',
@@ -15,20 +35,19 @@ function send_queued_mail(int $id): bool {
     $m = row('SELECT * FROM email_queue WHERE id = ? AND status != "sent"', [$id]);
     if (!$m) return false;
     try {
+        $cfg = smtp_config();
         $mailer = new PHPMailer(true);
         $mailer->isSMTP();
-        $mailer->Host = getenv('SMTP_HOST') ?: 'mailhog';
-        $mailer->Port = (int)(getenv('SMTP_PORT') ?: 1025);
-        $user = getenv('SMTP_USER');
-        if ($user) {
+        $mailer->Host = $cfg['host'];
+        $mailer->Port = (int)$cfg['port'];
+        if ($cfg['user']) {
             $mailer->SMTPAuth = true;
-            $mailer->Username = $user;
-            $mailer->Password = getenv('SMTP_PASS') ?: '';
+            $mailer->Username = $cfg['user'];
+            $mailer->Password = $cfg['pass'];
         }
-        $secure = getenv('SMTP_SECURE');
-        if ($secure) $mailer->SMTPSecure = $secure;
+        if ($cfg['secure']) $mailer->SMTPSecure = $cfg['secure'];
         $mailer->CharSet = 'UTF-8';
-        $mailer->setFrom(getenv('MAIL_FROM') ?: 'torneos@bjjmanager.local', getenv('MAIL_FROM_NAME') ?: 'BJJ Manager');
+        $mailer->setFrom($cfg['from'], $cfg['from_name']);
         $mailer->addAddress($m['to_email'], $m['to_name'] ?? '');
         $mailer->isHTML(true);
         $mailer->Subject = $m['subject'];

@@ -112,6 +112,17 @@ main.bare-main { padding: 0; flex: 1; animation: pageIn .32s ease; }
   .grid.cols2, .grid.cols3, .grid.cols4 { grid-template-columns: 1fr; }
 }
 
+/* Modal de felicitaciones al terminar la ultima lucha del torneo (operador) */
+.tfin-overlay { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center;
+                background: rgba(5,7,15,.72); backdrop-filter: blur(4px); padding: 20px; animation: tfinFade .25s ease; }
+.tfin-card { background: var(--card); border: 1px solid var(--gold); border-radius: 16px; padding: 32px;
+             max-width: 420px; text-align: center; box-shadow: 0 12px 48px rgba(212,175,55,.25); animation: tfinPop .3s ease; }
+.tfin-card h2 { margin: 14px 0 8px; color: var(--gold); }
+.tfin-card p { color: var(--muted); margin-bottom: 22px; }
+.tfin-trophy { color: var(--gold); }
+@keyframes tfinFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes tfinPop { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
+
 /* Forms */
 label { display: block; margin: 10px 0 4px; color: var(--muted); font-size: .9rem; font-weight: 600; }
 input, select, textarea { width: 100%; padding: 10px 12px; background: var(--bg2); color: var(--text); border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; transition: border-color .2s ease, background .3s ease; }

@@ -4,6 +4,7 @@
  *   * * * * *  curl -s "https://tu-dominio/cron.php?task=emails&key=CRON_KEY"
  *   0 * * * *  curl -s "https://tu-dominio/cron.php?task=rankings&key=CRON_KEY"
  *   0 4 * * *  curl -s "https://tu-dominio/cron.php?task=cleanup&key=CRON_KEY"
+ *   0,15,30,45 * * * *  curl -s "https://tu-dominio/cron.php?task=tournament_status&key=CRON_KEY"
  */
 require_once dirname(__DIR__) . '/src/bootstrap.php';
 
@@ -46,6 +47,19 @@ switch ($task) {
         $b = q('DELETE FROM email_queue WHERE status = "sent" AND sent_at < DATE_SUB(NOW(), INTERVAL 30 DAY)')->rowCount();
         $c = q('DELETE FROM cron_log WHERE ran_at < DATE_SUB(NOW(), INTERVAL 30 DAY)')->rowCount();
         $detail = "$a inscripciones, $b mails, $c logs";
+        break;
+
+    case 'tournament_status':
+        // Inscripcion abierta -> en curso cuando llega la fecha del evento
+        $started = q("UPDATE tournaments SET status = 'running'
+                      WHERE status = 'open' AND event_date IS NOT NULL AND event_date <= CURDATE()")->rowCount();
+        // Red de seguridad: si alguna llave quedo completa sin pasar por check_tournament_done()
+        // (p.ej. reopen/edicion manual), lo detecta igual en el proximo barrido.
+        $finished = 0;
+        foreach (rows("SELECT id FROM tournaments WHERE status = 'running'") as $tt) {
+            if (check_tournament_done((int)$tt['id'])) $finished++;
+        }
+        $detail = "$started a en curso, $finished a finalizado";
         break;
 
     default:

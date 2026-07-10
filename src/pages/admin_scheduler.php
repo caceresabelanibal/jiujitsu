@@ -2,10 +2,11 @@
 require_admin();
 
 $tasks = [
-    'emails'       => ['mail', 'Procesa la cola de mails (verificaciones, certificados)', '* * * * *'],
-    'certificates' => ['award', 'Genera los PDFs de certificados pendientes por lotes', '*/5 * * * *'],
-    'rankings'     => ['chart', 'Recalcula el ranking global de competidores', '0 * * * *'],
-    'cleanup'      => ['trash', 'Borra inscripciones no verificadas (>72h) y mails viejos', '0 4 * * *'],
+    'emails'            => ['mail', 'Procesa la cola de mails (verificaciones, certificados)', '* * * * *'],
+    'certificates'      => ['award', 'Genera los PDFs de certificados pendientes por lotes', '*/5 * * * *'],
+    'rankings'          => ['chart', 'Recalcula el ranking global de competidores', '0 * * * *'],
+    'tournament_status' => ['calendar', 'Pasa a "en curso" al llegar la fecha y a "finalizado" si ya no quedan luchas', '0,15,30,45 * * * *'],
+    'cleanup'           => ['trash', 'Borra inscripciones no verificadas (>72h) y mails viejos', '0 4 * * *'],
 ];
 $key = CRON_KEY;
 view_header(t('scheduler'));

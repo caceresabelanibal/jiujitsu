@@ -61,6 +61,50 @@ function find_age_division(int $age): ?array {
     return row('SELECT * FROM age_divisions WHERE min_age <= ? AND (max_age IS NULL OR max_age >= ?) ORDER BY sort LIMIT 1', [$age, $age]);
 }
 
+/**
+ * A partir de que edad (al 31/12) se considera infantil/juvenil en cada torneo;
+ * adulto arranca despues de `juvenile_max`. Configurable en /admin/settings
+ * (general) y por torneo en /tournament/{id}/settings o al crearlo (sobreescribe
+ * el general si se guarda) — solo afecta inscripciones nuevas, no reclasifica
+ * las que ya estan cargadas.
+ */
+function age_threshold_defaults(): array {
+    return ['kids_max' => 15, 'juvenile_max' => 17];
+}
+
+function age_threshold_sanitize($v): array {
+    $d = age_threshold_defaults();
+    $kidsMax = is_array($v) ? (int)($v['kids_max'] ?? 0) : 0;
+    $juvMax = is_array($v) ? (int)($v['juvenile_max'] ?? 0) : 0;
+    if ($kidsMax < 3 || $kidsMax > 17) $kidsMax = $d['kids_max'];
+    if ($juvMax <= $kidsMax || $juvMax > 20) $juvMax = max($kidsMax + 1, $d['juvenile_max']);
+    return ['kids_max' => $kidsMax, 'juvenile_max' => $juvMax];
+}
+
+function age_thresholds_global(): array {
+    return age_threshold_sanitize(setting('age_thresholds', null));
+}
+
+/** Umbrales efectivos para un torneo: su propio override si guardo uno, si no el general */
+function age_thresholds_for(?array $tournament): array {
+    if ($tournament && !empty($tournament['age_thresholds'])) {
+        $decoded = json_decode((string)$tournament['age_thresholds'], true);
+        if (is_array($decoded)) return age_threshold_sanitize($decoded);
+    }
+    return age_thresholds_global();
+}
+
+/** Igual que find_age_division() pero respetando los umbrales infantil/juvenil/adulto del torneo */
+function find_age_division_for(int $age, array $thresholds): ?array {
+    if ($age <= $thresholds['kids_max']) {
+        return row('SELECT * FROM age_divisions WHERE is_kids=1 AND min_age <= ? ORDER BY sort DESC LIMIT 1', [$age]);
+    }
+    if ($age <= $thresholds['juvenile_max']) {
+        return row("SELECT * FROM age_divisions WHERE code = 'juvenil' LIMIT 1");
+    }
+    return find_age_division(max($age, 18));
+}
+
 function find_weight_class(string $gender, float $kg, bool $kids): ?array {
     $g = $kids ? 'A' : $gender;
     $wc = row('SELECT * FROM weight_classes WHERE gender = ? AND is_absolute = 0 AND max_kg IS NOT NULL AND max_kg >= ? ORDER BY max_kg LIMIT 1', [$g, $kg]);

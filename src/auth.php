@@ -45,6 +45,17 @@ function require_tournament_owner(int $tournamentId): array {
     return $t;
 }
 
+/** Dueño real del torneo (creador) o admin del sitio — NO el personal (staff). Se usa para clonar. */
+function require_tournament_creator(int $tournamentId): array {
+    $u = require_login();
+    $t = row('SELECT * FROM tournaments WHERE id = ?', [$tournamentId]);
+    if (!$t || ($t['user_id'] != $u['id'] && $u['role'] !== 'admin')) {
+        http_response_code(403);
+        die(t('forbidden'));
+    }
+    return $t;
+}
+
 function login_user(array $user): void {
     session_regenerate_id(true);
     $_SESSION['uid'] = (int)$user['id'];

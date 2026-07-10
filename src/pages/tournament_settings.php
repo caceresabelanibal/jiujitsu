@@ -18,14 +18,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($do === 'del_staff') {
         q('DELETE FROM tournament_staff WHERE id = ? AND tournament_id = ?', [(int)$_POST['id'], $tid]);
         flash('success', t('settings_saved'));
+    } elseif ($do === 'save_order') {
+        $divKeys = division_order_default();
+        usort($divKeys, fn($a, $b) => (int)($_POST["div_ord_$a"] ?? 0) <=> (int)($_POST["div_ord_$b"] ?? 0));
+        q('UPDATE tournaments SET division_order = ? WHERE id = ?', [json_encode(division_order_sanitize($divKeys), JSON_UNESCAPED_UNICODE), $tid]);
+        flash('success', t('settings_saved'));
+    } elseif ($do === 'reset_order') {
+        q('UPDATE tournaments SET division_order = NULL WHERE id = ?', [$tid]);
+        flash('success', t('settings_saved'));
+    } elseif ($do === 'save_duration') {
+        $durInput = [];
+        foreach (belt_duration_defaults() as $key => $def) {
+            $durInput[$key] = max(1, (int)($_POST["dur_$key"] ?? 0)) * 60;
+        }
+        $durations = belt_duration_sanitize($durInput);
+        q('UPDATE tournaments SET belt_durations = ? WHERE id = ?', [json_encode($durations, JSON_UNESCAPED_UNICODE), $tid]);
+        apply_belt_durations($tid, $durations);
+        flash('success', t('settings_saved'));
+    } elseif ($do === 'reset_duration') {
+        q('UPDATE tournaments SET belt_durations = NULL WHERE id = ?', [$tid]);
+        apply_belt_durations($tid, belt_durations_global());
+        flash('success', t('settings_saved'));
+    } elseif ($do === 'save_age') {
+        $ages = age_threshold_sanitize([
+            'kids_max' => (int)($_POST['age_kids_max'] ?? 0),
+            'juvenile_max' => (int)($_POST['age_juvenile_max'] ?? 0),
+        ]);
+        q('UPDATE tournaments SET age_thresholds = ? WHERE id = ?', [json_encode($ages, JSON_UNESCAPED_UNICODE), $tid]);
+        flash('success', t('settings_saved'));
+    } elseif ($do === 'reset_age') {
+        q('UPDATE tournaments SET age_thresholds = NULL WHERE id = ?', [$tid]);
+        flash('success', t('settings_saved'));
     }
     redirect("/tournament/$tid/settings");
 }
 
 $staff = rows('SELECT s.id, u.name, u.email FROM tournament_staff s JOIN users u ON u.id = s.user_id WHERE s.tournament_id = ? ORDER BY u.name', [$tid]);
+$divOrder = division_order_for($t);
+$divOrderCustom = !empty($t['division_order']);
+$beltDur = belt_durations_for($t);
+$beltDurCustom = !empty($t['belt_durations']);
+$ageTh = age_thresholds_for($t);
+$ageThCustom = !empty($t['age_thresholds']);
+$u = current_user();
+$canClone = is_admin() || (int)$t['user_id'] === (int)$u['id'];
 view_header(t('settings'));
 ?>
-<h1><?= e($t['name']) ?></h1>
+<div class="flex spread">
+  <h1><?= e($t['name']) ?></h1>
+  <?php if ($canClone): ?>
+  <a class="btn secondary" href="<?= APP_URL ?>/tournament/<?= $tid ?>/clone"><?= icon('shuffle', 15) ?> <?= t('clone_tournament') ?></a>
+  <?php endif; ?>
+</div>
 <?php tournament_tabs($t, 'settings'); ?>
 
 <div class="card">
@@ -80,5 +124,73 @@ view_header(t('settings'));
     </div>
     <?php endforeach; ?>
   </div>
+</div>
+
+<div class="card">
+  <h3><?= icon('sliders', 16) ?> <?= t('division_order_title') ?> <?php if ($divOrderCustom): ?><span class="badge blue"><?= t('division_order_custom_badge') ?></span><?php endif; ?></h3>
+  <p class="muted" style="margin-top:0"><?= t('division_order_tournament_hint') ?></p>
+  <form method="post">
+    <?= csrf_field() ?>
+    <div class="grid cols3">
+      <?php foreach (division_order_labels() as $key => $label): ?>
+      <div>
+        <label><?= e($label) ?></label>
+        <input type="number" name="div_ord_<?= e($key) ?>" value="<?= array_search($key, $divOrder, true) + 1 ?>" min="1" max="6">
+      </div>
+      <?php endforeach; ?>
+    </div>
+    <div class="flex mt">
+      <button class="btn" type="submit" name="do" value="save_order"><?= t('save') ?></button>
+      <?php if ($divOrderCustom): ?>
+      <button class="btn secondary" type="submit" name="do" value="reset_order"><?= t('division_order_reset') ?></button>
+      <?php endif; ?>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <h3><?= icon('clock', 16) ?> <?= t('belt_duration_title') ?> <?php if ($beltDurCustom): ?><span class="badge blue"><?= t('belt_duration_custom_badge') ?></span><?php endif; ?></h3>
+  <p class="muted" style="margin-top:0"><?= t('belt_duration_tournament_hint') ?></p>
+  <form method="post">
+    <?= csrf_field() ?>
+    <div class="grid cols3">
+      <?php foreach (division_order_labels() as $key => $label): ?>
+      <div>
+        <label><?= e($label) ?></label>
+        <input type="number" name="dur_<?= e($key) ?>" value="<?= (int)round($beltDur[$key] / 60) ?>" min="1" max="30"> <span class="muted"><?= t('belt_duration_minutes') ?></span>
+      </div>
+      <?php endforeach; ?>
+    </div>
+    <div class="flex mt">
+      <button class="btn" type="submit" name="do" value="save_duration"><?= t('save') ?></button>
+      <?php if ($beltDurCustom): ?>
+      <button class="btn secondary" type="submit" name="do" value="reset_duration"><?= t('belt_duration_reset') ?></button>
+      <?php endif; ?>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <h3><?= icon('calendar', 16) ?> <?= t('age_thresholds_title') ?> <?php if ($ageThCustom): ?><span class="badge blue"><?= t('age_thresholds_custom_badge') ?></span><?php endif; ?></h3>
+  <p class="muted" style="margin-top:0"><?= t('age_thresholds_tournament_hint') ?></p>
+  <form method="post">
+    <?= csrf_field() ?>
+    <div class="grid cols3">
+      <div>
+        <label><?= t('age_kids_max') ?></label>
+        <input type="number" name="age_kids_max" value="<?= (int)$ageTh['kids_max'] ?>" min="3" max="17"> <span class="muted"><?= t('age_years') ?></span>
+      </div>
+      <div>
+        <label><?= t('age_juvenile_max') ?></label>
+        <input type="number" name="age_juvenile_max" value="<?= (int)$ageTh['juvenile_max'] ?>" min="4" max="20"> <span class="muted"><?= t('age_years') ?></span>
+      </div>
+    </div>
+    <div class="flex mt">
+      <button class="btn" type="submit" name="do" value="save_age"><?= t('save') ?></button>
+      <?php if ($ageThCustom): ?>
+      <button class="btn secondary" type="submit" name="do" value="reset_age"><?= t('age_thresholds_reset') ?></button>
+      <?php endif; ?>
+    </div>
+  </form>
 </div>
 <?php view_footer();

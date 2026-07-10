@@ -86,7 +86,10 @@ window.SB = {
   isOperator: true,
   csrf: '<?= e($_SESSION['csrf']) ?>',
   confirmReopen: '<?= e(t('confirm_reopen')) ?>',
-  reopenBlocked: '<?= e(t('reopen_blocked')) ?>'
+  reopenBlocked: '<?= e(t('reopen_blocked')) ?>',
+  tournamentFinishedTitle: '<?= e(t('tournament_finished_title')) ?>',
+  tournamentFinishedBody: '<?= e(sprintf(t('tournament_finished_body'), $t['name'])) ?>',
+  tournamentFinishedClose: '<?= e(t('tournament_finished_close')) ?>'
 };
 </script>
 <script src="<?= asset('/assets/js/scoreboard.js') ?>"></script>

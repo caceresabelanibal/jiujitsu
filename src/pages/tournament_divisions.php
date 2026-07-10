@@ -11,14 +11,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     redirect("/tournament/$tid/divisions");
 }
 
-$divs = rows('SELECT d.*, b.name_es b_es, b.name_en b_en, b.color_hex,
+$divOrder = division_order_case_sql(division_order_for($t));
+$divs = rows("SELECT d.*, b.name_es b_es, b.name_en b_en, b.color_hex,
                      ad.name_es a_es, ad.name_en a_en, wc.name_es w_es, wc.name_en w_en,
                      (SELECT COUNT(*) FROM matches m WHERE m.division_id=d.id) has_bracket
               FROM divisions d
               JOIN belts b ON b.id=d.belt_id
               JOIN age_divisions ad ON ad.id=d.age_division_id
               JOIN weight_classes wc ON wc.id=d.weight_class_id
-              WHERE d.tournament_id=? ORDER BY d.gender, ad.sort, b.sort, wc.sort', [$tid]);
+              WHERE d.tournament_id=? ORDER BY $divOrder, d.gender, ad.sort, b.sort, wc.sort", [$tid]);
 $isEn = lang() === 'en';
 view_header(t('divisions'));
 ?>

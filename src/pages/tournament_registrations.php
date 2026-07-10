@@ -13,7 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     redirect("/tournament/$tid/registrations");
 }
 
-$regs = rows('SELECT r.*, b.name_es b_es, b.name_en b_en, b.color_hex,
+$divOrder = division_order_case_sql(division_order_for($t));
+$regs = rows("SELECT r.*, b.name_es b_es, b.name_en b_en, b.color_hex,
                      ad.name_es a_es, ad.name_en a_en, wc.name_es w_es, wc.name_en w_en,
                      a.name academy_name, p.name professor_name
               FROM registrations r
@@ -22,7 +23,7 @@ $regs = rows('SELECT r.*, b.name_es b_es, b.name_en b_en, b.color_hex,
               JOIN weight_classes wc ON wc.id=r.weight_class_id
               LEFT JOIN tournament_academies a ON a.id=r.academy_id
               LEFT JOIN tournament_professors p ON p.id=r.professor_id
-              WHERE r.tournament_id=? ORDER BY r.created_at DESC', [$tid]);
+              WHERE r.tournament_id=? ORDER BY $divOrder, r.gender, ad.sort, b.sort, wc.sort, r.name", [$tid]);
 $isEn = lang() === 'en';
 view_header(t('registrations'));
 ?>

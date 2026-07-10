@@ -1,8 +1,9 @@
 <?php
 $t = require_tournament_owner((int)$params[0]);
 $tid = (int)$t['id'];
-$matches = rows('SELECT m.*, r1.name red_name, r2.name blue_name, d.id did,
-                        b.name_es b_es, b.name_en b_en, ad.name_es ad_es, ad.name_en ad_en,
+$divOrder = division_order_case_sql(division_order_for($t));
+$matches = rows("SELECT m.*, r1.name red_name, r2.name blue_name, d.id did,
+                        b.name_es b_es, b.name_en b_en, b.color_hex, ad.name_es ad_es, ad.name_en ad_en,
                         wc.name_es w_es, wc.name_en w_en, d.gender
                  FROM matches m
                  JOIN divisions d ON d.id = m.division_id
@@ -12,7 +13,7 @@ $matches = rows('SELECT m.*, r1.name red_name, r2.name blue_name, d.id did,
                  LEFT JOIN registrations r1 ON r1.id = m.red_reg_id
                  LEFT JOIN registrations r2 ON r2.id = m.blue_reg_id
                  WHERE m.tournament_id = ? AND m.red_reg_id IS NOT NULL AND m.blue_reg_id IS NOT NULL
-                 ORDER BY (m.status = "live") DESC, (m.status = "pending") DESC, d.id, m.round, m.slot', [$tid]);
+                 ORDER BY (m.status = \"live\") DESC, (m.status = \"pending\") DESC, $divOrder, d.gender, ad.sort, b.sort, wc.sort, m.round, m.slot", [$tid]);
 $isEn = lang() === 'en';
 view_header(t('matches'));
 ?>
@@ -24,7 +25,7 @@ view_header(t('matches'));
   <?php foreach ($matches as $m): ?>
   <tr>
     <td class="muted" style="font-size:.82rem">
-      <?= ($m['gender'] === 'M' ? t('male') : t('female')) . ' · ' . e($isEn ? $m['ad_en'] : $m['ad_es']) . ' · ' . e($isEn ? $m['b_en'] : $m['b_es']) . ' · ' . e($isEn ? $m['w_en'] : $m['w_es']) ?>
+      <?= ($m['gender'] === 'M' ? t('male') : t('female')) . ' · ' . e($isEn ? $m['ad_en'] : $m['ad_es']) ?> · <span class="belt-chip" style="background:<?= e($m['color_hex']) ?>"></span> <?= e($isEn ? $m['w_en'] : $m['w_es']) ?>
       <?= $m['is_bronze'] ? '<span class="badge grey">' . icon('award', 11, 'ic-bronze') . '</span>' : '' ?>
     </td>
     <td><b><?= e($m['red_name']) ?></b> <span class="muted"><?= t('vs') ?></span> <b><?= e($m['blue_name']) ?></b></td>

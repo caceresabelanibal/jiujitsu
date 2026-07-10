@@ -29,6 +29,9 @@ view_header(t('my_tournaments'));
     <td style="white-space:nowrap">
       <a class="btn sm" href="<?= APP_URL ?>/tournament/<?= $tt['id'] ?>"><?= icon('play', 12) ?> <?= t('go_to_tournament') ?></a>
       <a class="btn sm secondary" href="<?= APP_URL ?>/tournament/<?= $tt['id'] ?>/settings" title="<?= t('settings') ?>"><?= icon('settings', 14) ?></a>
+      <?php if (is_admin() || (int)$tt['user_id'] === (int)$u['id']): ?>
+      <a class="btn sm secondary" href="<?= APP_URL ?>/tournament/<?= $tt['id'] ?>/clone" title="<?= t('clone_tournament') ?>"><?= icon('shuffle', 14) ?></a>
+      <?php endif; ?>
     </td>
   </tr>
   <?php endforeach; ?>

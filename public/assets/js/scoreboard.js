@@ -71,6 +71,20 @@
     } catch (e) { /* reintenta en el proximo tick */ }
   }
 
+  function showTournamentFinishedModal() {
+    const overlay = document.createElement('div');
+    overlay.className = 'tfin-overlay';
+    overlay.innerHTML =
+      '<div class="tfin-card">' +
+        '<svg class="ic tfin-trophy" width="48" height="48"><use href="#i-trophy"></use></svg>' +
+        '<h2>' + (S.tournamentFinishedTitle || '') + '</h2>' +
+        '<p>' + (S.tournamentFinishedBody || '') + '</p>' +
+        '<button class="btn" type="button">' + (S.tournamentFinishedClose || 'OK') + '</button>' +
+      '</div>';
+    overlay.querySelector('button').addEventListener('click', () => location.reload());
+    document.body.appendChild(overlay);
+  }
+
   window.sbAction = async function (action, side, type) {
     if (!S.isOperator) return;
     const body = new URLSearchParams({ action, csrf: S.csrf });
@@ -85,7 +99,11 @@
     state = data;
     lastSync = Date.now();
     render();
-    if ((state.status === 'done' && action === 'end') || action === 'reopen') location.reload();
+    if (data.tournament_finished) {
+      showTournamentFinishedModal();
+    } else if ((state.status === 'done' && action === 'end') || action === 'reopen') {
+      location.reload();
+    }
   };
 
   window.sbToggleTimer = function () {

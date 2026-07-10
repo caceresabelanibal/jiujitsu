@@ -5,6 +5,8 @@
 
 /** Crea/actualiza divisiones segun los inscriptos verificados del torneo */
 function ensure_divisions(int $tournamentId): int {
+    $tournament = row('SELECT * FROM tournaments WHERE id = ?', [$tournamentId]);
+    $durations = belt_durations_for($tournament);
     $combos = rows('SELECT DISTINCT gender, belt_id, age_division_id, weight_class_id
                     FROM registrations WHERE tournament_id = ? AND verified = 1', [$tournamentId]);
     $created = 0;
@@ -13,10 +15,12 @@ function ensure_divisions(int $tournamentId): int {
             [$tournamentId, $c['gender'], $c['belt_id'], $c['age_division_id'], $c['weight_class_id']]);
         if (!$exists) {
             $belt = row('SELECT * FROM belts WHERE id = ?', [$c['belt_id']]);
+            $age = row('SELECT * FROM age_divisions WHERE id = ?', [$c['age_division_id']]);
+            $bucket = belt_duration_bucket($belt['code'], (bool)$age['is_kids'], $age['code']);
+            $sec = $durations[$bucket] ?? (int)($belt['default_duration_sec'] ?? 300);
             q('INSERT INTO divisions (tournament_id, gender, belt_id, age_division_id, weight_class_id, duration_sec)
                VALUES (?,?,?,?,?,?)',
-                [$tournamentId, $c['gender'], $c['belt_id'], $c['age_division_id'], $c['weight_class_id'],
-                 (int)($belt['default_duration_sec'] ?? 300)]);
+                [$tournamentId, $c['gender'], $c['belt_id'], $c['age_division_id'], $c['weight_class_id'], $sec]);
             $created++;
         }
     }
@@ -163,8 +167,41 @@ function check_division_done(int $divisionId): void {
     $pending = (int)scalar('SELECT COUNT(*) FROM matches WHERE division_id=? AND status!="done"', [$divisionId]);
     $total = (int)scalar('SELECT COUNT(*) FROM matches WHERE division_id=?', [$divisionId]);
     if ($total > 0) {
-        q('UPDATE divisions SET status = ? WHERE id = ?', [$pending === 0 ? 'done' : 'bracketed', $divisionId]);
+        $status = $pending === 0 ? 'done' : 'bracketed';
+        q('UPDATE divisions SET status = ? WHERE id = ?', [$status, $divisionId]);
+        if ($status === 'done') {
+            $tid = scalar('SELECT tournament_id FROM divisions WHERE id = ?', [$divisionId]);
+            if ($tid) check_tournament_done((int)$tid);
+        }
     }
+}
+
+/**
+ * Si ya no queda ninguna division con llave por terminar, marca el torneo
+ * como finalizado y le manda un mail de agradecimiento al organizador. Se
+ * llama automaticamente al cerrar cualquier lucha (via check_division_done())
+ * y tambien desde el cron `tournament_status` como red de seguridad.
+ */
+function check_tournament_done(int $tournamentId): bool {
+    $t = row('SELECT * FROM tournaments WHERE id = ?', [$tournamentId]);
+    if (!$t || $t['status'] !== 'running') return false;
+    $withBracket = (int)scalar('SELECT COUNT(DISTINCT d.id) FROM divisions d JOIN matches m ON m.division_id = d.id WHERE d.tournament_id = ?', [$tournamentId]);
+    if ($withBracket === 0) return false;
+    $open = (int)scalar("SELECT COUNT(*) FROM divisions d
+                         WHERE d.tournament_id = ? AND d.status != 'done'
+                         AND EXISTS (SELECT 1 FROM matches m WHERE m.division_id = d.id)", [$tournamentId]);
+    if ($open > 0) return false;
+
+    q("UPDATE tournaments SET status = 'finished' WHERE id = ?", [$tournamentId]);
+    $owner = row('SELECT * FROM users WHERE id = ?', [$t['user_id']]);
+    if ($owner) {
+        queue_mail($owner['email'], $owner['name'], t('mail_tournament_done_subject'),
+            mail_layout(t('mail_tournament_done_subject'),
+                '<p>' . sprintf(t('mail_tournament_done_body1'), e($t['name'])) . '</p>' .
+                '<p>' . t('mail_tournament_done_body2') . '</p>' .
+                '<p style="text-align:center"><a href="' . APP_URL . '/tournaments/create" style="background:#30a46c;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold">' . t('mail_tournament_done_button') . '</a></p>'));
+    }
+    return true;
 }
 
 /** Podio de una division: [gold, silver, bronze] (reg ids o null) */
@@ -195,4 +232,114 @@ function infer_winner(array $m): ?string {
     if ($m['red_adv'] != $m['blue_adv']) return $m['red_adv'] > $m['blue_adv'] ? 'red' : 'blue';
     if ($m['red_pen'] != $m['blue_pen']) return $m['red_pen'] < $m['blue_pen'] ? 'red' : 'blue';
     return null;
+}
+
+/**
+ * Orden habitual de las luchas en un torneo de Jiu-Jitsu: primero infantiles y
+ * juveniles (todas las categorias/pesos juntos), despues los adultos/masters
+ * por cinturon de negro a blanco. Configurable en /admin/settings (general) y
+ * por torneo en /tournament/{id}/settings (sobreescribe el general si se guarda).
+ */
+function division_order_default(): array {
+    return ['kids_juvenile', 'black', 'brown', 'purple', 'blue', 'white'];
+}
+
+function division_order_labels(): array {
+    return [
+        'kids_juvenile' => t('div_order_kids_juvenile'),
+        'black' => t('div_order_black'),
+        'brown' => t('div_order_brown'),
+        'purple' => t('div_order_purple'),
+        'blue' => t('div_order_blue'),
+        'white' => t('div_order_white'),
+    ];
+}
+
+/** Valida que sea una permutacion de las 6 claves conocidas; si no, usa el default */
+function division_order_sanitize($order): array {
+    $keys = division_order_default();
+    $order = is_array($order) ? array_values(array_intersect(array_unique($order), $keys)) : [];
+    foreach ($keys as $k) {
+        if (!in_array($k, $order, true)) $order[] = $k;
+    }
+    return $order;
+}
+
+function division_order_global(): array {
+    return division_order_sanitize(setting('division_order', null));
+}
+
+/** Orden efectivo para un torneo: su propio override si guardo uno, si no el general */
+function division_order_for(?array $tournament): array {
+    if ($tournament && !empty($tournament['division_order'])) {
+        $decoded = json_decode((string)$tournament['division_order'], true);
+        if (is_array($decoded)) return division_order_sanitize($decoded);
+    }
+    return division_order_global();
+}
+
+/** Expresion SQL (CASE) que traduce el orden configurado a una posicion numerica para ORDER BY */
+function division_order_case_sql(array $order, string $adAlias = 'ad', string $beltAlias = 'b'): string {
+    $pos = array_flip(division_order_sanitize($order));
+    $sql = "CASE WHEN $adAlias.is_kids=1 OR $adAlias.code='juvenil' THEN " . (int)$pos['kids_juvenile'] . "\n";
+    foreach (['black', 'brown', 'purple', 'blue', 'white'] as $belt) {
+        $sql .= " WHEN $beltAlias.code='$belt' THEN " . (int)$pos[$belt] . "\n";
+    }
+    return $sql . ' ELSE 99 END';
+}
+
+/**
+ * Duracion de lucha por defecto segun categoria: infantiles/juveniles comparten
+ * un unico valor, los adultos/masters uno por cinturon (mismos 6 grupos que el
+ * orden de corrida). Configurable en /admin/settings (general) y por torneo en
+ * /tournament/{id}/settings (sobreescribe el general si se guarda) o al crear
+ * el torneo. Los valores de fabrica coinciden con los que ya traía cada
+ * cinturon en `belts.default_duration_sec`.
+ */
+function belt_duration_defaults(): array {
+    return ['kids_juvenile' => 240, 'black' => 600, 'brown' => 480, 'purple' => 420, 'blue' => 360, 'white' => 300];
+}
+
+/** A que grupo de duracion pertenece una division segun su cinturon y categoria de edad */
+function belt_duration_bucket(string $beltCode, bool $ageIsKids, string $ageCode): string {
+    if ($ageIsKids || $ageCode === 'juvenil') return 'kids_juvenile';
+    return in_array($beltCode, ['black', 'brown', 'purple', 'blue', 'white'], true) ? $beltCode : 'white';
+}
+
+/** Valida que tenga las 6 claves conocidas con segundos razonables; si no, usa el default */
+function belt_duration_sanitize($durations): array {
+    $defaults = belt_duration_defaults();
+    $out = [];
+    foreach ($defaults as $k => $def) {
+        $sec = is_array($durations) ? (int)($durations[$k] ?? 0) : 0;
+        $out[$k] = $sec >= 60 && $sec <= 1800 ? $sec : $def;
+    }
+    return $out;
+}
+
+function belt_durations_global(): array {
+    return belt_duration_sanitize(setting('belt_durations', null));
+}
+
+/** Duraciones efectivas para un torneo: su propio override si guardo uno, si no el general */
+function belt_durations_for(?array $tournament): array {
+    if ($tournament && !empty($tournament['belt_durations'])) {
+        $decoded = json_decode((string)$tournament['belt_durations'], true);
+        if (is_array($decoded)) return belt_duration_sanitize($decoded);
+    }
+    return belt_durations_global();
+}
+
+/** Aplica un mapa de duraciones a todas las divisiones existentes del torneo (y sus luchas pendientes) */
+function apply_belt_durations(int $tournamentId, array $durations): void {
+    $divs = rows('SELECT d.id, b.code belt_code, ad.is_kids, ad.code age_code
+                  FROM divisions d JOIN belts b ON b.id=d.belt_id JOIN age_divisions ad ON ad.id=d.age_division_id
+                  WHERE d.tournament_id = ?', [$tournamentId]);
+    foreach ($divs as $d) {
+        $bucket = belt_duration_bucket($d['belt_code'], (bool)$d['is_kids'], $d['age_code']);
+        $sec = $durations[$bucket] ?? null;
+        if ($sec === null) continue;
+        q('UPDATE divisions SET duration_sec = ? WHERE id = ?', [$sec, $d['id']]);
+        q('UPDATE matches SET duration_sec = ?, timer_remaining = ? WHERE division_id = ? AND status = "pending"', [$sec, $sec, $d['id']]);
+    }
 }

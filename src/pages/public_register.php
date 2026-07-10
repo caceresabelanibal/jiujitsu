@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         flash('error', t('already_registered'));
     } else {
         $age = competition_age($birthdate);
-        $ageDiv = find_age_division($age);
+        $ageDiv = find_age_division_for($age, age_thresholds_for($t));
         $belt = row('SELECT * FROM belts WHERE id=?', [$beltId]);
         $wc = find_weight_class($gender, $weight, (bool)($ageDiv['is_kids'] ?? false));
         if (!$ageDiv || !$wc) {

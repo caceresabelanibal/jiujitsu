@@ -12,20 +12,21 @@ $divsTotal = (int)scalar('SELECT COUNT(*) FROM divisions WHERE tournament_id=?',
 $live = rows('SELECT m.*, r1.name red_name, r2.name blue_name FROM matches m
               JOIN registrations r1 ON r1.id=m.red_reg_id JOIN registrations r2 ON r2.id=m.blue_reg_id
               WHERE m.tournament_id=? AND m.status="live" ORDER BY m.updated_at DESC', [$tid]);
-$next = rows('SELECT m.*, r1.name red_name, r2.name blue_name, d.id did,
-                     b.name_es b_es, b.name_en b_en, ad.name_es ad_es, ad.name_en ad_en, wc.name_es w_es, wc.name_en w_en, d.gender
+$divOrder = division_order_case_sql(division_order_for($t));
+$next = rows("SELECT m.*, r1.name red_name, r2.name blue_name, d.id did,
+                     b.name_es b_es, b.name_en b_en, b.color_hex, ad.name_es ad_es, ad.name_en ad_en, wc.name_es w_es, wc.name_en w_en, d.gender
               FROM matches m
               JOIN divisions d ON d.id=m.division_id
               JOIN belts b ON b.id=d.belt_id JOIN age_divisions ad ON ad.id=d.age_division_id JOIN weight_classes wc ON wc.id=d.weight_class_id
               JOIN registrations r1 ON r1.id=m.red_reg_id JOIN registrations r2 ON r2.id=m.blue_reg_id
-              WHERE m.tournament_id=? AND m.status="pending"
-              ORDER BY d.id, m.round, m.slot LIMIT 8', [$tid]);
-$divs = rows('SELECT d.*, b.name_es b_es, b.name_en b_en, b.color_hex,
+              WHERE m.tournament_id=? AND m.status=\"pending\"
+              ORDER BY $divOrder, d.gender, ad.sort, wc.sort, m.round, m.slot LIMIT 8", [$tid]);
+$divs = rows("SELECT d.*, b.name_es b_es, b.name_en b_en, b.color_hex,
                      ad.name_es a_es, ad.name_en a_en, wc.name_es w_es, wc.name_en w_en,
-                     (SELECT COUNT(*) FROM matches m WHERE m.division_id=d.id AND m.status!="done" AND m.red_reg_id IS NOT NULL AND m.blue_reg_id IS NOT NULL) left_fights
+                     (SELECT COUNT(*) FROM matches m WHERE m.division_id=d.id AND m.status!=\"done\" AND m.red_reg_id IS NOT NULL AND m.blue_reg_id IS NOT NULL) left_fights
               FROM divisions d
               JOIN belts b ON b.id=d.belt_id JOIN age_divisions ad ON ad.id=d.age_division_id JOIN weight_classes wc ON wc.id=d.weight_class_id
-              WHERE d.tournament_id=? ORDER BY (d.status="done"), d.gender, ad.sort, b.sort, wc.sort', [$tid]);
+              WHERE d.tournament_id=? ORDER BY (d.status=\"done\"), $divOrder, d.gender, ad.sort, b.sort, wc.sort", [$tid]);
 $isEn = lang() === 'en';
 
 view_header($t['name']);
@@ -65,7 +66,7 @@ view_header($t['name']);
   <div class="table-wrap"><table>
     <?php foreach ($next as $m): ?>
     <tr>
-      <td class="muted" style="font-size:.8rem"><?= ($m['gender'] === 'M' ? t('male') : t('female')) . ' · ' . e($isEn ? $m['ad_en'] : $m['ad_es']) . ' · ' . e($isEn ? $m['b_en'] : $m['b_es']) . ' · ' . e($isEn ? $m['w_en'] : $m['w_es']) ?><?= $m['is_bronze'] ? ' ' . icon('award', 12, 'ic-bronze') : '' ?></td>
+      <td class="muted" style="font-size:.8rem"><?= ($m['gender'] === 'M' ? t('male') : t('female')) . ' · ' . e($isEn ? $m['ad_en'] : $m['ad_es']) ?> · <span class="belt-chip" style="background:<?= e($m['color_hex']) ?>"></span> <?= e($isEn ? $m['w_en'] : $m['w_es']) ?><?= $m['is_bronze'] ? ' ' . icon('award', 12, 'ic-bronze') : '' ?></td>
       <td><b><?= e($m['red_name']) ?></b> <span class="muted"><?= t('vs') ?></span> <b><?= e($m['blue_name']) ?></b></td>
       <td class="right" style="white-space:nowrap">
         <a class="btn sm" href="<?= APP_URL ?>/match/<?= $m['id'] ?>/operator"><?= icon('timer', 14) ?> <?= t('operator') ?></a>

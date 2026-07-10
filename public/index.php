@@ -16,6 +16,7 @@ $routes = [
     '#^/tournament/(\d+)$#'              => 'tournament_view',
     '#^/tournament/(\d+)/edit$#'         => 'tournament_edit',
     '#^/tournament/(\d+)/settings$#'     => 'tournament_settings',
+    '#^/tournament/(\d+)/clone$#'        => 'tournament_clone',
     '#^/tournament/(\d+)/academies$#'    => 'tournament_academies',
     '#^/tournament/(\d+)/registrations$#'=> 'tournament_registrations',
     '#^/tournament/(\d+)/divisions$#'    => 'tournament_divisions',
