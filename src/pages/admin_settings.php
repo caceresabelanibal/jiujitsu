@@ -5,8 +5,13 @@ $scoring = setting('scoring', []);
 $ranking = setting('ranking', []);
 $smtp = smtp_config();
 $divOrder = division_order_global();
+$ageOrder = age_order_global();
+$weightOrder = weight_order_global();
 $beltDur = belt_durations_global();
 $ageTh = age_thresholds_global();
+$nogiTiers = nogi_tiers_global();
+$nogiDivOrder = nogi_division_order_global();
+$nogiTierDur = nogi_tier_durations_global();
 $testResult = null;
 $me = current_user();
 
@@ -16,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     set_setting('site_name', trim($_POST['site_name'] ?? 'Taninzu'));
     set_setting('tournament_weekly_limit', (string)max(1, (int)($_POST['weekly_limit'] ?? 1)));
+    set_setting('tournament_retention_months', (string)max(0, (int)($_POST['retention_months'] ?? 0)));
     set_setting('scoring', [
         'takedown' => (int)$_POST['sc_takedown'], 'sweep' => (int)$_POST['sc_sweep'],
         'knee_on_belly' => (int)$_POST['sc_kob'], 'guard_pass' => (int)$_POST['sc_pass'],
@@ -30,6 +36,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     set_setting('division_order', division_order_sanitize($divKeys));
     $divOrder = division_order_global();
 
+    $ageKeys = age_order_default();
+    usort($ageKeys, fn($a, $b) => (int)($_POST["age_ord_$a"] ?? 0) <=> (int)($_POST["age_ord_$b"] ?? 0));
+    set_setting('age_order', age_order_sanitize($ageKeys));
+    $ageOrder = age_order_global();
+
+    $wtKeys = weight_order_default();
+    usort($wtKeys, fn($a, $b) => (int)($_POST["wt_ord_$a"] ?? 0) <=> (int)($_POST["wt_ord_$b"] ?? 0));
+    set_setting('weight_order', weight_order_sanitize($wtKeys));
+    $weightOrder = weight_order_global();
+
     $durInput = [];
     foreach (belt_duration_defaults() as $key => $def) {
         $durInput[$key] = max(1, (int)($_POST["dur_$key"] ?? 0)) * 60;
@@ -37,11 +53,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     set_setting('belt_durations', belt_duration_sanitize($durInput));
     $beltDur = belt_durations_global();
 
+    $nogiDurInput = [];
+    foreach (nogi_tier_duration_defaults() as $key => $def) {
+        $nogiDurInput[$key] = max(1, (int)($_POST["nogi_dur_$key"] ?? 0)) * 60;
+    }
+    set_setting('nogi_tier_durations', nogi_tier_duration_sanitize($nogiDurInput));
+    $nogiTierDur = nogi_tier_durations_global();
+
     set_setting('age_thresholds', age_threshold_sanitize([
         'kids_max' => (int)($_POST['age_kids_max'] ?? 0),
         'juvenile_max' => (int)($_POST['age_juvenile_max'] ?? 0),
     ]));
     $ageTh = age_thresholds_global();
+
+    $tierInput = [];
+    foreach (nogi_tier_default() as $belt => $def) {
+        $tierInput[$belt] = $_POST["tier_$belt"] ?? $def;
+    }
+    set_setting('nogi_tiers', nogi_tiers_sanitize($tierInput));
+    $nogiTiers = nogi_tiers_global();
+
+    $nogiDivKeys = nogi_division_order_default();
+    usort($nogiDivKeys, fn($a, $b) => (int)($_POST["nogi_div_ord_$a"] ?? 0) <=> (int)($_POST["nogi_div_ord_$b"] ?? 0));
+    set_setting('nogi_division_order', nogi_division_order_sanitize($nogiDivKeys));
+    $nogiDivOrder = nogi_division_order_global();
 
     // La contraseña se deja en blanco para no reemplazarla (no se muestra el valor guardado en el form).
     $newPass = trim($_POST['smtp_pass'] ?? '');
@@ -90,30 +125,59 @@ view_header(t('settings'));
         <label><?= t('weekly_limit') ?></label>
         <input type="number" name="weekly_limit" value="<?= (int)setting('tournament_weekly_limit', 1) ?>" min="1">
       </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3><?= icon('sliders', 17) ?> <?= t('division_order_title') ?></h3>
-    <p class="muted" style="margin-top:0"><?= t('division_order_hint') ?></p>
-    <div class="grid cols3">
-      <?php foreach (division_order_labels() as $key => $label): ?>
       <div>
-        <label><?= e($label) ?></label>
-        <input type="number" name="div_ord_<?= e($key) ?>" value="<?= array_search($key, $divOrder, true) + 1 ?>" min="1" max="6">
+        <label><?= t('retention_months') ?></label>
+        <input type="number" name="retention_months" value="<?= (int)setting('tournament_retention_months', 0) ?>" min="0">
+        <span class="muted"><?= t('retention_months_hint') ?></span>
       </div>
-      <?php endforeach; ?>
     </div>
   </div>
 
   <div class="card">
-    <h3><?= icon('clock', 17) ?> <?= t('belt_duration_title') ?></h3>
+    <h3><?= icon('sliders', 17) ?> <?= t('division_order_title') ?> · Gi</h3>
+    <p class="muted" style="margin-top:0"><?= t('division_order_hint') ?></p>
+    <?php render_drag_order('div_ord', division_order_labels(), $divOrder); ?>
+  </div>
+
+  <div class="card">
+    <h3><?= icon('sliders', 17) ?> <?= t('division_order_title') ?> · NoGi</h3>
+    <p class="muted" style="margin-top:0"><?= t('nogi_division_order_hint') ?></p>
+    <?php render_drag_order('nogi_div_ord', nogi_division_order_labels(), $nogiDivOrder); ?>
+  </div>
+
+  <div class="card">
+    <h3><?= icon('calendar', 17) ?> <?= t('age_order_title') ?></h3>
+    <p class="muted" style="margin-top:0"><?= t('age_order_hint') ?></p>
+    <?php render_drag_order('age_ord', age_order_labels(), $ageOrder); ?>
+  </div>
+
+  <div class="card">
+    <h3><?= icon('sliders', 17) ?> <?= t('weight_order_title') ?></h3>
+    <p class="muted" style="margin-top:0"><?= t('weight_order_hint') ?></p>
+    <?php render_drag_order('wt_ord', weight_order_labels(), $weightOrder); ?>
+  </div>
+
+  <div class="card">
+    <h3><?= icon('clock', 17) ?> <?= t('belt_duration_title') ?> · Gi</h3>
     <p class="muted" style="margin-top:0"><?= t('belt_duration_hint') ?></p>
     <div class="grid cols3">
       <?php foreach (division_order_labels() as $key => $label): ?>
       <div>
         <label><?= e($label) ?></label>
         <input type="number" name="dur_<?= e($key) ?>" value="<?= (int)round($beltDur[$key] / 60) ?>" min="1" max="30"> <span class="muted"><?= t('belt_duration_minutes') ?></span>
+      </div>
+      <?php endforeach; ?>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><?= icon('clock', 17) ?> <?= t('nogi_duration_title') ?> · NoGi</h3>
+    <p class="muted" style="margin-top:0"><?= t('nogi_duration_hint') ?></p>
+    <div class="grid cols3">
+      <?php foreach (nogi_division_order_labels() as $key => $label): ?>
+      <div>
+        <label><?= e($label) ?></label>
+        <input type="number" name="nogi_dur_<?= e($key) ?>" value="<?= (int)round($nogiTierDur[$key] / 60) ?>" min="1" max="30"> <span class="muted"><?= t('belt_duration_minutes') ?></span>
       </div>
       <?php endforeach; ?>
     </div>
@@ -131,6 +195,23 @@ view_header(t('settings'));
         <label><?= t('age_juvenile_max') ?></label>
         <input type="number" name="age_juvenile_max" value="<?= (int)$ageTh['juvenile_max'] ?>" min="4" max="20"> <span class="muted"><?= t('age_years') ?></span>
       </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><?= icon('flag', 17) ?> <?= t('nogi_tiers_title') ?></h3>
+    <p class="muted" style="margin-top:0"><?= t('nogi_tiers_hint') ?></p>
+    <div class="grid cols3">
+      <?php foreach (division_order_labels() as $key => $label): if (!in_array($key, ['white','blue','purple','brown','black'], true)) continue; ?>
+      <div>
+        <label><?= e($label) ?></label>
+        <select name="tier_<?= e($key) ?>">
+          <?php foreach (['amateur','semipro','pro'] as $tier): ?>
+          <option value="<?= $tier ?>" <?= $nogiTiers[$key] === $tier ? 'selected' : '' ?>><?= t('nogi_' . $tier) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <?php endforeach; ?>
     </div>
   </div>
 
@@ -203,4 +284,5 @@ view_header(t('settings'));
 
   <button class="btn mt" type="submit" name="do" value="save"><?= t('save') ?></button>
 </form>
+<script src="<?= asset('/assets/js/dragorder.js') ?>"></script>
 <?php view_footer();

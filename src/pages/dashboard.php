@@ -1,6 +1,14 @@
 <?php
-// Panel del competidor: sus inscripciones, llaves y proximas luchas
+// Panel unificado: torneos que organizo/administro (gestion completa) + mis inscripciones como competidor
 $u = require_login();
+
+// Propios (o todos si admin) + torneos donde soy personal (arbitro/mesa)
+$mine = is_admin()
+    ? rows('SELECT t.*, u.name owner, (SELECT COUNT(*) FROM registrations r WHERE r.tournament_id=t.id AND r.verified=1) regs FROM tournaments t JOIN users u ON u.id=t.user_id ORDER BY t.created_at DESC')
+    : rows('SELECT DISTINCT t.*, (SELECT COUNT(*) FROM registrations r WHERE r.tournament_id=t.id AND r.verified=1) regs
+            FROM tournaments t LEFT JOIN tournament_staff s ON s.tournament_id = t.id
+            WHERE t.user_id = ? OR s.user_id = ? ORDER BY t.created_at DESC', [$u['id'], $u['id']]);
+
 $regs = rows('SELECT r.*, t.name t_name, t.slug, t.status t_status, t.event_date,
                      b.name_es b_es, b.name_en b_en, ad.name_es a_es, ad.name_en a_en,
                      wc.name_es w_es, wc.name_en w_en
@@ -12,37 +20,53 @@ $regs = rows('SELECT r.*, t.name t_name, t.slug, t.status t_status, t.event_date
               WHERE r.user_id = ? OR r.email = ? ORDER BY r.created_at DESC', [$u['id'], $u['email']]);
 $isEn = lang() === 'en';
 
-// Torneos que este usuario opera (dueño o personal): acceso directo al desarrollo
-$operate = is_admin()
-    ? rows('SELECT * FROM tournaments WHERE status != "finished" ORDER BY created_at DESC LIMIT 6')
-    : rows('SELECT DISTINCT t.* FROM tournaments t LEFT JOIN tournament_staff s ON s.tournament_id = t.id
-            WHERE t.user_id = ? OR s.user_id = ? ORDER BY t.created_at DESC LIMIT 6', [$u['id'], $u['id']]);
-
 view_header(t('my_panel'));
 ?>
 <h1><?= t('my_panel') ?> · <?= e($u['name']) ?></h1>
 
-<?php if ($operate): ?>
-<div class="grid cols3 mb">
-  <?php foreach ($operate as $ot): ?>
-  <div class="card" style="margin:0">
-    <div class="flex spread">
-      <h3 style="margin:0"><?php if ($ot['logo']): ?><img class="logo-sm" src="<?= APP_URL . '/' . e($ot['logo']) ?>" alt=""> <?php endif; ?><?= e($ot['name']) ?></h3>
-      <span class="badge <?= ['draft'=>'grey','open'=>'green','running'=>'blue','finished'=>'gold'][$ot['status']] ?>"><?= t('status_' . $ot['status']) ?></span>
-    </div>
-    <p class="muted" style="margin:6px 0 12px"><?= $ot['event_date'] ? icon('calendar', 13) . ' ' . date('d/m/Y', strtotime($ot['event_date'])) : '' ?></p>
-    <a class="btn" style="width:100%" href="<?= APP_URL ?>/tournament/<?= $ot['id'] ?>"><?= icon('play', 13) ?> <?= t('go_to_tournament') ?></a>
-  </div>
+<div class="flex spread mb">
+  <h2 style="margin:0"><?= icon('trophy', 18) ?> <?= t('my_tournaments') ?></h2>
+  <a class="btn" href="<?= APP_URL ?>/tournaments/create">+ <?= t('create_tournament') ?></a>
+</div>
+<?php if (!$mine): ?>
+  <div class="card center muted mb"><?= t('no_tournaments') ?></div>
+<?php else: ?>
+<div class="card table-wrap mb">
+<table>
+  <tr><th><?= t('tournament') ?></th><th><?= t('date') ?></th><th><?= t('tournament_type') ?></th><th><?= t('participants') ?></th><th><?= t('status') ?></th><?= is_admin() ? '<th>Owner</th>' : '' ?><th></th></tr>
+  <?php foreach ($mine as $tt): ?>
+  <tr>
+    <td><?php if ($tt['logo']): ?><img class="logo-sm" src="<?= APP_URL . '/' . e($tt['logo']) ?>" alt=""> <?php endif; ?><b><?= e($tt['name']) ?></b></td>
+    <td><?= $tt['event_date'] ? date('d/m/Y', strtotime($tt['event_date'])) : '—' ?></td>
+    <td><?= $tt['type'] === 'open' ? 'Open' : t('type_internal') ?></td>
+    <td><?= (int)$tt['regs'] ?></td>
+    <td><span class="badge <?= ['draft'=>'grey','open'=>'green','running'=>'blue','finished'=>'gold'][$tt['status']] ?>"><?= t('status_' . $tt['status']) ?></span></td>
+    <?= is_admin() ? '<td>' . e($tt['owner'] ?? '') . '</td>' : '' ?>
+    <td style="white-space:nowrap">
+      <a class="btn sm" href="<?= APP_URL ?>/tournament/<?= $tt['id'] ?>"><?= icon('play', 12) ?> <?= t('go_to_tournament') ?></a>
+      <a class="btn sm secondary" href="<?= APP_URL ?>/tournament/<?= $tt['id'] ?>/settings" title="<?= t('settings') ?>"><?= icon('settings', 14) ?></a>
+      <?php if (is_admin() || (int)$tt['user_id'] === (int)$u['id']): ?>
+      <a class="btn sm secondary" href="<?= APP_URL ?>/tournament/<?= $tt['id'] ?>/clone" title="<?= t('clone_tournament') ?>"><?= icon('shuffle', 14) ?></a>
+      <a class="btn sm danger" href="<?= APP_URL ?>/tournament/<?= $tt['id'] ?>/delete" title="<?= t('delete_tournament') ?>"><?= icon('trash', 14) ?></a>
+      <?php endif; ?>
+    </td>
+  </tr>
   <?php endforeach; ?>
+</table>
 </div>
 <?php endif; ?>
+
+<h2><?= icon('user', 18) ?> <?= t('my_registrations') ?></h2>
 <?php if (!$regs): ?>
-<div class="card center muted"><?= t('no_registrations') ?></div>
+<div class="card center muted mb"><?= t('no_registrations') ?></div>
 <?php endif; ?>
 
-<?php foreach ($regs as $r):
-    $div = row('SELECT * FROM divisions WHERE tournament_id=? AND gender=? AND belt_id=? AND age_division_id=? AND weight_class_id=?',
-        [$r['tournament_id'], $r['gender'], $r['belt_id'], $r['age_division_id'], $r['weight_class_id']]);
+<?php $tournamentsById = []; foreach ($regs as $r):
+    $tid2 = (int)$r['tournament_id'];
+    if (!array_key_exists($tid2, $tournamentsById)) {
+        $tournamentsById[$tid2] = row('SELECT * FROM tournaments WHERE id=?', [$tid2]);
+    }
+    $myDivs = find_registrant_divisions($r, $tournamentsById[$tid2]);
     $myMatches = rows('SELECT m.*, r1.name red_name, r2.name blue_name FROM matches m
                        LEFT JOIN registrations r1 ON r1.id=m.red_reg_id
                        LEFT JOIN registrations r2 ON r2.id=m.blue_reg_id
@@ -86,15 +110,13 @@ view_header(t('my_panel'));
   </table></div>
   <?php endif; ?>
 
-  <?php if ($div): ?>
-  <p class="mt"><a class="btn sm secondary" href="<?= APP_URL ?>/division/<?= $div['id'] ?>/view" target="_blank"><?= icon('screen', 13) ?> <?= t('my_position') ?></a></p>
+  <?php if ($myDivs): ?>
+  <p class="mt">
+    <?php foreach ($myDivs as $div): ?>
+    <a class="btn sm secondary" href="<?= APP_URL ?>/division/<?= $div['id'] ?>/view" target="_blank"><?= icon('screen', 13) ?> <?= t('my_position') ?><?= $div['kind'] === 'absolute' ? ' (' . t('absolute_category') . ')' : '' ?></a>
+    <?php endforeach; ?>
+  </p>
   <?php endif; ?>
 </div>
-<?php endforeach; ?>
-
-<div class="card">
-  <h3><?= t('my_tournaments') ?> (organizador)</h3>
-  <a class="btn" href="<?= APP_URL ?>/tournaments"><?= t('nav_tournaments') ?></a>
-  <a class="btn secondary" href="<?= APP_URL ?>/tournaments/create">+ <?= t('create_tournament') ?></a>
-</div>
-<?php view_footer();
+<?php endforeach;
+view_footer();

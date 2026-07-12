@@ -20,6 +20,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             q('UPDATE divisions SET duration_sec = ? WHERE id = ?', [$sec, $did]);
             q('UPDATE matches SET duration_sec = ?, timer_remaining = ? WHERE division_id = ? AND status = "pending"', [$sec, $sec, $did]);
             flash('success', t('settings_saved'));
+        } elseif ($do === 'add_member' && $d['kind'] === 'special') {
+            $regId = (int)($_POST['registration_id'] ?? 0);
+            if ($regId && row('SELECT id FROM registrations WHERE id=? AND tournament_id=?', [$regId, $d['tournament_id']])) {
+                q('INSERT IGNORE INTO division_members (division_id, registration_id) VALUES (?,?)', [$did, $regId]);
+            }
+        } elseif ($do === 'remove_member' && $d['kind'] === 'special') {
+            q('DELETE FROM division_members WHERE division_id=? AND registration_id=?', [$did, (int)($_POST['registration_id'] ?? 0)]);
         }
     } catch (RuntimeException $e) {
         flash('error', t('need_two'));
@@ -29,14 +36,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $regs = division_registrations($did);
 $hasBracket = (int)scalar('SELECT COUNT(*) FROM matches WHERE division_id = ?', [$did]) > 0;
+$candidates = [];
+if ($d['kind'] === 'special') {
+    $memberIds = array_column($regs, 'id');
+    $candidates = array_filter(
+        rows('SELECT id, name, gender FROM registrations WHERE tournament_id = ? AND verified = 1 ORDER BY name', [$d['tournament_id']]),
+        fn($c) => !in_array((int)$c['id'], $memberIds, true)
+    );
+}
 view_header(t('division'));
 ?>
 <script src="<?= asset('/assets/js/bracket.js') ?>"></script>
 <p><a href="<?= APP_URL ?>/tournament/<?= $t['id'] ?>/divisions">← <?= t('back') ?></a></p>
 <div class="flex spread">
-  <h1><?= e(division_label($d)) ?></h1>
+  <h1><?= division_label($d, true) ?></h1>
   <a class="btn secondary" href="<?= APP_URL ?>/division/<?= $did ?>/view" target="_blank"><?= icon('screen', 15) ?> <?= t('projector_view') ?></a>
 </div>
+
+<?php if ($d['kind'] === 'special'): ?>
+<div class="card mb">
+  <h3><?= icon('star', 16) ?> <?= t('special_members_title') ?></h3>
+  <p class="muted" style="margin-top:0"><?= t('special_members_hint') ?></p>
+  <?php if ($candidates): ?>
+  <form method="post" class="flex">
+    <?= csrf_field() ?>
+    <input type="hidden" name="do" value="add_member">
+    <div style="flex:1;min-width:200px">
+      <select name="registration_id">
+        <?php foreach ($candidates as $c): ?>
+        <option value="<?= $c['id'] ?>"><?= e($c['name']) ?> (<?= $c['gender'] === 'M' ? t('male') : t('female') ?>)</option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+    <button class="btn">+ <?= t('special_add_member') ?></button>
+  </form>
+  <?php endif; ?>
+  <?php foreach ($regs as $r): ?>
+  <div class="flex spread" style="padding:8px 0;border-bottom:1px solid var(--border)">
+    <span><b><?= e($r['name']) ?></b> <span class="muted"><?= e($r['academy_name'] ?? '') ?></span></span>
+    <form method="post"><?= csrf_field() ?><input type="hidden" name="do" value="remove_member"><input type="hidden" name="registration_id" value="<?= $r['id'] ?>">
+      <button class="btn sm danger"><?= icon('x', 13) ?></button>
+    </form>
+  </div>
+  <?php endforeach; ?>
+</div>
+<?php endif; ?>
 
 <div class="grid cols2 mb">
   <div class="card">

@@ -80,8 +80,8 @@ main.bare-main { padding: 0; flex: 1; animation: pageIn .32s ease; }
 .ic-red { color: var(--red); }
 .ic-muted { color: var(--muted); }
 .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; vertical-align: 1px; }
-.dot.red { background: var(--red); }
-.dot.blue { background: var(--blue); }
+.dot.red { background: #fff; border: 1px solid rgba(0,0,0,.25); }
+.dot.blue { background: linear-gradient(90deg, #f2c500 50%, #2e8b57 50%); border: 1px solid rgba(0,0,0,.25); }
 .dot.live { background: var(--red); animation: livepulse 1.2s infinite; }
 @keyframes livepulse { 50% { opacity: .35; } }
 .navlinks { display: flex; gap: 18px; align-items: center; margin-left: auto; flex-wrap: wrap; }
@@ -112,6 +112,26 @@ main.bare-main { padding: 0; flex: 1; animation: pageIn .32s ease; }
   .grid.cols2, .grid.cols3, .grid.cols4 { grid-template-columns: 1fr; }
 }
 
+/* Divisiones y llaves (pestaña Desarrollo): una tarjeta larga por division en
+   vez de una grilla de tarjetas cuadradas — asi el orden de corrida (arriba
+   hacia abajo) se lee de un vistazo, igual que "Proximas luchas". */
+.div-rows { display: flex; flex-direction: column; gap: 8px; }
+.div-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 12px 18px; margin: 0; }
+.div-row-label { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 220px; }
+.div-row-meta { display: flex; align-items: center; gap: 12px; white-space: nowrap; }
+.div-row-actions { display: flex; gap: 6px; }
+
+/* Lista drag-and-drop para ordenar categorias (cinturon/edad/peso) */
+.dragorder { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.dragorder li { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg2);
+                border: 1px solid var(--border); border-radius: 8px; cursor: grab; user-select: none; transition: opacity .15s ease, border-color .15s ease; }
+.dragorder li:active { cursor: grabbing; }
+.dragorder li.dragging { opacity: .35; border-color: var(--accent, #4d7cff); }
+.dragorder-pos { flex: 0 0 auto; width: 22px; height: 22px; border-radius: 50%; background: var(--border);
+                 color: var(--text); font-size: .75rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.dragorder-handle { flex: 0 0 auto; opacity: .5; }
+.dragorder-label { flex: 1; font-size: .92rem; }
+
 /* Modal de felicitaciones al terminar la ultima lucha del torneo (operador) */
 .tfin-overlay { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center;
                 background: rgba(5,7,15,.72); backdrop-filter: blur(4px); padding: 20px; animation: tfinFade .25s ease; }
@@ -132,6 +152,8 @@ html[data-theme="light"] input, html[data-theme="light"] select, html[data-theme
        transition: filter .2s ease, transform .15s ease, box-shadow .2s ease; }
 .btn:hover { filter: brightness(1.1); text-decoration: none; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,.25); }
 .btn:active { transform: translateY(0); }
+.btn:disabled { opacity: .35; cursor: not-allowed; filter: grayscale(.6); }
+.btn:disabled:hover { transform: none; box-shadow: none; filter: grayscale(.6); }
 .btn.secondary { background: var(--card2); border: 1px solid var(--border); color: var(--text); }
 .btn.danger { background: var(--red); }
 .btn.green { background: var(--green); }
@@ -224,7 +246,7 @@ html[data-theme="light"] .blob.b3 { opacity: .12; }
 @keyframes floaty { 50% { transform: translateY(-12px); } }
 
 /* Ilustracion: silueta de luchadores (fill: currentColor -> se tinta por CSS) */
-.art-fighters { width: 100%; height: auto; display: block; filter: drop-shadow(0 18px 26px rgba(0,0,0,.35)); }
+.art-fighters { width: 70%; height: auto; display: block; margin: 0 auto; filter: drop-shadow(0 18px 26px rgba(0,0,0,.35)); }
 .art-fighters.tint-red { color: #c9252c; opacity: .88; }
 .art-fighters.tint-mono { color: var(--text); opacity: .5; }
 .art-fighters.flip { transform: scaleX(-1); }
@@ -361,14 +383,25 @@ body.proj .bare-main { display: flex; flex-direction: column; height: 100%; box-
    tapado cuando termina la lucha. */
 .sb-sides { --sides-h: calc(var(--avail) * .5 - var(--wbar-h, 0px)); flex: 1 1 auto; display: flex; min-height: 0; }
 .sb-side { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 12px; min-width: 0; min-height: 0; }
-.sb-side.red { background: linear-gradient(160deg, #3d1215, #6e1e24); }
-.sb-side.blue { background: linear-gradient(160deg, #10203d, #1e3a6e); }
+/* Competidor "rojo" = blanco, competidor "azul" = mitad amarillo / mitad verde
+   (se mantienen los nombres de clase .red/.blue por compatibilidad con el
+   resto del codigo, solo cambia el color visual). Texto oscuro en ambos para
+   que los numeros se lean bien sobre fondos claros. */
+.sb-side.red { background: linear-gradient(160deg, #f2f2f2, #ffffff); }
+.sb-side.blue { background: linear-gradient(90deg, #f2c500 50%, #2e8b57 50%); }
+.sb-side.red .sb-name, .sb-side.red .sb-points, .sb-side.red .sb-extras { color: #14151a; }
+.sb-side.blue .sb-name, .sb-side.blue .sb-points, .sb-side.blue .sb-extras { color: #14151a; }
+.sb-side.red .sb-academy { color: rgba(20,21,26,.6); }
+.sb-side.blue .sb-academy { color: rgba(20,21,26,.65); text-shadow: 0 1px 2px rgba(255,255,255,.3); }
+.sb-photo { width: clamp(48px, 12vh, 110px); height: clamp(48px, 12vh, 110px); border-radius: 50%; object-fit: cover; border: 3px solid rgba(0,0,0,.2); }
 .sb-name { font-size: clamp(1.1rem, 3.5vw, 2.2rem); font-weight: 800; color: #fff; text-align: center; }
 .sb-academy { color: rgba(255,255,255,.65); font-size: clamp(.8rem, 2vw, 1.1rem); }
 .sb-points { font-size: min(calc(var(--sides-h, var(--avail)) * .42), 16vw); font-weight: 900; color: #fff; line-height: 1; font-variant-numeric: tabular-nums; }
 .sb-extras { display: flex; gap: 26px; color: #fff; font-size: clamp(1rem, 3vw, 1.8rem); font-weight: 700; }
 .sb-extras .adv { color: var(--accent2); }
 .sb-extras .pen { color: #ff8a8e; }
+.sb-side.red .sb-extras .adv, .sb-side.blue .sb-extras .adv { color: #0b3d91; }
+.sb-side.red .sb-extras .pen, .sb-side.blue .sb-extras .pen { color: #8b1e1e; }
 .sb-winnerbar { flex: 0 0 auto; text-align: center; font-size: clamp(1.2rem, 4vw, 2.4rem); color: var(--gold); font-weight: 900; padding: 12px; background: #0a0a0a; }
 @media (max-width: 640px) { .sb-sides { flex-direction: column; } }
 body.sbpage { height: 100vh; overflow: hidden; }
@@ -380,10 +413,13 @@ body.sbpage { height: 100vh; overflow: hidden; }
 .op-sides { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 @media (max-width: 700px) { .op-sides { grid-template-columns: 1fr; } }
 .op-side { border-radius: 14px; padding: 14px; }
-.op-side.red { background: #2d1215; border: 1px solid #6e1e24; }
-.op-side.blue { background: #101c33; border: 1px solid #1e3a6e; }
-.op-side h3 { margin: 0 0 4px; }
+.op-side.red { background: linear-gradient(160deg, #f2f2f2, #ffffff); border: 1px solid #d6d6d6; color: #14151a; }
+.op-side.blue { background: linear-gradient(90deg, #f2c500 50%, #2e8b57 50%); border: 1px solid #2b6b45; color: #14151a; }
+.op-side h3 { margin: 0 0 4px; color: #14151a; }
+.op-side h3 small { color: rgba(20,21,26,.6); }
 .op-score { font-size: 3rem; font-weight: 900; }
+.op-side .badge.gold { background: #fff3cd; color: #8a6300; }
+.op-side .badge.red { background: #ffe1e1; color: #8b1e1e; }
 .op-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
 .op-btns .btn { padding: 12px 8px; font-size: .85rem; }
 .op-avpen { display: flex; gap: 8px; margin-top: 8px; }
@@ -422,6 +458,9 @@ body.has-ads.dual-ads .bare-main { padding-top: 90px; }
 .right { text-align: right; }
 .center { text-align: center; }
 .logo-sm { height: 36px; border-radius: 6px; vertical-align: middle; }
+.reg-photo-sm { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; vertical-align: middle; border: 1px solid var(--border); }
+.reg-photo-md { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); }
+.reg-photo-lg { width: 96px; height: 96px; border-radius: 50%; object-fit: cover; border: 3px solid var(--border); }
 .copybox { display: flex; gap: 8px; }
 .copybox input { font-family: monospace; }
 img.tlogo { height: 60px; border-radius: 8px; }

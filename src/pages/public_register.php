@@ -6,6 +6,7 @@ $tid = (int)$t['id'];
 $academies = rows('SELECT * FROM tournament_academies WHERE tournament_id=? ORDER BY name', [$tid]);
 $professors = rows('SELECT * FROM tournament_professors WHERE tournament_id=? ORDER BY name', [$tid]);
 $belts = rows('SELECT * FROM belts ORDER BY sort');
+$nogiTiersForm = $t['discipline'] === 'nogi' ? nogi_tiers_for($t) : [];
 $count = (int)scalar('SELECT COUNT(*) FROM registrations WHERE tournament_id=?', [$tid]);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -16,6 +17,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $birthdate = $_POST['birthdate'] ?? '';
     $weight = (float)($_POST['weight_kg'] ?? 0);
     $beltId = (int)($_POST['belt_id'] ?? 0);
+    $inCategory = isset($_POST['compete_category']);
+    $inAbsolute = isset($_POST['compete_absolute']);
+    $competesIn = $inCategory && $inAbsolute ? 'both' : ($inAbsolute ? 'absolute' : 'category');
 
     if ($t['status'] !== 'open') {
         flash('error', t('registration_closed'));
@@ -32,6 +36,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $wc = find_weight_class($gender, $weight, (bool)($ageDiv['is_kids'] ?? false));
         if (!$ageDiv || !$wc) {
             flash('error', 'Edad/peso fuera de rango');
+        } elseif ($inAbsolute && !can_compete_absolute($beltId, $ageDiv['id'], $t)) {
+            flash('error', t('absolute_not_eligible'));
         } else {
             // Alta de usuario si no existe (la verificacion de inscripcion tambien verifica la cuenta)
             $user = row('SELECT * FROM users WHERE email = ?', [$email]);
@@ -40,11 +46,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     [$name, $email, password_hash($_POST['password'], PASSWORD_DEFAULT), lang()]);
                 $user = row('SELECT * FROM users WHERE email = ?', [$email]);
             }
+            $photo = upload_image('photo', 'competitor');
             $token = bin2hex(random_bytes(24));
-            q('INSERT INTO registrations (tournament_id, user_id, name, email, gender, birthdate, weight_kg, belt_id, age_division_id, weight_class_id, academy_id, professor_id, verify_token)
-               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)',
-                [$tid, $user['id'] ?? null, $name, $email, $gender, $birthdate, $weight, $beltId,
-                 $ageDiv['id'], $wc['id'],
+            q('INSERT INTO registrations (tournament_id, user_id, name, email, gender, birthdate, weight_kg, photo, belt_id, age_division_id, weight_class_id, competes_in, academy_id, professor_id, verify_token)
+               VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+                [$tid, $user['id'] ?? null, $name, $email, $gender, $birthdate, $weight, $photo, $beltId,
+                 $ageDiv['id'], $wc['id'], $competesIn,
                  (int)($_POST['academy_id'] ?? 0) ?: null, (int)($_POST['professor_id'] ?? 0) ?: null, $token]);
             $link = APP_URL . '/reg-verify?token=' . $token;
             queue_mail($email, $name, t('mail_reg_subject') . ' - ' . $t['name'], mail_layout(t('mail_reg_subject'),
@@ -69,7 +76,7 @@ view_header(t('register_for') . ' ' . $t['name']);
   <?php if ($t['status'] !== 'open'): ?>
     <div class="flash flash-warning"><?= t('registration_closed') ?></div>
   <?php else: ?>
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
     <?= csrf_field() ?>
     <div class="grid cols2">
       <div>
@@ -83,12 +90,16 @@ view_header(t('register_for') . ' ' . $t['name']);
         <input type="date" name="birthdate" required>
         <label><?= t('weight_kg') ?></label>
         <input type="number" name="weight_kg" step="0.1" min="10" max="250" required>
+        <label><?= t('photo') ?></label>
+        <input type="file" name="photo" accept="image/*">
+        <small class="muted"><?= t('photo_reg_hint') ?></small>
       </div>
       <div>
         <label><?= t('belt') ?></label>
-        <select name="belt_id" required>
-          <?php foreach ($belts as $b): ?>
-          <option value="<?= $b['id'] ?>"><?= e(loc_name($b)) ?></option>
+        <select name="belt_id" id="beltsel" required onchange="updateAbsEligibility()">
+          <?php foreach ($belts as $b):
+              $eligible = !$b['is_kids'] && ($t['discipline'] === 'nogi' ? ($nogiTiersForm[$b['code']] ?? 'amateur') !== 'amateur' : $b['code'] !== 'white'); ?>
+          <option value="<?= $b['id'] ?>" data-abs="<?= $eligible ? '1' : '0' ?>"><?= e(loc_name($b)) ?></option>
           <?php endforeach; ?>
         </select>
         <?php if ($academies): ?>
@@ -111,6 +122,13 @@ view_header(t('register_for') . ' ' . $t['name']);
         <small class="muted"><?= t('set_password_hint') ?></small>
       </div>
     </div>
+    <label class="mt"><?= t('compete_in_label') ?></label>
+    <div class="flex">
+      <label class="flex" style="margin:0"><input type="checkbox" name="compete_category" value="1" checked style="width:auto"> <?= t('compete_category') ?></label>
+      <label class="flex" style="margin:0"><input type="checkbox" name="compete_absolute" id="abschk" value="1" style="width:auto"> <?= t('compete_absolute') ?></label>
+    </div>
+    <small class="muted"><?= t('compete_in_hint') ?></small>
+    <small class="muted" id="abshint" style="display:none;color:var(--red)"><?= t('absolute_not_eligible') ?></small>
     <p class="muted"><?= t('your_category_auto') ?></p>
     <button class="btn xl" style="width:100%"><?= t('submit_registration') ?></button>
   </form>
@@ -124,6 +142,17 @@ view_header(t('register_for') . ' ' . $t['name']);
     if (sel && sel.selectedOptions[0]?.hidden) sel.value = '';
   }
   filterProfs();
+  function updateAbsEligibility() {
+    const sel = document.getElementById('beltsel');
+    const eligible = sel?.selectedOptions[0]?.dataset.abs === '1';
+    const chk = document.getElementById('abschk');
+    const hint = document.getElementById('abshint');
+    if (!chk) return;
+    chk.disabled = !eligible;
+    if (!eligible) chk.checked = false;
+    hint.style.display = eligible ? 'none' : '';
+  }
+  updateAbsEligibility();
   </script>
   <?php endif; ?>
 </div>

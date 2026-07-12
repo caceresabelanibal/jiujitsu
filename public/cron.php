@@ -5,6 +5,7 @@
  *   0 * * * *  curl -s "https://tu-dominio/cron.php?task=rankings&key=CRON_KEY"
  *   0 4 * * *  curl -s "https://tu-dominio/cron.php?task=cleanup&key=CRON_KEY"
  *   0,15,30,45 * * * *  curl -s "https://tu-dominio/cron.php?task=tournament_status&key=CRON_KEY"
+ *   0 5 * * *  curl -s "https://tu-dominio/cron.php?task=delete_old_tournaments&key=CRON_KEY"
  */
 require_once dirname(__DIR__) . '/src/bootstrap.php';
 
@@ -47,6 +48,20 @@ switch ($task) {
         $b = q('DELETE FROM email_queue WHERE status = "sent" AND sent_at < DATE_SUB(NOW(), INTERVAL 30 DAY)')->rowCount();
         $c = q('DELETE FROM cron_log WHERE ran_at < DATE_SUB(NOW(), INTERVAL 30 DAY)')->rowCount();
         $detail = "$a inscripciones, $b mails, $c logs";
+        break;
+
+    case 'delete_old_tournaments':
+        $months = (int)setting('tournament_retention_months', 0);
+        if ($months <= 0) {
+            $detail = 'deshabilitado (retencion no configurada en /admin/settings)';
+            break;
+        }
+        $old = rows('SELECT id FROM tournaments WHERE COALESCE(event_date, created_at) < DATE_SUB(NOW(), INTERVAL ? MONTH)', [$months]);
+        foreach ($old as $tt) {
+            q('DELETE FROM tournaments WHERE id = ?', [(int)$tt['id']]);
+        }
+        if ($old) recompute_rankings();
+        $detail = count($old) . " torneos eliminados (mas de $months meses)";
         break;
 
     case 'tournament_status':

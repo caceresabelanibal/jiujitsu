@@ -63,6 +63,7 @@ CREATE TABLE IF NOT EXISTS tournaments (
   name VARCHAR(160) NOT NULL,
   slug VARCHAR(64) NOT NULL UNIQUE,
   type ENUM('internal','open') NOT NULL DEFAULT 'internal',
+  discipline ENUM('gi','nogi') NOT NULL DEFAULT 'gi',
   logo VARCHAR(255) NULL,
   event_date DATE NULL,
   max_participants INT NOT NULL DEFAULT 200,
@@ -73,6 +74,11 @@ CREATE TABLE IF NOT EXISTS tournaments (
   division_order TEXT NULL, -- JSON: orden de corrida por categoria/cinturon; NULL = usa el general de /admin/settings
   belt_durations TEXT NULL, -- JSON: duracion de lucha (segundos) por cinturon/infantil-juvenil; NULL = usa el general de /admin/settings
   age_thresholds TEXT NULL, -- JSON: hasta que edad es infantil/juvenil (adulto empieza despues); NULL = usa el general de /admin/settings
+  age_order TEXT NULL, -- JSON: orden (drag-and-drop) de las categorias de edad dentro de cada cinturon; NULL = usa el general
+  weight_order TEXT NULL, -- JSON: orden (drag-and-drop) de las categorias de peso dentro de cada cinturon/edad; NULL = usa el general
+  nogi_tiers TEXT NULL, -- JSON: mapeo cinturon->nivel (amateur/semipro/pro) para torneos nogi; NULL = usa el general
+  nogi_division_order TEXT NULL, -- JSON: orden de corrida (kids_juvenile/amateur/semipro/pro) para torneos nogi, independiente de division_order (gi); NULL = usa el general
+  nogi_tier_durations TEXT NULL, -- JSON: duracion de lucha (segundos) por kids_juvenile/amateur/semipro/pro para torneos nogi, independiente de belt_durations (gi); NULL = usa el general
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -116,9 +122,11 @@ CREATE TABLE IF NOT EXISTS registrations (
   gender ENUM('M','F') NOT NULL,
   birthdate DATE NOT NULL,
   weight_kg DECIMAL(5,2) NOT NULL,
+  photo VARCHAR(255) NULL,
   belt_id INT NOT NULL,
   age_division_id INT NOT NULL,
   weight_class_id INT NOT NULL,
+  competes_in ENUM('category','absolute','both') NOT NULL DEFAULT 'category',
   academy_id INT NULL,
   professor_id INT NULL,
   verified TINYINT(1) NOT NULL DEFAULT 0,
@@ -131,21 +139,41 @@ CREATE TABLE IF NOT EXISTS registrations (
   FOREIGN KEY (weight_class_id) REFERENCES weight_classes(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Division = combinacion genero + cinturon + edad + peso dentro de un torneo
+-- Division = combinacion genero + cinturon/nivel + edad + peso dentro de un torneo.
+-- belt_id/age_division_id/weight_class_id son NULL cuando no aplican:
+--   - nogi adultos/masters: belt_id NULL, se usa "tier" (amateur/semipro/pro) en su lugar
+--   - nogi infantiles/juveniles: belt_id NULL y tier NULL (solo edad+peso)
+--   - kind='absolute': age_division_id y weight_class_id NULL (solo genero + cinturon/tier)
+--   - kind='special': todo NULL salvo gender; el nombre sale de "name" y los inscriptos
+--     se asignan a mano en division_members (no se derivan de belt/edad/peso)
 CREATE TABLE IF NOT EXISTS divisions (
   id INT AUTO_INCREMENT PRIMARY KEY,
   tournament_id INT NOT NULL,
   gender ENUM('M','F') NOT NULL,
-  belt_id INT NOT NULL,
-  age_division_id INT NOT NULL,
-  weight_class_id INT NOT NULL,
+  belt_id INT NULL,
+  tier VARCHAR(20) NULL,
+  kind ENUM('standard','absolute','special') NOT NULL DEFAULT 'standard',
+  name VARCHAR(160) NULL,
+  age_division_id INT NULL,
+  weight_class_id INT NULL,
   duration_sec INT NOT NULL DEFAULT 300,
   status ENUM('pending','bracketed','done') NOT NULL DEFAULT 'pending',
   UNIQUE KEY uq_div (tournament_id, gender, belt_id, age_division_id, weight_class_id),
+  UNIQUE KEY uq_special (tournament_id, kind, gender, name),
   FOREIGN KEY (tournament_id) REFERENCES tournaments(id) ON DELETE CASCADE,
   FOREIGN KEY (belt_id) REFERENCES belts(id),
   FOREIGN KEY (age_division_id) REFERENCES age_divisions(id),
   FOREIGN KEY (weight_class_id) REFERENCES weight_classes(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Inscriptos de una division 'special' (asignacion manual, no derivada de belt/edad/peso)
+CREATE TABLE IF NOT EXISTS division_members (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  division_id INT NOT NULL,
+  registration_id INT NOT NULL,
+  UNIQUE KEY uq_member (division_id, registration_id),
+  FOREIGN KEY (division_id) REFERENCES divisions(id) ON DELETE CASCADE,
+  FOREIGN KEY (registration_id) REFERENCES registrations(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS matches (
@@ -218,12 +246,18 @@ CREATE TABLE IF NOT EXISTS certificates (
   FOREIGN KEY (registration_id) REFERENCES registrations(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- Ranking global (recalculado por cron): identidad por email
+-- Ranking global (recalculado por cron): identidad por email + disciplina.
+-- gi y nogi se calculan y muestran por separado: un mismo competidor puede
+-- tener una fila para sus resultados en torneos gi y otra fila (mismo
+-- cinturon/edad/peso reales, discipline distinta) para sus resultados en nogi.
 CREATE TABLE IF NOT EXISTS ranking_points (
   id INT AUTO_INCREMENT PRIMARY KEY,
   email VARCHAR(190) NOT NULL,
   name VARCHAR(120) NOT NULL,
+  photo VARCHAR(255) NULL,
   gender ENUM('M','F') NOT NULL,
+  discipline ENUM('gi','nogi') NOT NULL DEFAULT 'gi',
+  tier VARCHAR(20) NOT NULL DEFAULT '', -- nogi: kids_juvenile/amateur/semipro/pro (categoria real del ranking nogi); gi: '' (NUNCA NULL — un NULL en la unique key rompe el upsert)
   belt_id INT NOT NULL,
   age_division_id INT NOT NULL,
   weight_class_id INT NOT NULL,
@@ -234,7 +268,7 @@ CREATE TABLE IF NOT EXISTS ranking_points (
   wins INT NOT NULL DEFAULT 0,
   submissions INT NOT NULL DEFAULT 0,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  UNIQUE KEY uq_rank (email, gender, belt_id, age_division_id, weight_class_id),
+  UNIQUE KEY uq_rank (email, gender, belt_id, age_division_id, weight_class_id, discipline, tier),
   FOREIGN KEY (belt_id) REFERENCES belts(id),
   FOREIGN KEY (age_division_id) REFERENCES age_divisions(id),
   FOREIGN KEY (weight_class_id) REFERENCES weight_classes(id)

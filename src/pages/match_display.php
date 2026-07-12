@@ -1,6 +1,7 @@
 <?php
 // Marcador publico a pantalla completa (para monitor/proyector)
-$m = row('SELECT m.*, r1.name red_name, r2.name blue_name, a1.name red_academy, a2.name blue_academy
+$m = row('SELECT m.*, r1.name red_name, r2.name blue_name, r1.photo red_photo, r2.photo blue_photo,
+                 a1.name red_academy, a2.name blue_academy
           FROM matches m
           LEFT JOIN registrations r1 ON r1.id = m.red_reg_id
           LEFT JOIN registrations r2 ON r2.id = m.blue_reg_id
@@ -15,6 +16,7 @@ view_header('Scoreboard', true, 'sbpage');
   <div class="sb-timer" data-sb="timer"><?= fmt_time((int)$m['timer_remaining']) ?></div>
   <div class="sb-sides">
     <div class="sb-side red">
+      <?php if ($m['red_photo']): ?><img src="<?= APP_URL . '/' . e($m['red_photo']) ?>" alt="" class="sb-photo"><?php endif; ?>
       <div class="sb-name"><?= e($m['red_name'] ?? '—') ?></div>
       <div class="sb-academy"><?= e($m['red_academy'] ?? '') ?></div>
       <div class="sb-points" data-sb="red_points">0</div>
@@ -24,6 +26,7 @@ view_header('Scoreboard', true, 'sbpage');
       </div>
     </div>
     <div class="sb-side blue">
+      <?php if ($m['blue_photo']): ?><img src="<?= APP_URL . '/' . e($m['blue_photo']) ?>" alt="" class="sb-photo"><?php endif; ?>
       <div class="sb-name"><?= e($m['blue_name'] ?? '—') ?></div>
       <div class="sb-academy"><?= e($m['blue_academy'] ?? '') ?></div>
       <div class="sb-points" data-sb="blue_points">0</div>

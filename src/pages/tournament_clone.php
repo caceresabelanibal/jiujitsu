@@ -18,15 +18,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if (!is_admin() && !can_create_tournament($u)) {
         flash('warning', t('weekly_limit_reached'));
-        redirect('/tournaments');
+        redirect('/dashboard');
     }
 
     $name = trim($_POST['name'] ?? '') ?: ($src['name'] . ' ' . t('clone_suffix'));
-    q('INSERT INTO tournaments (user_id, name, slug, type, logo, max_participants, default_duration_sec, ads_mode, division_order, belt_durations, age_thresholds, status)
-       VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
-        [$targetUserId, $name, slug_token(10), $src['type'], $src['logo'],
+    q('INSERT INTO tournaments (user_id, name, slug, type, discipline, logo, max_participants, default_duration_sec, ads_mode,
+                                division_order, belt_durations, age_thresholds, age_order, weight_order, nogi_tiers, nogi_division_order, nogi_tier_durations, status)
+       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+        [$targetUserId, $name, slug_token(10), $src['type'], $src['discipline'], $src['logo'],
          $src['max_participants'], $src['default_duration_sec'], $src['ads_mode'],
-         $src['division_order'], $src['belt_durations'], $src['age_thresholds'], 'draft']);
+         $src['division_order'], $src['belt_durations'], $src['age_thresholds'],
+         $src['age_order'], $src['weight_order'], $src['nogi_tiers'], $src['nogi_division_order'], $src['nogi_tier_durations'], 'draft']);
     $newId = (int)db()->lastInsertId();
 
     $academyMap = [];

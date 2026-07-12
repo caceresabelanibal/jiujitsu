@@ -50,9 +50,10 @@ function img_data_uri(string $path): string {
 
 function certificate_generate(int $registrationId, string $type): string {
     $r = row('SELECT r.*, t.name AS tournament_name, t.logo AS tournament_logo, t.event_date, t.user_id AS owner_id,
+                     t.discipline, t.nogi_tiers,
                      a.name AS academy_name, a.logo AS academy_logo,
                      b.code AS belt_code, b.name_es AS belt_es, b.name_en AS belt_en, b.color_hex,
-                     ad.name_es AS age_es, ad.name_en AS age_en,
+                     ad.name_es AS age_es, ad.name_en AS age_en, ad.is_kids AS age_is_kids, ad.code AS age_code,
                      wc.name_es AS wc_es, wc.name_en AS wc_en
               FROM registrations r
               JOIN tournaments t ON t.id = r.tournament_id
@@ -78,15 +79,31 @@ function certificate_generate(int $registrationId, string $type): string {
     // Codigo de verificacion unico (HMAC del torneo+inscripto+tipo)
     $code = strtoupper(implode('-', str_split(substr(hash_hmac('sha256', $r['tournament_id'] . '|' . $registrationId . '|' . $type, CRON_KEY), 0, 12), 4)));
 
-    $beltName = $isEn ? $r['belt_en'] : $r['belt_es'];
     $ageName  = $isEn ? $r['age_en'] : $r['age_es'];
     $wcName   = $isEn ? $r['wc_en'] : $r['wc_es'];
     $genderName = $r['gender'] === 'M' ? ($isEn ? 'Male' : 'Masculino') : ($isEn ? 'Female' : 'Femenino');
     $category = e("$genderName · $ageName · $wcName");
-    $beltColor = $r['color_hex'];
-    $tipColor = $r['belt_code'] === 'black' ? '#c9252c' : '#1c1c1e';
     $certText = $isEn ? 'hereby confers this certificate upon' : 'otorga el presente certificado a';
-    $beltLabel = ($isEn ? 'Belt' : 'Cinturón') . ': ' . e($beltName);
+
+    // NoGi: el cinturon real no es la categoria que compitio (ver nogi_tiers) —
+    // el certificado muestra su nivel (Amateur/Semi Pro/Pro) o infantil/juvenil
+    // en texto, SIN el dibujo del cinturon (no se compite con kimono; el dibujo
+    // solo aplica a gi). Gi sigue mostrando el cinturon real dibujado de siempre.
+    if (($r['discipline'] ?? 'gi') === 'nogi') {
+        $isKidsOrJuv = (bool)$r['age_is_kids'] || $r['age_code'] === 'juvenil';
+        $catKey = $isKidsOrJuv ? 'kids_juvenile' : (nogi_tiers_for(['discipline' => 'nogi', 'nogi_tiers' => $r['nogi_tiers']])[$r['belt_code']] ?? 'amateur');
+        $catLabel = $catKey === 'kids_juvenile' ? t('div_order_kids_juvenile') : nogi_tier_labels()[$catKey];
+        $beltColor = 'transparent';
+        $tipColor = 'transparent';
+        $beltDrawing = '';
+        $beltLabel = ($isEn ? 'Category' : 'Categoría') . ': ' . e($catLabel);
+    } else {
+        $beltName = $isEn ? $r['belt_en'] : $r['belt_es'];
+        $beltColor = $r['color_hex'];
+        $tipColor = $r['belt_code'] === 'black' ? '#c9252c' : '#1c1c1e';
+        $beltDrawing = '<div class="belt"><div class="belttip"></div><div class="beltknot"></div></div>';
+        $beltLabel = ($isEn ? 'Belt' : 'Cinturón') . ': ' . e($beltName);
+    }
     $dateStr = $r['event_date'] ? date('d/m/Y', strtotime($r['event_date'])) : date('d/m/Y');
     $tournamentNameEsc = e($r['tournament_name']);
     $nameEsc = e($r['name']);
@@ -167,7 +184,7 @@ function certificate_generate(int $registrationId, string $type): string {
     <div class="rule"></div>
     <div class="award">$award</div>
     <p class="category">$category</p>
-    <div class="belt"><div class="belttip"></div><div class="beltknot"></div></div>
+    $beltDrawing
     <div class="beltlabel">$beltLabel</div>
     $academyLine
     $fightsLine

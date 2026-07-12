@@ -122,12 +122,97 @@ function loc_name(array $rowData): string {
     return lang() === 'en' ? ($rowData['name_en'] ?? $rowData['name_es']) : $rowData['name_es'];
 }
 
-function division_label(array $d): string {
-    $belt = row('SELECT * FROM belts WHERE id = ?', [$d['belt_id']]);
-    $age  = row('SELECT * FROM age_divisions WHERE id = ?', [$d['age_division_id']]);
-    $wc   = row('SELECT * FROM weight_classes WHERE id = ?', [$d['weight_class_id']]);
+/**
+ * Lista drag-and-drop (ver public/assets/js/dragorder.js) para ordenar
+ * categorias. $prefix + "_" + clave = nombre del input hidden que se manda
+ * con el form (ej. "div_ord_black", "age_ord_adulto", "wt_ord_w70").
+ */
+function render_drag_order(string $prefix, array $labels, array $order): void {
+    echo '<ul class="dragorder">';
+    foreach ($order as $i => $key) {
+        $label = $labels[$key] ?? $key;
+        echo '<li data-key="' . e($key) . '">'
+           . '<span class="dragorder-pos">' . ($i + 1) . '</span>'
+           . icon('grip', 15, 'dragorder-handle')
+           . '<span class="dragorder-label">' . e($label) . '</span>'
+           . '<input type="hidden" name="' . e($prefix) . '_' . e($key) . '" value="' . ($i + 1) . '">'
+           . '</li>';
+    }
+    echo '</ul>';
+}
+
+/**
+ * Colores fijos de las 4 categorias NoGi (mismo criterio que el belt-chip de
+ * gi: blanco/violeta/negro para amateur/semipro/pro, amarillo para infantil/juvenil).
+ */
+function nogi_category_colors(): array {
+    return [
+        'kids_juvenile' => ['bg' => '#f2c500', 'fg' => '#1a1a1a'],
+        'amateur' => ['bg' => '#f5f5f5', 'fg' => '#1a1a1a'],
+        'semipro' => ['bg' => '#7b2fbe', 'fg' => '#ffffff'],
+        'pro' => ['bg' => '#1a1a1a', 'fg' => '#ffffff'],
+    ];
+}
+
+/** Ovalo de color envolviendo una categoria NoGi (infantil/juvenil o nivel) */
+function nogi_category_badge(string $key, string $label): string {
+    $c = nogi_category_colors()[$key] ?? null;
+    if (!$c) return e($label);
+    return '<span class="badge" style="background:' . e($c['bg']) . ';color:' . e($c['fg']) . ';border:1px solid rgba(128,128,128,.4)">' . e($label) . '</span>';
+}
+
+/**
+ * Cinturon (gi) o categoria (nogi: infantil/juvenil o nivel) de una division,
+ * ya localizado. $html=true envuelve infantil/juvenil o el nivel en el ovalo
+ * de color (nogi_category_badge()) para mostrar en pantalla; $html=false
+ * (default) devuelve texto plano para contextos que no toleran HTML (ej.
+ * <title>). En NoGi el cinturon NO es el parametro real — antes esta funcion
+ * devolvia '' para infantil/juvenil NoGi (sin cinturon ni nivel), ahora
+ * siempre devuelve algo que distingue la categoria.
+ */
+function division_belt_or_tier_label(array $d, bool $html = false): string {
+    if (!empty($d['tier'])) {
+        $label = nogi_tier_labels()[$d['tier']] ?? $d['tier'];
+        return $html ? nogi_category_badge($d['tier'], $label) : $label;
+    }
+    if (!empty($d['belt_id'])) {
+        $belt = row('SELECT * FROM belts WHERE id = ?', [$d['belt_id']]);
+        return $belt ? loc_name($belt) : '';
+    }
+    // nogi infantil/juvenil: sin cinturon ni tier (los dos NULL)
+    $label = t('div_order_kids_juvenile');
+    return $html ? nogi_category_badge('kids_juvenile', $label) : $label;
+}
+
+/**
+ * Categoria de una division sin el genero (edad · cinturon/nivel · peso,
+ * absoluto o nombre especial). $html=true devuelve HTML ya escapado (con el
+ * ovalo de color de nogi_category_badge() incluido) — el caller NO debe
+ * volver a pasarlo por e(); $html=false (default) devuelve texto plano, como
+ * siempre, y el caller sigue siendo responsable de escaparlo.
+ */
+function division_category_label(array $d, bool $html = false): string {
+    if (($d['kind'] ?? 'standard') === 'special') {
+        $name = $d['name'] ?: t('special_category');
+        return $html ? e($name) : $name;
+    }
+    $beltOrTier = division_belt_or_tier_label($d, $html);
+    if (($d['kind'] ?? 'standard') === 'absolute') {
+        $absLabel = $html ? e(t('absolute_category')) : t('absolute_category');
+        return $beltOrTier ? $absLabel . ' · ' . $beltOrTier : $absLabel;
+    }
+    $age = !empty($d['age_division_id']) ? row('SELECT * FROM age_divisions WHERE id = ?', [$d['age_division_id']]) : null;
+    $wc  = !empty($d['weight_class_id']) ? row('SELECT * FROM weight_classes WHERE id = ?', [$d['weight_class_id']]) : null;
+    $parts = [];
+    if ($age) $parts[] = $html ? e(loc_name($age)) : loc_name($age);
+    if ($beltOrTier) $parts[] = $beltOrTier;
+    if ($wc) $parts[] = $html ? e(loc_name($wc)) : loc_name($wc);
+    return implode(' · ', $parts);
+}
+
+function division_label(array $d, bool $html = false): string {
     $g = $d['gender'] === 'M' ? t('male') : t('female');
-    return sprintf('%s · %s · %s · %s', $g, loc_name($age), loc_name($belt), loc_name($wc));
+    return ($html ? e($g) : $g) . ' · ' . division_category_label($d, $html);
 }
 
 function fmt_time(int $sec): string {

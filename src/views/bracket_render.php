@@ -37,7 +37,7 @@ function render_bracket(int $divisionId, bool $manage = false): void {
         $label = $rnum === $maxRound ? t('final') : ($rnum === $maxRound - 1 ? t('semifinal') : t('round') . ' ' . $rnum);
         $accent = BRACKET_PALETTE[$ri % count(BRACKET_PALETTE)];
         echo '<div class="b-round" style="--accent:' . $accent . '"><h4>' . e($label) . '</h4>';
-        foreach ($ms as $m) render_bracket_match($m, $manage);
+        foreach ($ms as $m) render_bracket_match($m, $manage, false, $rnum === $maxRound);
         // Bronce junto a la final
         if ($rnum === $maxRound && $bronze) {
             echo '<div class="b-match b-bronze-label"><h5>' . icon('award', 13, 'ic-bronze') . ' ' . t('bronze_match') . '</h5></div>';
@@ -63,7 +63,7 @@ function render_bracket(int $divisionId, bool $manage = false): void {
     echo '<script>if (window.fitBracket) fitBracket();</script>';
 }
 
-function render_bracket_match(array $m, bool $manage, bool $isBronze = false): void {
+function render_bracket_match(array $m, bool $manage, bool $isBronze = false, bool $isFinal = false): void {
     $live = $m['status'] === 'live';
     $attrs = ' data-id="' . (int)$m['id'] . '"';
     if (!empty($m['next_match_id'])) $attrs .= ' data-next="' . (int)$m['next_match_id'] . '"';
@@ -78,6 +78,11 @@ function render_bracket_match(array $m, bool $manage, bool $isBronze = false): v
             echo '<span class="pts">' . (int)$pts . '</span>';
         }
         if ($isWinner) echo ' ' . icon('trophy', 13, 'ic-gold');
+        // El perdedor de la FINAL es el 2do puesto: lleva la copita plateada
+        // (los perdedores de las demas luchas no llevan nada).
+        if ($isFinal && !$isWinner && $regId && $m['status'] === 'done' && $m['winner_reg_id'] && $m['red_reg_id'] && $m['blue_reg_id']) {
+            echo ' ' . icon('trophy', 13, 'ic-silver');
+        }
         echo '</div>';
     }
     $methodLabel = ($m['status'] === 'done' && $m['method'] && $m['method'] !== 'wo')

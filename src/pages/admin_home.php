@@ -2,7 +2,7 @@
 require_admin();
 $stats = [
     [icon('user', 14) . ' ' . t('users'), (int)scalar('SELECT COUNT(*) FROM users'), '/admin/users'],
-    [icon('trophy', 14) . ' ' . t('nav_tournaments'), (int)scalar('SELECT COUNT(*) FROM tournaments'), '/tournaments'],
+    [icon('trophy', 14) . ' ' . t('nav_tournaments'), (int)scalar('SELECT COUNT(*) FROM tournaments'), '/dashboard'],
     [icon('clipboard', 14) . ' ' . t('registrations'), (int)scalar('SELECT COUNT(*) FROM registrations'), null],
     [icon('swords', 14) . ' ' . t('matches'), (int)scalar('SELECT COUNT(*) FROM matches WHERE status="done"'), null],
     [icon('mail', 14) . ' ' . t('emails_pending'), (int)scalar('SELECT COUNT(*) FROM email_queue WHERE status="pending"'), '/admin/scheduler'],

@@ -60,6 +60,12 @@
       el.classList.toggle('warn', !!state.timer_running);
       el.classList.toggle('green', !state.timer_running);
     });
+    // Los botones de puntaje quedan grisados hasta que se arranca el
+    // cronometro por primera vez (status pasa de "pending" a "live").
+    const locked = state.status === 'pending';
+    document.querySelectorAll('.op-scorebtn').forEach((el) => { el.disabled = locked; });
+    const hint = document.querySelector('[data-sb="lockedhint"]');
+    if (hint) hint.style.display = locked ? '' : 'none';
   }
 
   async function sync() {
@@ -94,6 +100,11 @@
     const data = await r.json();
     if (data.error === 'downstream_started') {
       alert(S.reopenBlocked || 'No se puede editar: la siguiente lucha ya avanzó.');
+      return;
+    }
+    if (data.error === 'not_started') {
+      state = data.state;
+      render();
       return;
     }
     state = data;

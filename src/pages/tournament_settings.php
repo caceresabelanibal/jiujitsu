@@ -26,6 +26,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($do === 'reset_order') {
         q('UPDATE tournaments SET division_order = NULL WHERE id = ?', [$tid]);
         flash('success', t('settings_saved'));
+    } elseif ($do === 'save_nogi_order') {
+        $nogiDivKeys = nogi_division_order_default();
+        usort($nogiDivKeys, fn($a, $b) => (int)($_POST["nogi_div_ord_$a"] ?? 0) <=> (int)($_POST["nogi_div_ord_$b"] ?? 0));
+        q('UPDATE tournaments SET nogi_division_order = ? WHERE id = ?', [json_encode(nogi_division_order_sanitize($nogiDivKeys), JSON_UNESCAPED_UNICODE), $tid]);
+        flash('success', t('settings_saved'));
+    } elseif ($do === 'reset_nogi_order') {
+        q('UPDATE tournaments SET nogi_division_order = NULL WHERE id = ?', [$tid]);
+        flash('success', t('settings_saved'));
     } elseif ($do === 'save_duration') {
         $durInput = [];
         foreach (belt_duration_defaults() as $key => $def) {
@@ -39,6 +47,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         q('UPDATE tournaments SET belt_durations = NULL WHERE id = ?', [$tid]);
         apply_belt_durations($tid, belt_durations_global());
         flash('success', t('settings_saved'));
+    } elseif ($do === 'save_nogi_duration') {
+        $nogiDurInput = [];
+        foreach (nogi_tier_duration_defaults() as $key => $def) {
+            $nogiDurInput[$key] = max(1, (int)($_POST["nogi_dur_$key"] ?? 0)) * 60;
+        }
+        $nogiDurations = nogi_tier_duration_sanitize($nogiDurInput);
+        q('UPDATE tournaments SET nogi_tier_durations = ? WHERE id = ?', [json_encode($nogiDurations, JSON_UNESCAPED_UNICODE), $tid]);
+        apply_nogi_tier_durations($tid, $nogiDurations);
+        flash('success', t('settings_saved'));
+    } elseif ($do === 'reset_nogi_duration') {
+        q('UPDATE tournaments SET nogi_tier_durations = NULL WHERE id = ?', [$tid]);
+        apply_nogi_tier_durations($tid, nogi_tier_durations_global());
+        flash('success', t('settings_saved'));
     } elseif ($do === 'save_age') {
         $ages = age_threshold_sanitize([
             'kids_max' => (int)($_POST['age_kids_max'] ?? 0),
@@ -49,6 +70,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($do === 'reset_age') {
         q('UPDATE tournaments SET age_thresholds = NULL WHERE id = ?', [$tid]);
         flash('success', t('settings_saved'));
+    } elseif ($do === 'save_age_order') {
+        $ageKeys = age_order_default();
+        usort($ageKeys, fn($a, $b) => (int)($_POST["age_ord_$a"] ?? 0) <=> (int)($_POST["age_ord_$b"] ?? 0));
+        q('UPDATE tournaments SET age_order = ? WHERE id = ?', [json_encode(age_order_sanitize($ageKeys), JSON_UNESCAPED_UNICODE), $tid]);
+        flash('success', t('settings_saved'));
+    } elseif ($do === 'reset_age_order') {
+        q('UPDATE tournaments SET age_order = NULL WHERE id = ?', [$tid]);
+        flash('success', t('settings_saved'));
+    } elseif ($do === 'save_weight_order') {
+        $wtKeys = weight_order_default();
+        usort($wtKeys, fn($a, $b) => (int)($_POST["wt_ord_$a"] ?? 0) <=> (int)($_POST["wt_ord_$b"] ?? 0));
+        q('UPDATE tournaments SET weight_order = ? WHERE id = ?', [json_encode(weight_order_sanitize($wtKeys), JSON_UNESCAPED_UNICODE), $tid]);
+        flash('success', t('settings_saved'));
+    } elseif ($do === 'reset_weight_order') {
+        q('UPDATE tournaments SET weight_order = NULL WHERE id = ?', [$tid]);
+        flash('success', t('settings_saved'));
+    } elseif ($do === 'save_tiers') {
+        $tierInput = [];
+        foreach (nogi_tier_default() as $belt => $def) {
+            $tierInput[$belt] = $_POST["tier_$belt"] ?? $def;
+        }
+        q('UPDATE tournaments SET nogi_tiers = ? WHERE id = ?', [json_encode(nogi_tiers_sanitize($tierInput), JSON_UNESCAPED_UNICODE), $tid]);
+        reconcile_nogi_tier_divisions($tid);
+        flash('success', t('settings_saved'));
+    } elseif ($do === 'reset_tiers') {
+        q('UPDATE tournaments SET nogi_tiers = NULL WHERE id = ?', [$tid]);
+        reconcile_nogi_tier_divisions($tid);
+        flash('success', t('settings_saved'));
     }
     redirect("/tournament/$tid/settings");
 }
@@ -56,10 +105,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $staff = rows('SELECT s.id, u.name, u.email FROM tournament_staff s JOIN users u ON u.id = s.user_id WHERE s.tournament_id = ? ORDER BY u.name', [$tid]);
 $divOrder = division_order_for($t);
 $divOrderCustom = !empty($t['division_order']);
+$nogiTiers = nogi_tiers_for($t);
+$nogiDivOrder = nogi_division_order_for($t);
+$nogiDivOrderCustom = !empty($t['nogi_division_order']);
 $beltDur = belt_durations_for($t);
 $beltDurCustom = !empty($t['belt_durations']);
+$nogiTierDur = nogi_tier_durations_for($t);
+$nogiTierDurCustom = !empty($t['nogi_tier_durations']);
 $ageTh = age_thresholds_for($t);
 $ageThCustom = !empty($t['age_thresholds']);
+$ageOrder = age_order_for($t);
+$ageOrderCustom = !empty($t['age_order']);
+$weightOrder = weight_order_for($t);
+$weightOrderCustom = !empty($t['weight_order']);
+$nogiTiersCustom = !empty($t['nogi_tiers']);
 $u = current_user();
 $canClone = is_admin() || (int)$t['user_id'] === (int)$u['id'];
 view_header(t('settings'));
@@ -99,6 +158,11 @@ view_header(t('settings'));
       <input type="number" name="max_participants" value="<?= (int)$t['max_participants'] ?>" min="2">
       <label><?= t('fight_duration_default') ?></label>
       <input type="number" name="duration_min" value="<?= (int)round($t['default_duration_sec'] / 60) ?>" min="1" max="20">
+      <label><?= t('discipline') ?></label>
+      <select name="discipline">
+        <option value="gi" <?= $t['discipline'] === 'gi' ? 'selected' : '' ?>><?= t('discipline_gi') ?></option>
+        <option value="nogi" <?= $t['discipline'] === 'nogi' ? 'selected' : '' ?>><?= t('discipline_nogi') ?></option>
+      </select>
       <label><?= t('logo') ?></label>
       <input type="file" name="logo" accept="image/*">
       <button class="btn mt"><?= t('save') ?></button>
@@ -126,19 +190,13 @@ view_header(t('settings'));
   </div>
 </div>
 
+<?php if ($t['discipline'] === 'gi'): ?>
 <div class="card">
   <h3><?= icon('sliders', 16) ?> <?= t('division_order_title') ?> <?php if ($divOrderCustom): ?><span class="badge blue"><?= t('division_order_custom_badge') ?></span><?php endif; ?></h3>
   <p class="muted" style="margin-top:0"><?= t('division_order_tournament_hint') ?></p>
   <form method="post">
     <?= csrf_field() ?>
-    <div class="grid cols3">
-      <?php foreach (division_order_labels() as $key => $label): ?>
-      <div>
-        <label><?= e($label) ?></label>
-        <input type="number" name="div_ord_<?= e($key) ?>" value="<?= array_search($key, $divOrder, true) + 1 ?>" min="1" max="6">
-      </div>
-      <?php endforeach; ?>
-    </div>
+    <?php render_drag_order('div_ord', division_order_labels(), $divOrder); ?>
     <div class="flex mt">
       <button class="btn" type="submit" name="do" value="save_order"><?= t('save') ?></button>
       <?php if ($divOrderCustom): ?>
@@ -147,7 +205,54 @@ view_header(t('settings'));
     </div>
   </form>
 </div>
+<?php else: ?>
+<div class="card">
+  <h3><?= icon('sliders', 16) ?> <?= t('division_order_title') ?> <?php if ($nogiDivOrderCustom): ?><span class="badge blue"><?= t('nogi_division_order_custom_badge') ?></span><?php endif; ?></h3>
+  <p class="muted" style="margin-top:0"><?= t('nogi_division_order_tournament_hint') ?></p>
+  <form method="post">
+    <?= csrf_field() ?>
+    <?php render_drag_order('nogi_div_ord', nogi_division_order_labels(), $nogiDivOrder); ?>
+    <div class="flex mt">
+      <button class="btn" type="submit" name="do" value="save_nogi_order"><?= t('save') ?></button>
+      <?php if ($nogiDivOrderCustom): ?>
+      <button class="btn secondary" type="submit" name="do" value="reset_nogi_order"><?= t('nogi_division_order_reset') ?></button>
+      <?php endif; ?>
+    </div>
+  </form>
+</div>
+<?php endif; ?>
 
+<div class="card">
+  <h3><?= icon('calendar', 16) ?> <?= t('age_order_title') ?> <?php if ($ageOrderCustom): ?><span class="badge blue"><?= t('age_order_custom_badge') ?></span><?php endif; ?></h3>
+  <p class="muted" style="margin-top:0"><?= t('age_order_tournament_hint') ?></p>
+  <form method="post">
+    <?= csrf_field() ?>
+    <?php render_drag_order('age_ord', age_order_labels(), $ageOrder); ?>
+    <div class="flex mt">
+      <button class="btn" type="submit" name="do" value="save_age_order"><?= t('save') ?></button>
+      <?php if ($ageOrderCustom): ?>
+      <button class="btn secondary" type="submit" name="do" value="reset_age_order"><?= t('age_order_reset') ?></button>
+      <?php endif; ?>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <h3><?= icon('sliders', 16) ?> <?= t('weight_order_title') ?> <?php if ($weightOrderCustom): ?><span class="badge blue"><?= t('weight_order_custom_badge') ?></span><?php endif; ?></h3>
+  <p class="muted" style="margin-top:0"><?= t('weight_order_tournament_hint') ?></p>
+  <form method="post">
+    <?= csrf_field() ?>
+    <?php render_drag_order('wt_ord', weight_order_labels(), $weightOrder); ?>
+    <div class="flex mt">
+      <button class="btn" type="submit" name="do" value="save_weight_order"><?= t('save') ?></button>
+      <?php if ($weightOrderCustom): ?>
+      <button class="btn secondary" type="submit" name="do" value="reset_weight_order"><?= t('weight_order_reset') ?></button>
+      <?php endif; ?>
+    </div>
+  </form>
+</div>
+
+<?php if ($t['discipline'] === 'gi'): ?>
 <div class="card">
   <h3><?= icon('clock', 16) ?> <?= t('belt_duration_title') ?> <?php if ($beltDurCustom): ?><span class="badge blue"><?= t('belt_duration_custom_badge') ?></span><?php endif; ?></h3>
   <p class="muted" style="margin-top:0"><?= t('belt_duration_tournament_hint') ?></p>
@@ -169,6 +274,29 @@ view_header(t('settings'));
     </div>
   </form>
 </div>
+<?php else: ?>
+<div class="card">
+  <h3><?= icon('clock', 16) ?> <?= t('nogi_duration_title') ?> <?php if ($nogiTierDurCustom): ?><span class="badge blue"><?= t('nogi_duration_custom_badge') ?></span><?php endif; ?></h3>
+  <p class="muted" style="margin-top:0"><?= t('nogi_duration_tournament_hint') ?></p>
+  <form method="post">
+    <?= csrf_field() ?>
+    <div class="grid cols3">
+      <?php foreach (nogi_division_order_labels() as $key => $label): ?>
+      <div>
+        <label><?= e($label) ?></label>
+        <input type="number" name="nogi_dur_<?= e($key) ?>" value="<?= (int)round($nogiTierDur[$key] / 60) ?>" min="1" max="30"> <span class="muted"><?= t('belt_duration_minutes') ?></span>
+      </div>
+      <?php endforeach; ?>
+    </div>
+    <div class="flex mt">
+      <button class="btn" type="submit" name="do" value="save_nogi_duration"><?= t('save') ?></button>
+      <?php if ($nogiTierDurCustom): ?>
+      <button class="btn secondary" type="submit" name="do" value="reset_nogi_duration"><?= t('nogi_duration_reset') ?></button>
+      <?php endif; ?>
+    </div>
+  </form>
+</div>
+<?php endif; ?>
 
 <div class="card">
   <h3><?= icon('calendar', 16) ?> <?= t('age_thresholds_title') ?> <?php if ($ageThCustom): ?><span class="badge blue"><?= t('age_thresholds_custom_badge') ?></span><?php endif; ?></h3>
@@ -193,4 +321,41 @@ view_header(t('settings'));
     </div>
   </form>
 </div>
+
+<?php if ($t['discipline'] === 'nogi'): ?>
+<div class="card">
+  <h3><?= icon('flag', 16) ?> <?= t('nogi_tiers_title') ?> <?php if ($nogiTiersCustom): ?><span class="badge blue"><?= t('nogi_tiers_custom_badge') ?></span><?php endif; ?></h3>
+  <p class="muted" style="margin-top:0"><?= t('nogi_tiers_tournament_hint') ?></p>
+  <form method="post">
+    <?= csrf_field() ?>
+    <div class="grid cols3">
+      <?php foreach (division_order_labels() as $key => $label): if (!in_array($key, ['white','blue','purple','brown','black'], true)) continue; ?>
+      <div>
+        <label><?= e($label) ?></label>
+        <select name="tier_<?= e($key) ?>">
+          <?php foreach (['amateur','semipro','pro'] as $tier): ?>
+          <option value="<?= $tier ?>" <?= $nogiTiers[$key] === $tier ? 'selected' : '' ?>><?= t('nogi_' . $tier) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <?php endforeach; ?>
+    </div>
+    <div class="flex mt">
+      <button class="btn" type="submit" name="do" value="save_tiers"><?= t('save') ?></button>
+      <?php if ($nogiTiersCustom): ?>
+      <button class="btn secondary" type="submit" name="do" value="reset_tiers"><?= t('nogi_tiers_reset') ?></button>
+      <?php endif; ?>
+    </div>
+  </form>
+</div>
+<?php endif; ?>
+
+<?php if ($canClone): ?>
+<div class="card" style="border-color:var(--red)">
+  <h3><?= icon('trash', 16) ?> <?= t('danger_zone') ?></h3>
+  <p class="muted" style="margin-top:0"><?= t('delete_tournament_hint') ?></p>
+  <a class="btn danger" href="<?= APP_URL ?>/tournament/<?= $tid ?>/delete"><?= icon('trash', 15) ?> <?= t('delete_tournament') ?></a>
+</div>
+<?php endif; ?>
+<script src="<?= asset('/assets/js/dragorder.js') ?>"></script>
 <?php view_footer();

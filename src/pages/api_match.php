@@ -70,6 +70,9 @@ switch ($action) {
         break;
 
     case 'score':
+        // No se puede puntuar antes de arrancar el cronometro por primera vez
+        // (evita clicks accidentales pre-inicio; el boton ya queda grisado en el front).
+        if ($m['status'] === 'pending') json_out(['error' => 'not_started', 'state' => match_state($m)], 422);
         $type = $_POST['type'] ?? '';
         if (isset($scoring[$type])) {
             $col = $side . '_points';

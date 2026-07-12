@@ -7,6 +7,7 @@ $tasks = [
     'rankings'          => ['chart', 'Recalcula el ranking global de competidores', '0 * * * *'],
     'tournament_status' => ['calendar', 'Pasa a "en curso" al llegar la fecha y a "finalizado" si ya no quedan luchas', '0,15,30,45 * * * *'],
     'cleanup'           => ['trash', 'Borra inscripciones no verificadas (>72h) y mails viejos', '0 4 * * *'],
+    'delete_old_tournaments' => ['trash', 'Borra torneos mas viejos que la retencion configurada (deshabilitado si es 0)', '0 5 * * *'],
 ];
 $key = CRON_KEY;
 view_header(t('scheduler'));

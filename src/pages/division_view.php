@@ -19,7 +19,7 @@ view_header(division_label($d), true, 'proj');
   <div class="projector-header">
     <?php if ($t['logo']): ?><img class="tlogo" src="<?= APP_URL . '/' . e($t['logo']) ?>" alt=""><?php endif; ?>
     <h1><?= e($t['name']) ?></h1>
-    <h2 class="muted"><?= e(division_label($d)) ?></h2>
+    <h2 class="muted"><?= division_label($d, true) ?></h2>
   </div>
   <div class="bracket-region" id="bracket-region">
     <?php render_bracket((int)$d['id']); ?>

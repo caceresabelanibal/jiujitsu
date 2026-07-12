@@ -30,7 +30,6 @@ function view_header(string $title, bool $bare = false, string $bodyClass = ''):
     <a href="<?= APP_URL ?>/rankings"><?= t('nav_rankings') ?></a>
     <?php if ($u): ?>
       <a href="<?= APP_URL ?>/dashboard"><?= t('nav_dashboard') ?></a>
-      <a href="<?= APP_URL ?>/tournaments"><?= t('nav_tournaments') ?></a>
       <?php if (is_admin()): ?><a href="<?= APP_URL ?>/admin"><?= t('nav_admin') ?></a><?php endif; ?>
       <a href="<?= APP_URL ?>/logout"><?= t('nav_logout') ?> (<?= e($u['name']) ?>)</a>
     <?php else: ?>

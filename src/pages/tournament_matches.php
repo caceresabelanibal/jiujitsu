@@ -1,20 +1,22 @@
 <?php
 $t = require_tournament_owner((int)$params[0]);
 $tid = (int)$t['id'];
-$divOrder = division_order_case_sql(division_order_for($t));
+$divOrder = $t['discipline'] === 'nogi'
+    ? nogi_division_order_case_sql(nogi_division_order_for($t))
+    : division_order_case_sql(division_order_for($t));
+$ageOrder = age_order_case_sql(age_order_for($t));
+$weightOrder = weight_order_case_sql(weight_order_for($t));
 $matches = rows("SELECT m.*, r1.name red_name, r2.name blue_name, d.id did,
-                        b.name_es b_es, b.name_en b_en, b.color_hex, ad.name_es ad_es, ad.name_en ad_en,
-                        wc.name_es w_es, wc.name_en w_en, d.gender
+                        d.gender, d.belt_id, d.tier, d.kind, d.name dname, d.age_division_id, d.weight_class_id, b.color_hex
                  FROM matches m
                  JOIN divisions d ON d.id = m.division_id
-                 JOIN belts b ON b.id = d.belt_id
-                 JOIN age_divisions ad ON ad.id = d.age_division_id
-                 JOIN weight_classes wc ON wc.id = d.weight_class_id
+                 LEFT JOIN belts b ON b.id = d.belt_id
+                 LEFT JOIN age_divisions ad ON ad.id = d.age_division_id
+                 LEFT JOIN weight_classes wc ON wc.id = d.weight_class_id
                  LEFT JOIN registrations r1 ON r1.id = m.red_reg_id
                  LEFT JOIN registrations r2 ON r2.id = m.blue_reg_id
                  WHERE m.tournament_id = ? AND m.red_reg_id IS NOT NULL AND m.blue_reg_id IS NOT NULL
-                 ORDER BY (m.status = \"live\") DESC, (m.status = \"pending\") DESC, $divOrder, d.gender, ad.sort, b.sort, wc.sort, m.round, m.slot", [$tid]);
-$isEn = lang() === 'en';
+                 ORDER BY (m.status = \"live\") DESC, (m.status = \"pending\") DESC, $divOrder, d.gender, $ageOrder, b.sort, $weightOrder, m.round, m.slot", [$tid]);
 view_header(t('matches'));
 ?>
 <h1><?= e($t['name']) ?></h1>
@@ -25,7 +27,8 @@ view_header(t('matches'));
   <?php foreach ($matches as $m): ?>
   <tr>
     <td class="muted" style="font-size:.82rem">
-      <?= ($m['gender'] === 'M' ? t('male') : t('female')) . ' · ' . e($isEn ? $m['ad_en'] : $m['ad_es']) ?> · <span class="belt-chip" style="background:<?= e($m['color_hex']) ?>"></span> <?= e($isEn ? $m['w_en'] : $m['w_es']) ?>
+      <?= division_label(['gender' => $m['gender'], 'belt_id' => $m['belt_id'], 'tier' => $m['tier'], 'kind' => $m['kind'], 'name' => $m['dname'], 'age_division_id' => $m['age_division_id'], 'weight_class_id' => $m['weight_class_id']], true) ?>
+      <?php if ($m['color_hex']): ?><span class="belt-chip" style="background:<?= e($m['color_hex']) ?>"></span><?php endif; ?>
       <?= $m['is_bronze'] ? '<span class="badge grey">' . icon('award', 11, 'ic-bronze') . '</span>' : '' ?>
     </td>
     <td><b><?= e($m['red_name']) ?></b> <span class="muted"><?= t('vs') ?></span> <b><?= e($m['blue_name']) ?></b></td>
