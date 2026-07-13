@@ -22,4 +22,11 @@ RUN composer install --no-dev --no-interaction --no-progress || true
 COPY . .
 RUN mkdir -p storage/certificates public/uploads && chown -R www-data:www-data storage public/uploads
 
+# Entrypoint: espera la DB, crea el admin inicial (idempotente) y arranca Apache.
+# Se copia fuera de /var/www/html para que el bind mount del código no lo tape.
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN sed -i 's/\r$//' /usr/local/bin/entrypoint.sh && chmod +x /usr/local/bin/entrypoint.sh
+
 EXPOSE 80
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["apache2-foreground"]
