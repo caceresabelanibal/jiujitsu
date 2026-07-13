@@ -23,6 +23,11 @@ until php -r '
     sleep 1
 done
 
+# Migrar el esquema: lleva una base creada con un schema viejo al actual
+# (agrega columnas/índices/tablas que falten). Idempotente.
+echo "[entrypoint] migrando esquema si hace falta..."
+php /var/www/html/scripts/migrate.php || echo "[entrypoint] migrate.php falló (revisar logs)."
+
 # Crear/asegurar el admin inicial (no pisa la contraseña si ya existe).
 echo "[entrypoint] asegurando usuario admin inicial..."
 php /var/www/html/scripts/seed_admin.php || echo "[entrypoint] seed_admin no pudo correr (se puede correr a mano luego)."
