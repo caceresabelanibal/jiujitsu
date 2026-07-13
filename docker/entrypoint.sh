@@ -32,5 +32,11 @@ php /var/www/html/scripts/migrate.php || echo "[entrypoint] migrate.php falló (
 echo "[entrypoint] asegurando usuario admin inicial..."
 php /var/www/html/scripts/seed_admin.php || echo "[entrypoint] seed_admin no pudo correr (se puede correr a mano luego)."
 
+# Torneos demo (solo si SEED_DEMO=1). Idempotente: no duplica si ya existen.
+if [ "$SEED_DEMO" = "1" ]; then
+    echo "[entrypoint] sembrando torneos demo..."
+    php /var/www/html/scripts/seed_demo_tournaments.php || echo "[entrypoint] seed_demo_tournaments falló (revisar logs)."
+fi
+
 echo "[entrypoint] iniciando Apache."
 exec "$@"

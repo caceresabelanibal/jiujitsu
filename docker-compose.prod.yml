@@ -25,6 +25,9 @@ services:
       CRON_KEY: ${CRON_KEY:-changeme-cron-key}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@taninzu.com}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Taninzu2026!}
+      # Torneos demo para mirar el sistema. Poné 0 (o borrá esta línea) cuando
+      # no los quieras más; borralos una vez desde la UI y no se recrean.
+      SEED_DEMO: ${SEED_DEMO:-1}
     restart: unless-stopped
 
   db:
