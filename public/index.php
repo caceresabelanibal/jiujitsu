@@ -33,6 +33,7 @@ $routes = [
     '#^/t/([a-zA-Z0-9]+)$#'              => 'public_register',
     '#^/reg-verify$#'                    => 'reg_verify',
     '#^/rankings$#'                      => 'rankings',
+    '#^/help$#'                          => 'help',
     '#^/admin$#'                         => 'admin_home',
     '#^/admin/users$#'                   => 'admin_users',
     '#^/admin/settings$#'                => 'admin_settings',

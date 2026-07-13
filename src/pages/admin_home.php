@@ -9,7 +9,7 @@ $stats = [
 ];
 view_header(t('admin_panel'));
 ?>
-<h1><?= icon('sliders', 24) ?> <?= t('admin_panel') ?></h1>
+<div class="flex spread"><h1><?= icon('sliders', 24) ?> <?= t('admin_panel') ?></h1><?= help_link('administracion') ?></div>
 <div class="grid cols3 mb">
   <?php foreach ($stats as [$label, $v, $link]): ?>
   <div class="stat"><div class="k"><?= $label ?></div><div class="v"><?= $v ?></div>

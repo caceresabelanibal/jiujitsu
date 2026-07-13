@@ -24,7 +24,7 @@ function view_header(string $title, bool $bare = false, string $bodyClass = ''):
 <?php icons_sprite(); ?>
 <?php if (!$bare): ?>
 <header class="topnav">
-  <a class="brand" href="<?= APP_URL ?>/"><img class="brandlogo" src="<?= asset('/assets/img/logo.png') ?>" alt=""> <?= e($site) ?></a>
+  <a class="brand" href="<?= APP_URL ?>/"><img class="brandlogo" src="<?= asset('/assets/img/logo.png') ?>" alt="<?= e($site) ?>"></a>
   <button class="navtoggle" onclick="document.querySelector('.navlinks').classList.toggle('show')">☰</button>
   <nav class="navlinks">
     <a href="<?= APP_URL ?>/rankings"><?= t('nav_rankings') ?></a>
@@ -36,10 +36,16 @@ function view_header(string $title, bool $bare = false, string $bodyClass = ''):
       <a href="<?= APP_URL ?>/login"><?= t('nav_login') ?></a>
       <a href="<?= APP_URL ?>/register"><?= t('nav_register') ?></a>
     <?php endif; ?>
-    <span class="langswitch">
-      <a href="?lang=es" class="<?= $l === 'es' ? 'active' : '' ?>">ES</a>·<a href="?lang=en" class="<?= $l === 'en' ? 'active' : '' ?>">EN</a>
-    </span>
+    <?php /* OJO: en handlers inline el scope incluye document, y document.URL (string)
+             tapa al constructor global URL — hay que usar window.URL explicito. */ ?>
+    <select class="langsel" title="<?= t('language') ?>" aria-label="<?= t('language') ?>"
+            onchange="const u = new window.URL(window.location.href); u.searchParams.set('lang', this.value); window.location.href = u;">
+      <?php foreach (APP_LANGS as $code => $label): ?>
+      <option value="<?= $code ?>" <?= $l === $code ? 'selected' : '' ?>><?= e($label) ?></option>
+      <?php endforeach; ?>
+    </select>
     <button class="themetoggle" type="button" onclick="toggleTheme(this)" title="<?= t('theme') ?>">◐</button>
+    <a class="themetoggle navhelp" href="<?= APP_URL ?>/help" title="<?= t('help') ?>" aria-label="<?= t('help') ?>">?</a>
   </nav>
 </header>
 <?php endif; ?>
@@ -52,7 +58,7 @@ function view_header(string $title, bool $bare = false, string $bodyClass = ''):
 function view_footer(bool $bare = false): void {
     ?></main>
 <?php if (!$bare): ?>
-<footer class="footer"><img class="brandlogo" src="<?= asset('/assets/img/logo.png') ?>" alt="" style="height:18px;vertical-align:-4px"> <?= e((string)setting('site_name', 'Taninzu')) ?> · taninzu.com · <?= date('Y') ?></footer>
+<footer class="footer"><img class="brandlogo" src="<?= asset('/assets/img/logo.png') ?>" alt="" style="height:36px;vertical-align:-12px"> <?= e((string)setting('site_name', 'Taninzu')) ?> · taninzu.com · <?= date('Y') ?></footer>
 <?php endif; ?>
 <script src="<?= asset('/assets/js/app.js') ?>"></script>
 </body>

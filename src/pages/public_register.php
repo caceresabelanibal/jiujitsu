@@ -72,6 +72,7 @@ view_header(t('register_for') . ' ' . $t['name']);
     <h1><?= e($t['name']) ?></h1>
     <p class="muted"><?= t('register_for') ?> <b><?= e($t['name']) ?></b>
       <?= $t['event_date'] ? '· ' . date('d/m/Y', strtotime($t['event_date'])) : '' ?></p>
+    <p><?= help_link('inscribirse') ?></p>
   </div>
   <?php if ($t['status'] !== 'open'): ?>
     <div class="flash flash-warning"><?= t('registration_closed') ?></div>

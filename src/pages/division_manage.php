@@ -50,7 +50,10 @@ view_header(t('division'));
 <p><a href="<?= APP_URL ?>/tournament/<?= $t['id'] ?>/divisions">← <?= t('back') ?></a></p>
 <div class="flex spread">
   <h1><?= division_label($d, true) ?></h1>
-  <a class="btn secondary" href="<?= APP_URL ?>/division/<?= $did ?>/view" target="_blank"><?= icon('screen', 15) ?> <?= t('projector_view') ?></a>
+  <span>
+    <?= help_link('armar-llave') ?>
+    <a class="btn secondary" href="<?= APP_URL ?>/division/<?= $did ?>/view" target="_blank"><?= icon('screen', 15) ?> <?= t('projector_view') ?></a>
+  </span>
 </div>
 
 <?php if ($d['kind'] === 'special'): ?>

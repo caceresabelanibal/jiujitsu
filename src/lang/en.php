@@ -10,6 +10,12 @@ return [
     'name' => 'Name', 'email' => 'Email', 'password' => 'Password', 'login_required' => 'You must log in.',
     'forbidden' => 'You are not allowed to do that.', 'confirm_delete' => 'Are you sure you want to delete?',
     'never' => 'Never', 'all' => 'All', 'none' => '—', 'total' => 'Total', 'close' => 'Close',
+    'language' => 'Language',
+    'help' => 'Help',
+    'help_search_ph' => 'Search the help (e.g. brackets, certificates, absolute...)',
+    'help_index' => 'Index',
+    'help_no_results' => 'No topics found for that text.',
+    'help_link_label' => 'Help',
 
     // Landing
     'hero_title' => 'Your Jiu-Jitsu tournament platform',

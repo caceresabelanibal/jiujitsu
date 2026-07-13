@@ -115,11 +115,28 @@ function find_weight_class(string $gender, float $kg, bool $kids): ?array {
 }
 
 function belt_name(array $belt): string {
-    return lang() === 'en' ? $belt['name_en'] : $belt['name_es'];
+    return loc_name($belt);
 }
 
+/** Nombre localizado (name_es/name_en/name_pt) de una fila de referencia; cae a name_es si falta el idioma */
 function loc_name(array $rowData): string {
-    return lang() === 'en' ? ($rowData['name_en'] ?? $rowData['name_es']) : $rowData['name_es'];
+    $v = $rowData['name_' . lang()] ?? '';
+    return $v !== '' && $v !== null ? $v : $rowData['name_es'];
+}
+
+/** Enlace contextual al centro de ayuda (/help#ancla) — para pantallas donde el usuario puede perderse */
+function help_link(string $anchor): string {
+    return '<a class="helplink" href="' . APP_URL . '/help#' . e($anchor) . '" title="' . e(t('help')) . '">'
+        . icon('help', 14) . ' ' . e(t('help_link_label')) . '</a>';
+}
+
+/**
+ * Variante para columnas ya alias-adas en una query (b_es/b_en/b_pt, a_es...):
+ * loc_col($row, 'b') elige $row['b_<lang>'] cayendo a $row['b_es'].
+ */
+function loc_col(array $rowData, string $prefix): string {
+    $v = $rowData[$prefix . '_' . lang()] ?? '';
+    return $v !== '' && $v !== null ? $v : ($rowData[$prefix . '_es'] ?? '');
 }
 
 /**

@@ -62,15 +62,19 @@ main.container { max-width: 1200px; width: 100%; margin: 0 auto; padding: 20px 1
 main.bare-main { padding: 0; flex: 1; animation: pageIn .32s ease; }
 
 /* Nav (vidrio esmerilado) */
-.topnav { display: flex; align-items: center; gap: 16px; padding: 12px 20px; background: var(--nav-glass);
+.topnav { display: flex; align-items: center; gap: 16px; padding: 2px 20px; background: var(--nav-glass);
           backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
           border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 50; flex-wrap: wrap; }
 .themetoggle { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 999px;
                width: 34px; height: 34px; font-size: 1rem; cursor: pointer; transition: all .25s ease; }
 .themetoggle:hover { color: var(--text); border-color: var(--accent); transform: rotate(40deg); }
+/* El "?" del nav (link a /help) reusa el look del boton redondo de tema, sin girar */
+a.navhelp { display: inline-flex; align-items: center; justify-content: center; font-weight: 700; text-decoration: none; }
+a.navhelp:hover { transform: none; text-decoration: none; }
 .brand { font-weight: 800; font-size: 1.15rem; color: var(--text); letter-spacing: .02em; }
 .brand:hover { text-decoration: none; }
-.brandlogo { height: 28px; vertical-align: -8px; }
+/* El logo ocupa ~95% del alto del navbar (76px de 80px totales) sin agrandarlo */
+.brandlogo { height: 76px; vertical-align: middle; }
 
 /* Iconos SVG minimalistas */
 .ic { vertical-align: -2.5px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
@@ -87,8 +91,10 @@ main.bare-main { padding: 0; flex: 1; animation: pageIn .32s ease; }
 .navlinks { display: flex; gap: 18px; align-items: center; margin-left: auto; flex-wrap: wrap; }
 .navlinks a { color: var(--muted); font-weight: 600; }
 .navlinks a:hover { color: var(--text); text-decoration: none; }
-.langswitch a { padding: 0 4px; }
-.langswitch a.active { color: var(--accent2); }
+.langsel { background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: 8px;
+           padding: 4px 6px; font-size: .82rem; font-weight: 600; cursor: pointer; width: auto; }
+.langsel:hover { color: var(--text); }
+.langsel option { background: var(--card); color: var(--text); }
 .navtoggle { display: none; background: none; border: 1px solid var(--border); color: var(--text); font-size: 1.2rem; border-radius: 8px; padding: 4px 10px; margin-left: auto; cursor: pointer; }
 @media (max-width: 720px) {
   .navtoggle { display: block; }
@@ -110,6 +116,37 @@ main.bare-main { padding: 0; flex: 1; animation: pageIn .32s ease; }
      chicas que su propio minimo (ej. dos de ~170px con minmax 220px), lo que
      desborda el contenido de cada tarjeta. Se fuerza una sola columna. */
   .grid.cols2, .grid.cols3, .grid.cols4 { grid-template-columns: 1fr; }
+}
+
+/* Centro de ayuda (/help): indice lateral pegajoso + contenido; buscador arriba.
+   .helplink es el enlace contextual "(?) Ayuda" que aparece en las pantallas. */
+.helplink { display: inline-flex; align-items: center; gap: 4px; color: var(--muted); font-size: .82rem;
+            font-weight: 600; white-space: nowrap; }
+.helplink:hover { color: var(--accent); text-decoration: none; }
+.help-head { max-width: 760px; margin: 0 auto 22px; text-align: center; }
+.help-search { width: 100%; max-width: 560px; padding: 12px 16px; border-radius: 999px; font-size: 1rem;
+               background: var(--card); border: 1px solid var(--border); color: var(--text); }
+.help-search:focus { outline: none; border-color: var(--accent); }
+.help-layout { display: grid; grid-template-columns: 260px 1fr; gap: 22px; align-items: start; }
+.help-index { position: sticky; top: 96px; max-height: calc(100vh - 120px); overflow-y: auto; padding: 14px 16px; }
+.help-index h3 { margin: 0 0 8px; font-size: .95rem; }
+.hi-title { display: block; font-weight: 700; color: var(--text); margin: 10px 0 2px; font-size: .88rem; }
+.hi-title:hover { color: var(--accent); text-decoration: none; }
+.hi-topics a { display: block; color: var(--muted); font-size: .8rem; padding: 2px 0 2px 20px; }
+.hi-topics a:hover { color: var(--text); text-decoration: none; }
+.help-topic { scroll-margin-top: 96px; padding: 16px 20px; margin-bottom: 12px; }
+.help-topic h3 { margin: 0 0 8px; }
+.help-topic p, .help-topic li { color: var(--muted); font-size: .92rem; line-height: 1.55; }
+.help-topic b, .help-topic strong { color: var(--text); }
+.help-topic ol, .help-topic ul { padding-left: 20px; margin: 8px 0; }
+.help-sec { scroll-margin-top: 96px; }
+.help-sec h2 { margin: 26px 0 12px; }
+.help-hl { border-color: var(--accent) !important; box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
+.hb { display: inline-block; background: var(--card2); border: 1px solid var(--border); border-radius: 6px;
+      padding: 0 7px; font-size: .85em; color: var(--text); white-space: nowrap; }
+@media (max-width: 900px) {
+  .help-layout { grid-template-columns: 1fr; }
+  .help-index { position: static; max-height: none; }
 }
 
 /* Divisiones y llaves (pestaña Desarrollo): una tarjeta larga por division en
@@ -226,6 +263,20 @@ html[data-theme="light"] .badge.gold { background: #f8efd4; color: #96721a; }
 @keyframes drift { to { transform: translate(60px, 40px) scale(1.15); } }
 html[data-theme="light"] .blob { opacity: .16; }
 html[data-theme="light"] .blob.b3 { opacity: .12; }
+
+/* Marcas de agua del logo en la landing: fijas (viewport), detras de todo,
+   bien transparentes para que jueguen con los blobs sin competir con el
+   contenido. app.js les aplica un translateY lento segun el scroll
+   (parallax); las posiciones iniciales las reparten a lo largo de la pagina
+   (wm3 arranca abajo del viewport y va entrando al scrollear). Tamanos en
+   clamp() para que en mobile queden proporcionados sin desbordar. */
+.wm { position: fixed; z-index: -1; pointer-events: none; user-select: none;
+      opacity: .06; width: clamp(200px, 34vw, 460px); height: auto; will-change: transform; }
+.wm1 { top: 6%; right: -6vw; rotate: 12deg; }
+.wm2 { top: 58%; left: -8vw; rotate: -10deg; width: clamp(160px, 28vw, 380px); }
+.wm3 { top: 108%; right: 14vw; rotate: 8deg; width: clamp(140px, 22vw, 300px); opacity: .05; }
+html[data-theme="light"] .wm { opacity: .05; }
+html[data-theme="light"] .wm3 { opacity: .04; }
 
 .glass { background: color-mix(in srgb, var(--card) 62%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
          border: 1px solid color-mix(in srgb, var(--border) 75%, transparent); border-radius: 18px; box-shadow: var(--shadow); }

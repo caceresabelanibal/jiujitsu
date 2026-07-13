@@ -1,0 +1,33 @@
+# Override de PRODUCCIÓN. Se usa junto con docker-compose.yml:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# - La app responde en el puerto 80 (taninzu.com directo, sin :8080).
+# - APP_ENV=prod: no muestra errores PHP al visitante.
+# - mailhog y phpmyadmin NO arrancan (están en el profile "dev").
+# - Las credenciales y secretos se toman de variables de entorno si están
+#   definidas; si no, usan los mismos defaults que dev para no romper una
+#   instalación existente. Para una instalación nueva, definí las variables
+#   (en un archivo .env junto a este compose, o exportadas en el shell):
+#       CRON_KEY=<algo-largo-y-aleatorio>
+#       ADMIN_EMAIL=admin@taninzu.com
+#       ADMIN_PASSWORD=<una-contraseña-fuerte>
+services:
+  app:
+    # !override reemplaza la lista de puertos del base (si no, 8080 y 80 quedarían ambos)
+    ports: !override
+      - "80:80"
+    environment:
+      APP_ENV: prod
+      # APP_URL se autodetecta del host de cada request (taninzu.com), y respeta
+      # https detrás de un reverse proxy (X-Forwarded-Proto). Descomentá para forzarlo:
+      # APP_URL: https://taninzu.com
+      CRON_KEY: ${CRON_KEY:-changeme-cron-key}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@taninzu.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Taninzu2026!}
+    restart: unless-stopped
+
+  db:
+    restart: unless-stopped
+    # En prod la DB no se expone al host (la app le habla por la red interna de Docker)
+    ports: !reset []

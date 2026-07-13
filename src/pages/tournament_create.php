@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 view_header(t('create_tournament'));
 ?>
 <div class="card" style="max-width:560px;margin:0 auto">
-  <h2><?= t('create_tournament') ?></h2>
+  <div class="flex spread"><h2><?= t('create_tournament') ?></h2><?= help_link('crear-torneo') ?></div>
   <form method="post" enctype="multipart/form-data">
     <?= csrf_field() ?>
     <label><?= t('tournament_name') ?></label>

@@ -108,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 view_header(t('settings'));
 ?>
-<h1><?= icon('settings', 24) ?> <?= t('settings') ?></h1>
+<div class="flex spread"><h1><?= icon('settings', 24) ?> <?= t('settings') ?></h1><?= help_link('administracion') ?></div>
 <?php if ($testResult): ?>
   <div class="flash flash-<?= $testResult['ok'] ? 'success' : 'error' ?>"><?= $testResult['msg'] ?></div>
 <?php endif; ?>

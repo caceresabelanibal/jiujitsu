@@ -52,9 +52,9 @@ function certificate_generate(int $registrationId, string $type): string {
     $r = row('SELECT r.*, t.name AS tournament_name, t.logo AS tournament_logo, t.event_date, t.user_id AS owner_id,
                      t.discipline, t.nogi_tiers,
                      a.name AS academy_name, a.logo AS academy_logo,
-                     b.code AS belt_code, b.name_es AS belt_es, b.name_en AS belt_en, b.color_hex,
-                     ad.name_es AS age_es, ad.name_en AS age_en, ad.is_kids AS age_is_kids, ad.code AS age_code,
-                     wc.name_es AS wc_es, wc.name_en AS wc_en
+                     b.code AS belt_code, b.name_es AS belt_es, b.name_en AS belt_en, b.name_pt AS belt_pt, b.color_hex,
+                     ad.name_es AS age_es, ad.name_en AS age_en, ad.name_pt AS age_pt, ad.is_kids AS age_is_kids, ad.code AS age_code,
+                     wc.name_es AS wc_es, wc.name_en AS wc_en, wc.name_pt AS wc_pt
               FROM registrations r
               JOIN tournaments t ON t.id = r.tournament_id
               LEFT JOIN tournament_academies a ON a.id = r.academy_id
@@ -64,26 +64,38 @@ function certificate_generate(int $registrationId, string $type): string {
               WHERE r.id = ?', [$registrationId]);
     if (!$r) throw new RuntimeException('Registration not found');
 
-    $isEn = lang() === 'en';
+    // Idioma del certificado: el del que lo genera (viewer), 3 idiomas con
+    // fallback a espanol. $L indexa los mapas literales de aca abajo.
+    $L = isset(APP_LANGS[lang()]) ? lang() : 'es';
     $fights = fights_count($registrationId);
     $site = (string)setting('site_name', 'Taninzu');
 
     $titles = [
-        'gold'          => [$isEn ? 'GOLD MEDAL · 1st PLACE' : 'MEDALLA DE ORO · 1er PUESTO', '#b8912a'],
-        'silver'        => [$isEn ? 'SILVER MEDAL · 2nd PLACE' : 'MEDALLA DE PLATA · 2do PUESTO', '#7c8794'],
-        'bronze'        => [$isEn ? 'BRONZE MEDAL · 3rd PLACE' : 'MEDALLA DE BRONCE · 3er PUESTO', '#9c6a33'],
-        'participation' => [$isEn ? 'CERTIFICATE OF PARTICIPATION' : 'CERTIFICADO DE PARTICIPACIÓN', '#31577e'],
+        'gold' => [[
+            'es' => 'MEDALLA DE ORO · 1er PUESTO', 'en' => 'GOLD MEDAL · 1st PLACE', 'pt' => 'MEDALHA DE OURO · 1º LUGAR',
+        ][$L], '#b8912a'],
+        'silver' => [[
+            'es' => 'MEDALLA DE PLATA · 2do PUESTO', 'en' => 'SILVER MEDAL · 2nd PLACE', 'pt' => 'MEDALHA DE PRATA · 2º LUGAR',
+        ][$L], '#7c8794'],
+        'bronze' => [[
+            'es' => 'MEDALLA DE BRONCE · 3er PUESTO', 'en' => 'BRONZE MEDAL · 3rd PLACE', 'pt' => 'MEDALHA DE BRONZE · 3º LUGAR',
+        ][$L], '#9c6a33'],
+        'participation' => [[
+            'es' => 'CERTIFICADO DE PARTICIPACIÓN', 'en' => 'CERTIFICATE OF PARTICIPATION', 'pt' => 'CERTIFICADO DE PARTICIPAÇÃO',
+        ][$L], '#31577e'],
     ];
     [$award, $accent] = $titles[$type];
 
     // Codigo de verificacion unico (HMAC del torneo+inscripto+tipo)
     $code = strtoupper(implode('-', str_split(substr(hash_hmac('sha256', $r['tournament_id'] . '|' . $registrationId . '|' . $type, CRON_KEY), 0, 12), 4)));
 
-    $ageName  = $isEn ? $r['age_en'] : $r['age_es'];
-    $wcName   = $isEn ? $r['wc_en'] : $r['wc_es'];
-    $genderName = $r['gender'] === 'M' ? ($isEn ? 'Male' : 'Masculino') : ($isEn ? 'Female' : 'Femenino');
+    $ageName  = loc_col($r, 'age');
+    $wcName   = loc_col($r, 'wc');
+    $genderName = $r['gender'] === 'M'
+        ? ['es' => 'Masculino', 'en' => 'Male', 'pt' => 'Masculino'][$L]
+        : ['es' => 'Femenino', 'en' => 'Female', 'pt' => 'Feminino'][$L];
     $category = e("$genderName · $ageName · $wcName");
-    $certText = $isEn ? 'hereby confers this certificate upon' : 'otorga el presente certificado a';
+    $certText = ['es' => 'otorga el presente certificado a', 'en' => 'hereby confers this certificate upon', 'pt' => 'confere o presente certificado a'][$L];
 
     // NoGi: el cinturon real no es la categoria que compitio (ver nogi_tiers) —
     // el certificado muestra su nivel (Amateur/Semi Pro/Pro) o infantil/juvenil
@@ -96,25 +108,29 @@ function certificate_generate(int $registrationId, string $type): string {
         $beltColor = 'transparent';
         $tipColor = 'transparent';
         $beltDrawing = '';
-        $beltLabel = ($isEn ? 'Category' : 'Categoría') . ': ' . e($catLabel);
+        $beltLabel = (['es' => 'Categoría', 'en' => 'Category', 'pt' => 'Categoria'][$L]) . ': ' . e($catLabel);
     } else {
-        $beltName = $isEn ? $r['belt_en'] : $r['belt_es'];
+        $beltName = loc_col($r, 'belt');
         $beltColor = $r['color_hex'];
         $tipColor = $r['belt_code'] === 'black' ? '#c9252c' : '#1c1c1e';
         $beltDrawing = '<div class="belt"><div class="belttip"></div><div class="beltknot"></div></div>';
-        $beltLabel = ($isEn ? 'Belt' : 'Cinturón') . ': ' . e($beltName);
+        $beltLabel = (['es' => 'Cinturón', 'en' => 'Belt', 'pt' => 'Faixa'][$L]) . ': ' . e($beltName);
     }
     $dateStr = $r['event_date'] ? date('d/m/Y', strtotime($r['event_date'])) : date('d/m/Y');
     $tournamentNameEsc = e($r['tournament_name']);
     $nameEsc = e($r['name']);
     $organizer = e((string)(scalar('SELECT name FROM users WHERE id = ?', [$r['owner_id']]) ?: $site));
-    $orgLabel = $isEn ? 'Organization' : 'Organización';
-    $certLabel = $isEn ? 'Official certification' : 'Certificación oficial';
-    $verifyLabel = ($isEn ? 'Verification code' : 'Código de verificación') . ': ' . $code;
+    $orgLabel = ['es' => 'Organización', 'en' => 'Organization', 'pt' => 'Organização'][$L];
+    $certLabel = ['es' => 'Certificación oficial', 'en' => 'Official certification', 'pt' => 'Certificação oficial'][$L];
+    $verifyLabel = (['es' => 'Código de verificación', 'en' => 'Verification code', 'pt' => 'Código de verificação'][$L]) . ': ' . $code;
 
     $academyLine = $r['academy_name'] ? '<p class="academy">' . e($r['academy_name']) . '</p>' : '';
     $fightsLine = $fights > 0
-        ? '<p class="fights">' . ($isEn ? "Fights in this tournament: <b>$fights</b>" : "Luchas disputadas en este torneo: <b>$fights</b>") . '</p>'
+        ? '<p class="fights">' . ([
+            'es' => "Luchas disputadas en este torneo: <b>$fights</b>",
+            'en' => "Fights in this tournament: <b>$fights</b>",
+            'pt' => "Lutas disputadas neste torneio: <b>$fights</b>",
+          ][$L]) . '</p>'
         : '';
 
     // Logos del torneo/academia (esquinas superiores)
@@ -241,7 +257,7 @@ HTML;
 function certificates_send_all(int $tournamentId, bool $podium = true, bool $participation = true, int $limit = 0): array {
     set_time_limit(0);
     $t = row('SELECT * FROM tournaments WHERE id = ?', [$tournamentId]);
-    $isEn = lang() === 'en';
+    $L = isset(APP_LANGS[lang()]) ? lang() : 'es';
 
     $queue = []; // reg_id => type (el podio pisa participacion)
     if ($participation) {
@@ -270,10 +286,12 @@ function certificates_send_all(int $tournamentId, bool $podium = true, bool $par
         if ($limit > 0 && $sent >= $limit) break;
         $path = certificate_generate($regId, $type);
         $reg = row('SELECT * FROM registrations WHERE id = ?', [$regId]);
-        $subject = ($isEn ? 'Your certificate - ' : 'Tu certificado - ') . $t['name'];
-        $body = mail_layout($subject, '<p>' .
-            ($isEn ? "Congratulations <b>{$reg['name']}</b>! Attached is your certificate from <b>{$t['name']}</b>. OSS! 🥋"
-                   : "¡Felicitaciones <b>{$reg['name']}</b>! Te adjuntamos tu certificado del torneo <b>{$t['name']}</b>. ¡OSS! 🥋") . '</p>');
+        $subject = (['es' => 'Tu certificado - ', 'en' => 'Your certificate - ', 'pt' => 'Seu certificado - '][$L]) . $t['name'];
+        $body = mail_layout($subject, '<p>' . ([
+            'es' => "¡Felicitaciones <b>{$reg['name']}</b>! Te adjuntamos tu certificado del torneo <b>{$t['name']}</b>. ¡OSS! 🥋",
+            'en' => "Congratulations <b>{$reg['name']}</b>! Attached is your certificate from <b>{$t['name']}</b>. OSS! 🥋",
+            'pt' => "Parabéns <b>{$reg['name']}</b>! Segue em anexo seu certificado do torneio <b>{$t['name']}</b>. OSS! 🥋",
+        ][$L]) . '</p>');
         queue_mail($reg['email'], $reg['name'], $subject, $body, $path);
         q('UPDATE certificates SET emailed_at = NOW() WHERE tournament_id=? AND registration_id=? AND type=?',
             [$tournamentId, $regId, $type]);

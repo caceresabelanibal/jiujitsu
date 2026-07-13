@@ -10,19 +10,19 @@ $mine = is_admin()
             WHERE t.user_id = ? OR s.user_id = ? ORDER BY t.created_at DESC', [$u['id'], $u['id']]);
 
 $regs = rows('SELECT r.*, t.name t_name, t.slug, t.status t_status, t.event_date,
-                     b.name_es b_es, b.name_en b_en, ad.name_es a_es, ad.name_en a_en,
-                     wc.name_es w_es, wc.name_en w_en
+                     b.name_es b_es, b.name_en b_en, b.name_pt b_pt,
+                     ad.name_es a_es, ad.name_en a_en, ad.name_pt a_pt,
+                     wc.name_es w_es, wc.name_en w_en, wc.name_pt w_pt
               FROM registrations r
               JOIN tournaments t ON t.id = r.tournament_id
               JOIN belts b ON b.id = r.belt_id
               JOIN age_divisions ad ON ad.id = r.age_division_id
               JOIN weight_classes wc ON wc.id = r.weight_class_id
               WHERE r.user_id = ? OR r.email = ? ORDER BY r.created_at DESC', [$u['id'], $u['email']]);
-$isEn = lang() === 'en';
 
 view_header(t('my_panel'));
 ?>
-<h1><?= t('my_panel') ?> · <?= e($u['name']) ?></h1>
+<div class="flex spread"><h1><?= t('my_panel') ?> · <?= e($u['name']) ?></h1><?= help_link('mi-panel') ?></div>
 
 <div class="flex spread mb">
   <h2 style="margin:0"><?= icon('trophy', 18) ?> <?= t('my_tournaments') ?></h2>
@@ -81,7 +81,7 @@ view_header(t('my_panel'));
   </div>
   <p class="muted">
     <?= $r['event_date'] ? icon('calendar', 13) . ' ' . date('d/m/Y', strtotime($r['event_date'])) . ' · ' : '' ?>
-    <?= ($r['gender'] === 'M' ? t('male') : t('female')) . ' · ' . e($isEn ? $r['a_en'] : $r['a_es']) . ' · ' . e($isEn ? $r['b_en'] : $r['b_es']) . ' · ' . e($isEn ? $r['w_en'] : $r['w_es']) ?>
+    <?= ($r['gender'] === 'M' ? t('male') : t('female')) . ' · ' . e(loc_col($r, 'a')) . ' · ' . e(loc_col($r, 'b')) . ' · ' . e(loc_col($r, 'w')) ?>
     · <?= $r['verified'] ? '<span class="badge green">' . t('verified') . '</span>' : '<span class="badge grey">' . t('pending') . '</span>' ?>
   </p>
 

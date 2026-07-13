@@ -13,6 +13,11 @@ view_header(t('nav_home'));
 ?>
 <div class="landing">
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <?php // Marcas de agua del logo: fijas detras de todo (z-index -1), muy
+        // transparentes; app.js las desplaza lento con el scroll (parallax). ?>
+  <img class="wm wm1" src="<?= asset('/assets/img/logo.png') ?>" alt="" aria-hidden="true">
+  <img class="wm wm2" src="<?= asset('/assets/img/logo.png') ?>" alt="" aria-hidden="true">
+  <img class="wm wm3" src="<?= asset('/assets/img/logo.png') ?>" alt="" aria-hidden="true">
 
   <!-- HERO -->
   <section class="hero2">
@@ -97,7 +102,7 @@ view_header(t('nav_home'));
 
   <!-- CTA FINAL -->
   <section class="ctaband glass reveal">
-    <img src="<?= asset('/assets/img/logo.png') ?>" alt="" style="height:92px">
+    <img src="<?= asset('/assets/img/logo.png') ?>" alt="" style="height:368px;max-width:100%;object-fit:contain">
     <h2><?= t('cta_title') ?></h2>
     <p class="muted"><?= t('cta_sub') ?></p>
     <a class="btn xl glow" href="<?= APP_URL ?>/register"><?= t('nav_register') ?> <?= icon('arrow-right', 18) ?></a>

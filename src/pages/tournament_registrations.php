@@ -18,9 +18,9 @@ $divOrder = $t['discipline'] === 'nogi'
     : division_order_case_sql(division_order_for($t));
 $ageOrder = age_order_case_sql(age_order_for($t));
 $weightOrder = weight_order_case_sql(weight_order_for($t));
-$regs = rows("SELECT r.*, b.name_es b_es, b.name_en b_en, b.color_hex, b.code belt_code,
-                     ad.name_es a_es, ad.name_en a_en, ad.is_kids age_is_kids, ad.code age_code,
-                     wc.name_es w_es, wc.name_en w_en,
+$regs = rows("SELECT r.*, b.name_es b_es, b.name_en b_en, b.name_pt b_pt, b.color_hex, b.code belt_code,
+                     ad.name_es a_es, ad.name_en a_en, ad.name_pt a_pt, ad.is_kids age_is_kids, ad.code age_code,
+                     wc.name_es w_es, wc.name_en w_en, wc.name_pt w_pt,
                      a.name academy_name, p.name professor_name
               FROM registrations r
               JOIN belts b ON b.id=r.belt_id
@@ -29,7 +29,6 @@ $regs = rows("SELECT r.*, b.name_es b_es, b.name_en b_en, b.color_hex, b.code be
               LEFT JOIN tournament_academies a ON a.id=r.academy_id
               LEFT JOIN tournament_professors p ON p.id=r.professor_id
               WHERE r.tournament_id=? ORDER BY $divOrder, r.gender, $ageOrder, b.sort, $weightOrder, r.name", [$tid]);
-$isEn = lang() === 'en';
 $nogiTierMap = $t['discipline'] === 'nogi' ? nogi_tiers_for($t) : [];
 view_header(t('registrations'));
 ?>
@@ -54,11 +53,11 @@ view_header(t('registrations'));
               echo nogi_category_badge($tier, nogi_tier_labels()[$tier]);
           }
       else: ?>
-      <span class="belt-chip" style="background:<?= e($r['color_hex']) ?>"></span><?= e($isEn ? $r['b_en'] : $r['b_es']) ?>
+      <span class="belt-chip" style="background:<?= e($r['color_hex']) ?>"></span><?= e(loc_col($r, 'b')) ?>
       <?php endif; ?>
     </td>
-    <td><?= e($isEn ? $r['a_en'] : $r['a_es']) ?></td>
-    <td><?php if ($r['competes_in'] === 'absolute'): ?><span class="badge gold"><?= t('compete_absolute') ?></span><?php else: ?><?= e($isEn ? $r['w_en'] : $r['w_es']) ?> <span class="muted">(<?= e($r['weight_kg']) ?> kg)</span><?php if ($r['competes_in'] === 'both'): ?> <span class="badge gold"><?= t('compete_absolute') ?></span><?php endif; endif; ?></td>
+    <td><?= e(loc_col($r, 'a')) ?></td>
+    <td><?php if ($r['competes_in'] === 'absolute'): ?><span class="badge gold"><?= t('compete_absolute') ?></span><?php else: ?><?= e(loc_col($r, 'w')) ?> <span class="muted">(<?= e($r['weight_kg']) ?> kg)</span><?php if ($r['competes_in'] === 'both'): ?> <span class="badge gold"><?= t('compete_absolute') ?></span><?php endif; endif; ?></td>
     <td><?= e($r['academy_name'] ?? '—') ?><?= $r['professor_name'] ? '<br><small class="muted">' . e($r['professor_name']) . '</small>' : '' ?></td>
     <td><span class="badge <?= $r['verified'] ? 'green' : 'grey' ?>"><?= $r['verified'] ? t('verified') : t('pending') ?></span></td>
     <td class="right" style="white-space:nowrap">

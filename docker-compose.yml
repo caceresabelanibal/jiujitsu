@@ -48,15 +48,19 @@ services:
       timeout: 3s
       retries: 20
 
+  # mailhog y phpmyadmin son solo para desarrollo (profile "dev"): no arrancan
+  # en produccion. Para levantarlos en dev: docker compose --profile dev up -d
   mailhog:
     image: mailhog/mailhog:latest
     container_name: bjj_mailhog
+    profiles: ["dev"]
     ports:
       - "8025:8025"
 
   phpmyadmin:
     image: phpmyadmin:latest
     container_name: bjj_pma
+    profiles: ["dev"]
     environment:
       PMA_HOST: db
       PMA_USER: root

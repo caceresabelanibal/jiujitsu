@@ -10,6 +10,12 @@ return [
     'name' => 'Nombre', 'email' => 'Email', 'password' => 'Contraseña', 'login_required' => 'Tenés que iniciar sesión.',
     'forbidden' => 'No tenés permiso para esta acción.', 'confirm_delete' => '¿Seguro que querés eliminar?',
     'never' => 'Nunca', 'all' => 'Todos', 'none' => '—', 'total' => 'Total', 'close' => 'Cerrar',
+    'language' => 'Idioma',
+    'help' => 'Ayuda',
+    'help_search_ph' => 'Buscar en la ayuda (ej: llaves, certificados, absoluto...)',
+    'help_index' => 'Índice',
+    'help_no_results' => 'No se encontraron temas con ese texto.',
+    'help_link_label' => 'Ayuda',
 
     // Landing
     'hero_title' => 'Tu plataforma de torneos de Jiu-Jitsu',

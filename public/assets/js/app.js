@@ -38,6 +38,26 @@ if (revealEls.length && 'IntersectionObserver' in window) {
   revealEls.forEach((el) => el.classList.add('in'));
 }
 
+// Parallax lento de las marcas de agua del logo (landing). Cada una sube a
+// una fraccion de la velocidad del scroll; se desactiva si el usuario pidio
+// menos movimiento.
+const wmEls = document.querySelectorAll('.wm');
+if (wmEls.length && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const speeds = [0.10, 0.16, 0.07];
+  let ticking = false;
+  function wmUpdate() {
+    ticking = false;
+    const y = window.scrollY || document.documentElement.scrollTop || 0;
+    wmEls.forEach((el, i) => {
+      el.style.transform = 'translateY(' + (-y * (speeds[i % speeds.length])) + 'px)';
+    });
+  }
+  window.addEventListener('scroll', () => {
+    if (!ticking) { ticking = true; requestAnimationFrame(wmUpdate); }
+  }, { passive: true });
+  wmUpdate();
+}
+
 // Contador animado de estadisticas
 document.querySelectorAll('[data-count]').forEach((el) => {
   const target = parseInt(el.dataset.count, 10) || 0;

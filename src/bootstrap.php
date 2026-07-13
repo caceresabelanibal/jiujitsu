@@ -4,6 +4,17 @@ declare(strict_types=1);
 define('BASE_PATH', dirname(__DIR__));
 define('APP_URL', resolve_app_url());
 define('CRON_KEY', getenv('CRON_KEY') ?: 'changeme-cron-key');
+define('APP_ENV', getenv('APP_ENV') ?: 'dev');
+
+// En produccion no mostramos errores PHP al visitante (se registran en el log
+// de Apache/PHP igual). En dev se muestran para depurar.
+if (APP_ENV === 'prod') {
+    ini_set('display_errors', '0');
+    error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
+} else {
+    ini_set('display_errors', '1');
+    error_reporting(E_ALL);
+}
 
 /**
  * URL base de la app. Si APP_URL esta seteada por env (produccion, ej.

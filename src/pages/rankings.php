@@ -21,8 +21,9 @@ if ($fd === 'nogi') {
 if ($fa) { $where .= ' AND rp.age_division_id = ?'; $args[] = $fa; }
 if ($fw) { $where .= ' AND rp.weight_class_id = ?'; $args[] = $fw; }
 
-$ranks = rows("SELECT rp.*, b.name_es b_es, b.name_en b_en, b.color_hex,
-                      ad.name_es a_es, ad.name_en a_en, wc.name_es w_es, wc.name_en w_en
+$ranks = rows("SELECT rp.*, b.name_es b_es, b.name_en b_en, b.name_pt b_pt, b.color_hex,
+                      ad.name_es a_es, ad.name_en a_en, ad.name_pt a_pt,
+                      wc.name_es w_es, wc.name_en w_en, wc.name_pt w_pt
                FROM ranking_points rp
                JOIN belts b ON b.id = rp.belt_id
                JOIN age_divisions ad ON ad.id = rp.age_division_id
@@ -32,10 +33,9 @@ $ranks = rows("SELECT rp.*, b.name_es b_es, b.name_en b_en, b.color_hex,
 
 $weights = rows('SELECT * FROM weight_classes ' . (in_array($fg, ['M','F']) ? "WHERE gender IN ('A', ?)" : '') . ' ORDER BY gender, sort',
     in_array($fg, ['M','F']) ? [$fg] : []);
-$isEn = lang() === 'en';
 view_header(t('rankings_title'));
 ?>
-<h1><?= icon('chart', 26) ?> <?= t('rankings_title') ?></h1>
+<div class="flex spread"><h1><?= icon('chart', 26) ?> <?= t('rankings_title') ?></h1><?= help_link('rankings') ?></div>
 <?php // al cambiar de pestaña se descarta el filtro que no aplica en la otra (cinturon en nogi, categoria en gi)
 $tabQuery = array_diff_key($_GET, ['belt' => 1, 'tier' => 1]); ?>
 <div class="tabs mb">
@@ -83,10 +83,10 @@ $tabQuery = array_diff_key($_GET, ['belt' => 1, 'tier' => 1]); ?>
     <td class="muted" style="font-size:.82rem">
       <?php if ($fd === 'nogi'):
           $tierLabel = $r['tier'] === 'kids_juvenile' ? t('div_order_kids_juvenile') : (nogi_tier_labels()[$r['tier']] ?? $r['tier']); ?>
-      <?= e($r['gender'] === 'M' ? t('male') : t('female')) ?> · <?= nogi_category_badge($r['tier'], $tierLabel) ?> · <?= e($isEn ? $r['a_en'] : $r['a_es']) . ' · ' . e($isEn ? $r['w_en'] : $r['w_es']) ?>
+      <?= e($r['gender'] === 'M' ? t('male') : t('female')) ?> · <?= nogi_category_badge($r['tier'], $tierLabel) ?> · <?= e(loc_col($r, 'a')) . ' · ' . e(loc_col($r, 'w')) ?>
       <?php else: ?>
       <span class="belt-chip" style="background:<?= e($r['color_hex']) ?>"></span>
-      <?= ($r['gender'] === 'M' ? t('male') : t('female')) . ' · ' . e($isEn ? $r['a_en'] : $r['a_es']) . ' · ' . e($isEn ? $r['b_en'] : $r['b_es']) . ' · ' . e($isEn ? $r['w_en'] : $r['w_es']) ?>
+      <?= ($r['gender'] === 'M' ? t('male') : t('female')) . ' · ' . e(loc_col($r, 'a')) . ' · ' . e(loc_col($r, 'b')) . ' · ' . e(loc_col($r, 'w')) ?>
       <?php endif; ?>
     </td>
     <td data-label="<?= t('points_col') ?>"><b style="color:var(--accent2)"><?= (int)$r['points'] ?></b></td>

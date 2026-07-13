@@ -16,7 +16,10 @@ view_header(t('score_operator'));
 <div class="op">
   <div class="flex spread mb">
     <a href="<?= APP_URL ?>/division/<?= $m['division_id'] ?>">← <?= division_label($d, true) ?></a>
-    <a class="btn secondary" href="<?= APP_URL ?>/match/<?= $mid ?>/display" target="_blank"><?= icon('screen', 15) ?> <?= t('open_display') ?></a>
+    <span>
+      <?= help_link('operador') ?>
+      <a class="btn secondary" href="<?= APP_URL ?>/match/<?= $mid ?>/display" target="_blank"><?= icon('screen', 15) ?> <?= t('open_display') ?></a>
+    </span>
   </div>
 
   <div class="op-timerband">
