@@ -287,11 +287,13 @@ function certificates_send_all(int $tournamentId, bool $podium = true, bool $par
         $path = certificate_generate($regId, $type);
         $reg = row('SELECT * FROM registrations WHERE id = ?', [$regId]);
         $subject = (['es' => 'Tu certificado - ', 'en' => 'Your certificate - ', 'pt' => 'Seu certificado - '][$L]) . $t['name'];
-        $body = mail_layout($subject, '<p>' . ([
-            'es' => "¡Felicitaciones <b>{$reg['name']}</b>! Te adjuntamos tu certificado del torneo <b>{$t['name']}</b>. ¡OSS! 🥋",
-            'en' => "Congratulations <b>{$reg['name']}</b>! Attached is your certificate from <b>{$t['name']}</b>. OSS! 🥋",
-            'pt' => "Parabéns <b>{$reg['name']}</b>! Segue em anexo seu certificado do torneio <b>{$t['name']}</b>. OSS! 🥋",
-        ][$L]) . '</p>');
+        $rn = e($reg['name']);
+        $tn = e($t['name']);
+        $body = mail_layout($subject, mail_p([
+            'es' => "¡Felicitaciones <b>{$rn}</b>! Te adjuntamos tu certificado del torneo <b>{$tn}</b>. ¡OSS! 🥋",
+            'en' => "Congratulations <b>{$rn}</b>! Attached is your certificate from <b>{$tn}</b>. OSS! 🥋",
+            'pt' => "Parabéns <b>{$rn}</b>! Segue em anexo seu certificado do torneio <b>{$tn}</b>. OSS! 🥋",
+        ][$L]));
         queue_mail($reg['email'], $reg['name'], $subject, $body, $path);
         q('UPDATE certificates SET emailed_at = NOW() WHERE tournament_id=? AND registration_id=? AND type=?',
             [$tournamentId, $regId, $type]);

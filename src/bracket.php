@@ -385,9 +385,9 @@ function check_tournament_done(int $tournamentId): bool {
     if ($owner) {
         queue_mail($owner['email'], $owner['name'], t('mail_tournament_done_subject'),
             mail_layout(t('mail_tournament_done_subject'),
-                '<p>' . sprintf(t('mail_tournament_done_body1'), e($t['name'])) . '</p>' .
-                '<p>' . t('mail_tournament_done_body2') . '</p>' .
-                '<p style="text-align:center"><a href="' . APP_URL . '/tournaments/create" style="background:#30a46c;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold">' . t('mail_tournament_done_button') . '</a></p>'));
+                mail_p(sprintf(t('mail_tournament_done_body1'), e($t['name']))) .
+                mail_p(t('mail_tournament_done_body2')) .
+                mail_button(APP_URL . '/tournaments/create', t('mail_tournament_done_button'))));
     }
     return true;
 }

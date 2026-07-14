@@ -55,9 +55,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                  (int)($_POST['academy_id'] ?? 0) ?: null, (int)($_POST['professor_id'] ?? 0) ?: null, $token]);
             $link = APP_URL . '/reg-verify?token=' . $token;
             queue_mail($email, $name, t('mail_reg_subject') . ' - ' . $t['name'], mail_layout(t('mail_reg_subject'),
-                '<p>' . t('mail_reg_body') . ' <b>' . e($t['name']) . '</b>.</p>' .
-                '<p style="text-align:center"><a href="' . $link . '" style="background:#30a46c;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold">' . t('mail_reg_button') . '</a></p>' .
-                '<p style="font-size:12px;color:#888">' . $link . '</p>'));
+                mail_p(e($name) . ',') .
+                mail_p(t('mail_reg_body') . ' <b>' . e($t['name']) . '</b>.') .
+                mail_button($link, t('mail_reg_button')) .
+                mail_link_fallback($link)));
             flash('success', t('reg_check_email'));
             redirect('/t/' . $t['slug']);
         }

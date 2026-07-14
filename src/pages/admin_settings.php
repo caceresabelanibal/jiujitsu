@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $to = trim($_POST['test_to'] ?? $me['email'] ?? '');
         if (filter_var($to, FILTER_VALIDATE_EMAIL)) {
             $id = queue_mail($to, null, t('smtp_test_subject'),
-                mail_layout(t('smtp_test_subject'), '<p>' . t('smtp_test_body') . '</p>'));
+                mail_layout(t('smtp_test_subject'), mail_p(t('smtp_test_body'))));
             $sent = row('SELECT status, error FROM email_queue WHERE id = ?', [$id]);
             $testResult = $sent['status'] === 'sent'
                 ? ['ok' => true, 'msg' => t('smtp_test_ok')]

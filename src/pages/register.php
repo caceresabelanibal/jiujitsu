@@ -18,9 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             [$name, $email, password_hash($pass, PASSWORD_DEFAULT), $token, lang()]);
         $link = APP_URL . '/verify?token=' . $token;
         queue_mail($email, $name, t('mail_verify_subject'), mail_layout(t('mail_verify_title'),
-            '<p>' . t('mail_verify_body') . '</p>' .
-            '<p style="text-align:center"><a href="' . $link . '" style="background:#4f8cff;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:bold">' . t('mail_verify_button') . '</a></p>' .
-            '<p style="font-size:12px;color:#888">' . $link . '</p>'));
+            mail_p(e($name) . ',') .
+            mail_p(t('mail_verify_body')) .
+            mail_button($link, t('mail_verify_button')) .
+            mail_link_fallback($link)));
         flash('success', t('account_created_check_email'));
         redirect('/login');
     }

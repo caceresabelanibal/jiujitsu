@@ -49,6 +49,7 @@ return [
     'mail_verify_title' => 'Verifique seu endereço de email',
     'mail_verify_body' => 'Clique no botão para verificar seu email e ativar sua conta.',
     'mail_verify_button' => 'Verificar meu email',
+    'mail_link_fallback' => 'O botão não funciona? Copie e cole este link no seu navegador:',
 
     // Torneos
     'my_tournaments' => 'Meus torneios', 'create_tournament' => 'Criar torneio',
