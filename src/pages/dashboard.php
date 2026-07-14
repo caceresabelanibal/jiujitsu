@@ -2,12 +2,17 @@
 // Panel unificado: torneos que organizo/administro (gestion completa) + mis inscripciones como competidor
 $u = require_login();
 
-// Propios (o todos si admin) + torneos donde soy personal (arbitro/mesa)
+// Propios (o todos si admin) + torneos donde soy personal (arbitro/mesa).
+// Los torneos de muestra (is_demo) NO van acá — tienen su propia sección abajo.
 $mine = is_admin()
-    ? rows('SELECT t.*, u.name owner, (SELECT COUNT(*) FROM registrations r WHERE r.tournament_id=t.id AND r.verified=1) regs FROM tournaments t JOIN users u ON u.id=t.user_id ORDER BY t.created_at DESC')
+    ? rows('SELECT t.*, u.name owner, (SELECT COUNT(*) FROM registrations r WHERE r.tournament_id=t.id AND r.verified=1) regs FROM tournaments t JOIN users u ON u.id=t.user_id WHERE t.is_demo=0 ORDER BY t.created_at DESC')
     : rows('SELECT DISTINCT t.*, (SELECT COUNT(*) FROM registrations r WHERE r.tournament_id=t.id AND r.verified=1) regs
             FROM tournaments t LEFT JOIN tournament_staff s ON s.tournament_id = t.id
-            WHERE t.user_id = ? OR s.user_id = ? ORDER BY t.created_at DESC', [$u['id'], $u['id']]);
+            WHERE t.is_demo=0 AND (t.user_id = ? OR s.user_id = ?) ORDER BY t.created_at DESC', [$u['id'], $u['id']]);
+
+// Torneos de muestra: los ve (y opera) cualquier usuario logueado.
+$demos = rows('SELECT t.*, (SELECT COUNT(*) FROM registrations r WHERE r.tournament_id=t.id AND r.verified=1) regs
+               FROM tournaments t WHERE t.is_demo=1 ORDER BY t.discipline');
 
 $regs = rows('SELECT r.*, t.name t_name, t.slug, t.status t_status, t.event_date,
                      b.name_es b_es, b.name_en b_en, b.name_pt b_pt,
@@ -53,6 +58,32 @@ view_header(t('my_panel'));
   </tr>
   <?php endforeach; ?>
 </table>
+</div>
+<?php endif; ?>
+
+<?php if ($demos): ?>
+<h2><?= icon('trophy', 18) ?> <?= t('demo_tournaments') ?></h2>
+<p class="muted mb"><?= t('demo_tournaments_hint') ?></p>
+<div class="grid cols2 mb">
+  <?php foreach ($demos as $dt): ?>
+  <div class="card">
+    <div class="flex spread">
+      <h3 style="margin:0"><?= e($dt['name']) ?> <span class="badge grey"><?= t('demo_badge') ?></span></h3>
+      <span class="badge blue"><?= strtoupper($dt['discipline']) ?></span>
+    </div>
+    <p class="muted"><?= (int)$dt['regs'] ?> <?= t('participants') ?></p>
+    <p>
+      <a class="btn sm" href="<?= APP_URL ?>/tournament/<?= $dt['id'] ?>"><?= icon('play', 12) ?> <?= t('go_to_tournament') ?></a>
+      <?php if (is_admin()): ?>
+      <form method="post" action="<?= APP_URL ?>/tournament/<?= $dt['id'] ?>/reset-demo" style="display:inline"
+            onsubmit="return confirm('<?= e(t('demo_reset_confirm')) ?>')">
+        <?= csrf_field() ?>
+        <button class="btn sm danger"><?= icon('shuffle', 13) ?> <?= t('demo_reset') ?></button>
+      </form>
+      <?php endif; ?>
+    </p>
+  </div>
+  <?php endforeach; ?>
 </div>
 <?php endif; ?>
 

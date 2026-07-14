@@ -140,6 +140,13 @@ return [
 
     // Mi panel (competidor)
     'my_panel' => 'Mi panel', 'my_registrations' => 'Mis inscripciones', 'my_matches' => 'Mis luchas',
+    'not_found' => 'No encontrado',
+    'demo_tournaments' => 'Torneos de muestra',
+    'demo_tournaments_hint' => 'Torneos de ejemplo, ya armados, para explorar la plataforma andando. Cualquiera los puede ver y operar; solo el admin los resetea.',
+    'demo_badge' => 'Muestra',
+    'demo_reset' => 'Resetear al momento cero',
+    'demo_reset_confirm' => '¿Resetear el torneo de muestra? Se vuelve a armar con la mitad de las luchas jugadas y los certificados generados.',
+    'demo_reset_done' => 'Torneo de muestra reseteado: %d luchas jugadas.',
     'next_opponent' => 'Próximo rival', 'my_position' => 'Tu posición en la llave',
     'no_registrations' => 'No estás inscripto en ningún torneo todavía.',
     'upcoming' => 'Próxima', 'result' => 'Resultado', 'won' => 'Ganaste', 'lost' => 'Perdiste',

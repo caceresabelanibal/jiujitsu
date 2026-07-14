@@ -140,6 +140,13 @@ return [
 
     // Competitor panel
     'my_panel' => 'My panel', 'my_registrations' => 'My registrations', 'my_matches' => 'My matches',
+    'not_found' => 'Not found',
+    'demo_tournaments' => 'Demo tournaments',
+    'demo_tournaments_hint' => 'Ready-made example tournaments to explore the platform in action. Anyone can view and operate them; only the admin resets them.',
+    'demo_badge' => 'Demo',
+    'demo_reset' => 'Reset to zero',
+    'demo_reset_confirm' => 'Reset the demo tournament? It will be rebuilt with half the matches played and certificates generated.',
+    'demo_reset_done' => 'Demo tournament reset: %d matches played.',
     'next_opponent' => 'Next opponent', 'my_position' => 'Your bracket position',
     'no_registrations' => 'You are not registered in any tournament yet.',
     'upcoming' => 'Upcoming', 'result' => 'Result', 'won' => 'You won', 'lost' => 'You lost',

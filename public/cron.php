@@ -6,6 +6,7 @@
  *   0 4 * * *  curl -s "https://tu-dominio/cron.php?task=cleanup&key=CRON_KEY"
  *   0,15,30,45 * * * *  curl -s "https://tu-dominio/cron.php?task=tournament_status&key=CRON_KEY"
  *   0 5 * * *  curl -s "https://tu-dominio/cron.php?task=delete_old_tournaments&key=CRON_KEY"
+ *   0 6 * * *  curl -s "https://tu-dominio/cron.php?task=reset_demo&key=CRON_KEY"
  */
 require_once dirname(__DIR__) . '/src/bootstrap.php';
 
@@ -62,6 +63,11 @@ switch ($task) {
         }
         if ($old) recompute_rankings();
         $detail = count($old) . " torneos eliminados (mas de $months meses)";
+        break;
+
+    case 'reset_demo':
+        $res = reset_all_demo_tournaments();
+        $detail = $res ? implode(' · ', $res) : 'no hay torneos de muestra';
         break;
 
     case 'tournament_status':

@@ -39,6 +39,19 @@ view_header($t['name']);
 </div>
 <?php tournament_tabs($t, 'overview'); ?>
 
+<?php if ($t['is_demo']): ?>
+<div class="card flex spread" style="background:var(--bg2)">
+  <span class="muted"><?= icon('trophy', 15) ?> <b><?= t('demo_badge') ?></b> — <?= t('demo_tournaments_hint') ?></span>
+  <?php if (is_admin()): ?>
+  <form method="post" action="<?= APP_URL ?>/tournament/<?= $tid ?>/reset-demo" style="margin:0"
+        onsubmit="return confirm('<?= e(t('demo_reset_confirm')) ?>')">
+    <?= csrf_field() ?>
+    <button class="btn sm danger"><?= icon('shuffle', 13) ?> <?= t('demo_reset') ?></button>
+  </form>
+  <?php endif; ?>
+</div>
+<?php endif; ?>
+
 <div class="grid cols4 mb">
   <div class="stat"><div class="k"><?= icon('users', 14) ?> <?= t('participants') ?></div><div class="v"><?= $regs ?></div></div>
   <div class="stat"><div class="k"><?= icon('swords', 14) ?> <?= t('matches') ?></div><div class="v"><?= $fightsDone ?> <span class="muted" style="font-size:1rem">/ <?= $fightsDone + $fightsLeft ?></span></div><div class="sub"><?= $fightsLeft ?> <?= t('pending') ?></div></div>

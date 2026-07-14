@@ -36,6 +36,9 @@ ensure_col('tournaments', 'weight_order', 'weight_order TEXT NULL');
 ensure_col('tournaments', 'nogi_tiers', 'nogi_tiers TEXT NULL');
 ensure_col('tournaments', 'nogi_division_order', 'nogi_division_order TEXT NULL');
 ensure_col('tournaments', 'nogi_tier_durations', 'nogi_tier_durations TEXT NULL');
+ensure_col('tournaments', 'is_demo', 'is_demo TINYINT(1) NOT NULL DEFAULT 0');
+// marcar como demo los torneos de muestra ya sembrados (por slug) — idempotente
+q("UPDATE tournaments SET is_demo = 1 WHERE slug IN ('demo-gi-2026','demo-nogi-2026') AND is_demo = 0");
 
 // --- registrations: foto + categoria/absoluto ---
 ensure_col('registrations', 'photo', 'photo VARCHAR(255) NULL');

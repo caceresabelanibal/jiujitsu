@@ -34,11 +34,16 @@ function is_tournament_staff(int $tournamentId, int $userId): bool {
     return (bool)row('SELECT id FROM tournament_staff WHERE tournament_id = ? AND user_id = ?', [$tournamentId, $userId]);
 }
 
-/** Dueño del torneo, personal del torneo o admin del sitio */
+/**
+ * Dueño del torneo, personal del torneo o admin del sitio.
+ * Excepción: los torneos de muestra (is_demo) los puede ver y operar CUALQUIER
+ * usuario logueado — son públicos a propósito para mostrar la plataforma andando.
+ * (Borrar/clonar siguen restringidos: usan require_tournament_creator.)
+ */
 function require_tournament_owner(int $tournamentId): array {
     $u = require_login();
     $t = row('SELECT * FROM tournaments WHERE id = ?', [$tournamentId]);
-    if (!$t || ($t['user_id'] != $u['id'] && $u['role'] !== 'admin' && !is_tournament_staff($tournamentId, (int)$u['id']))) {
+    if (!$t || (!$t['is_demo'] && $t['user_id'] != $u['id'] && $u['role'] !== 'admin' && !is_tournament_staff($tournamentId, (int)$u['id']))) {
         http_response_code(403);
         die(t('forbidden'));
     }

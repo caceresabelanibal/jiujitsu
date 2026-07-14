@@ -48,6 +48,7 @@ require_once __DIR__ . '/mail.php';
 require_once __DIR__ . '/bracket.php';
 require_once __DIR__ . '/ranking.php';
 require_once __DIR__ . '/certificates.php';
+require_once __DIR__ . '/demo.php';
 require_once __DIR__ . '/stats.php';
 require_once __DIR__ . '/ads.php';
 require_once __DIR__ . '/views/icons.php';

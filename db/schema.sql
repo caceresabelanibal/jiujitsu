@@ -73,6 +73,8 @@ CREATE TABLE IF NOT EXISTS tournaments (
   default_duration_sec INT NOT NULL DEFAULT 300,
   status ENUM('draft','open','running','finished') NOT NULL DEFAULT 'open',
   certs_requested TINYINT(1) NOT NULL DEFAULT 0,
+  is_demo TINYINT(1) NOT NULL DEFAULT 0, -- torneo de muestra: lo ven/operan todos; solo el admin lo resetea
+
   ads_mode ENUM('none','tournament','general','both') NOT NULL DEFAULT 'both',
   division_order TEXT NULL, -- JSON: orden de corrida por categoria/cinturon; NULL = usa el general de /admin/settings
   belt_durations TEXT NULL, -- JSON: duracion de lucha (segundos) por cinturon/infantil-juvenil; NULL = usa el general de /admin/settings
