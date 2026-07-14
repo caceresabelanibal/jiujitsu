@@ -41,6 +41,32 @@ function csrf_check(): void {
     }
 }
 
+/** Convierte "8M"/"12M"/"1G" (shorthand de php.ini) a bytes. */
+function ini_bytes(string $val): int {
+    $val = trim($val);
+    if ($val === '') return 0;
+    $n = (int)$val;
+    switch (strtolower(substr($val, -1))) {
+        case 'g': $n *= 1024; // fallthrough
+        case 'm': $n *= 1024; // fallthrough
+        case 'k': $n *= 1024;
+    }
+    return $n;
+}
+
+/**
+ * True si el navegador mandó un POST más grande que post_max_size de PHP.
+ * En ese caso PHP descarta $_POST y $_FILES enteros (quedan vacíos) y emite un
+ * warning — por eso, sin este chequeo, el csrf_check() siguiente fallaba con un
+ * críptico "CSRF token mismatch". Lo usamos en los forms con foto para avisar
+ * "la imagen es muy pesada" antes de tocar nada.
+ */
+function post_exceeded_limit(): bool {
+    if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') return false;
+    if (!empty($_POST) || !empty($_FILES)) return false;
+    return (int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 0;
+}
+
 function json_out($data, int $code = 200): never {
     http_response_code($code);
     header('Content-Type: application/json; charset=utf-8');

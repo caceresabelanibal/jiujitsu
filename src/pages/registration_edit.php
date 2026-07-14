@@ -8,6 +8,10 @@ $t = require_tournament_owner((int)$r['tournament_id']);
 $tid = (int)$t['id'];
 $rid = (int)$r['id'];
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_exceeded_limit()) {
+    flash('error', t('upload_too_large'));
+    redirect("/registration/$rid/edit");
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_check();
     $photo = upload_image('photo', 'competitor') ?? $r['photo'];
@@ -60,7 +64,8 @@ view_header(t('edit_registration'));
         <input type="number" name="weight_kg" value="<?= e((string)$r['weight_kg']) ?>" step="0.1" min="10" max="250">
         <label><?= t('photo') ?></label>
         <?php if ($r['photo']): ?><div class="mb"><img src="<?= APP_URL . '/' . e($r['photo']) ?>" alt="" class="reg-photo-md"></div><?php endif; ?>
-        <input type="file" name="photo" accept="image/*">
+        <input type="file" name="photo" accept="image/*" data-photo
+               data-optimizing="<?= e(t('photo_optimizing')) ?>" data-toobig="<?= e(t('upload_too_large')) ?>">
       </div>
       <div>
         <label><?= t('belt') ?></label>
@@ -112,4 +117,5 @@ view_header(t('edit_registration'));
     <button class="btn mt" style="width:100%"><?= t('save') ?></button>
   </form>
 </div>
+<script src="<?= asset('/assets/js/photo-upload.js') ?>"></script>
 <?php view_footer();

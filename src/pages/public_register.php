@@ -9,6 +9,11 @@ $belts = rows('SELECT * FROM belts ORDER BY sort');
 $nogiTiersForm = $t['discipline'] === 'nogi' ? nogi_tiers_for($t) : [];
 $count = (int)scalar('SELECT COUNT(*) FROM registrations WHERE tournament_id=?', [$tid]);
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && post_exceeded_limit()) {
+    // La foto (o el total del form) superó post_max_size: PHP ya descartó todo.
+    flash('error', t('upload_too_large'));
+    redirect('/t/' . $t['slug']);
+}
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_check();
     $name = trim($_POST['name'] ?? '');
@@ -93,7 +98,8 @@ view_header(t('register_for') . ' ' . $t['name']);
         <label><?= t('weight_kg') ?></label>
         <input type="number" name="weight_kg" step="0.1" min="10" max="250" required>
         <label><?= t('photo') ?></label>
-        <input type="file" name="photo" accept="image/*">
+        <input type="file" name="photo" accept="image/*" data-photo
+               data-optimizing="<?= e(t('photo_optimizing')) ?>" data-toobig="<?= e(t('upload_too_large')) ?>">
         <small class="muted"><?= t('photo_reg_hint') ?></small>
       </div>
       <div>
@@ -156,6 +162,7 @@ view_header(t('register_for') . ' ' . $t['name']);
   }
   updateAbsEligibility();
   </script>
+  <script src="<?= asset('/assets/js/photo-upload.js') ?>"></script>
   <?php endif; ?>
 </div>
 <?php view_footer();
