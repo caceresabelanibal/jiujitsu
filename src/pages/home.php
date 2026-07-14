@@ -107,5 +107,32 @@ view_header(t('nav_home'));
     <p class="muted"><?= t('cta_sub') ?></p>
     <a class="btn xl glow" href="<?= APP_URL ?>/register"><?= t('nav_register') ?> <?= icon('arrow-right', 18) ?></a>
   </section>
+
+  <!-- SITIOS AMIGOS -->
+  <?php
+  $friends = [
+      ['name' => 'RollApp', 'url' => 'https://rollapp.ar/', 'logo' => '/assets/img/friends/rollapp-symbol.png', 'desc' => t('friend_rollapp_desc')],
+  ];
+  // Repetimos la lista hasta llenar la cinta (para que el carrusel se vea bien
+  // aunque haya pocos amigos) y luego la duplicamos: el track loopea a -50% sin
+  // cortes. Al agregar más amigos, se diversifica solo.
+  $strip = [];
+  while (count($strip) < 6) foreach ($friends as $f) $strip[] = $f;
+  ?>
+  <section class="friends reveal">
+    <h2 class="grad2"><?= t('friends_title') ?></h2>
+    <p class="sub"><?= t('friends_sub') ?></p>
+    <div class="friends-marquee">
+      <div class="friends-track">
+        <?php foreach (array_merge($strip, $strip) as $i => $f): ?>
+        <a class="friend-card glass" href="<?= e($f['url']) ?>" target="_blank" rel="noopener noreferrer"
+           aria-hidden="<?= $i >= count($strip) ? 'true' : 'false' ?>" tabindex="<?= $i >= count($strip) ? '-1' : '0' ?>">
+          <img src="<?= asset($f['logo']) ?>" alt="<?= e($f['name']) ?>" loading="lazy">
+          <span><span class="fn"><?= e($f['name']) ?></span><br><span class="fd"><?= e($f['desc']) ?></span></span>
+        </a>
+        <?php endforeach; ?>
+      </div>
+    </div>
+  </section>
 </div>
 <?php view_footer();

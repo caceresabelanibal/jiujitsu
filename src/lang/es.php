@@ -35,6 +35,9 @@ return [
     'competitors' => 'Competidores',
     'cta_title' => 'Tu próximo torneo empieza acá',
     'cta_sub' => 'Gratis para empezar. Creá tu cuenta y armá tu primer torneo en minutos.',
+    'friends_title' => 'Sitios amigos',
+    'friends_sub' => 'Otros proyectos que también empujan el Jiu-Jitsu.',
+    'friend_rollapp_desc' => 'Comunidad y app de Jiu-Jitsu',
 
     // Auth
     'login_title' => 'Iniciar sesión', 'register_title' => 'Crear cuenta',

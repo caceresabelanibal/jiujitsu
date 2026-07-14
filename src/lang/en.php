@@ -35,6 +35,9 @@ return [
     'competitors' => 'Competitors',
     'cta_title' => 'Your next tournament starts here',
     'cta_sub' => 'Free to start. Create your account and set up your first tournament in minutes.',
+    'friends_title' => 'Friend sites',
+    'friends_sub' => 'Other projects that also push Jiu-Jitsu forward.',
+    'friend_rollapp_desc' => 'Jiu-Jitsu community & app',
 
     // Auth
     'login_title' => 'Log in', 'register_title' => 'Create account',
