@@ -1,0 +1,27 @@
+# Override de HTTPS. Se suma a los otros dos:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.tls.yml up -d --build
+#
+# Antes de levantar, poné en la carpeta ./certs (junto a este archivo):
+#   certs/taninzu.crt  -> certificado del dominio + intermedio(s) (fullchain)
+#   certs/taninzu.key  -> clave privada
+# (ver certs/README.txt para armar el fullchain)
+#
+# Un nginx termina el HTTPS en 443 y redirige 80->443. La app deja de exponerse
+# al host y solo recibe tráfico del proxy por la red interna de Docker.
+services:
+  app:
+    ports: !reset []          # ya no se expone al host; entra por el proxy
+
+  proxy:
+    image: nginx:alpine
+    container_name: bjj_proxy
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certs:/etc/nginx/certs:ro

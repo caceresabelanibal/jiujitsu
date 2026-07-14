@@ -5,3 +5,7 @@ public/uploads/*
 !storage/certificates/.gitkeep
 .env
 composer.lock
+
+# Certificados TLS: nunca versionar la clave/cert
+/certs/*
+!/certs/README.txt
