@@ -1,25 +1,38 @@
-Certificados TLS (HTTPS) — NO se versionan en git (ver .gitignore).
+Certificados TLS (HTTPS) — NO se versionan en git (por eso no están acá).
+La clave privada es secreta y este repo es público: nunca la subas a git.
 
-Poné acá dos archivos con estos nombres exactos:
+=================  PUESTA EN MARCHA (una sola vez en el server)  =================
 
-  taninzu.crt   El certificado del dominio SEGUIDO del/los intermedio(s), en
-                un solo archivo (esto se llama "fullchain"). Primero el bloque
-                del certificado del dominio (el CRT que te da DonWeb), y debajo
-                el certificado intermedio (CA Intermediate).
+1) Copiá la plantilla de entorno a .env (habilita el comando corto con HTTPS):
+       cp .env.prod.example .env
 
-  taninzu.key   La clave privada (el bloque BEGIN PRIVATE KEY).
+2) Creá la clave privada:
+       nano certs/taninzu.key
+   pegá adentro tu bloque  -----BEGIN PRIVATE KEY----- ... -----END PRIVATE KEY-----
+   guardá y luego:
+       chmod 600 certs/taninzu.key
 
-Cómo armar el fullchain (en el server, dentro de la carpeta certs/):
+3) Creá el certificado del dominio:
+       nano certs/dominio.crt
+   pegá adentro tu bloque  -----BEGIN CERTIFICATE----- ... -----END CERTIFICATE-----
 
-  1) Pegá el certificado del dominio en  taninzu.crt
-  2) Descargá el "Certificado intermedio (CA Intermediate)" de DonWeb
-     (por ej. como  intermediate.crt )
-  3) Concatenalos en ese orden:
-       cat dominio.crt intermediate.crt > taninzu.crt
-     (dominio primero, intermedio después)
+4) Bajá el certificado intermedio de Sectigo y armá el fullchain
+   (el dominio primero, el intermedio después):
+       curl -fsSL http://crt.sectigo.com/SectigoPublicServerAuthenticationCADVR36.crt \
+         | openssl x509 -inform DER -out certs/intermediate.pem
+       cat certs/dominio.crt certs/intermediate.pem > certs/taninzu.crt
 
-Poné la clave privada en  taninzu.key  y protegé el archivo:
-       chmod 600 taninzu.key
+   (Alternativa: bajá el "Certificado intermedio (CA Intermediate)" desde el panel
+    de DonWeb, guardalo como certs/intermediate.pem y corré solo el "cat" de arriba.)
 
-Con eso, levantá con el override TLS:
-  docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.tls.yml up -d --build
+5) Levantá:
+       docker compose up -d --build
+
+=================  DE ACÁ EN MÁS  =================
+
+Actualizar y relanzar es solo:
+       git pull
+       docker compose up -d --build
+
+Los certificados quedan en el server (git no los toca). Solo hay que rehacer el
+paso 2-4 cuando renueves/reemitas el certificado.
