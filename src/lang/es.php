@@ -41,7 +41,7 @@ return [
     'invalid_credentials' => 'Email o contraseña incorrectos.',
     'email_taken' => 'Ya existe una cuenta con ese email.',
     'email_not_verified' => 'Tu email todavía no está verificado. Revisá tu casilla.',
-    'account_created_check_email' => '¡Cuenta creada! Te enviamos un mail para verificar tu dirección.',
+    'account_created_check_email' => '¡Cuenta creada! Te enviamos un mail para verificar tu dirección. Recuerda chequear la bandeja de "Correo electrónico no deseado, o SPAM si no encuentras el correo.',
     'verify_ok' => '¡Email verificado! Ya podés iniciar sesión.',
     'verify_fail' => 'El enlace de verificación no es válido o ya fue usado.',
     'password_min' => 'La contraseña debe tener al menos 6 caracteres.',

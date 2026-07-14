@@ -41,7 +41,7 @@ return [
     'invalid_credentials' => 'Wrong email or password.',
     'email_taken' => 'An account with that email already exists.',
     'email_not_verified' => 'Your email is not verified yet. Check your inbox.',
-    'account_created_check_email' => 'Account created! We sent you a verification email.',
+    'account_created_check_email' => 'Account created! We sent you a verification email. Remember to verify "SPAM" if you don´t find the email in your inbox.',
     'verify_ok' => 'Email verified! You can now log in.',
     'verify_fail' => 'Invalid or already used verification link.',
     'password_min' => 'Password must be at least 6 characters.',
