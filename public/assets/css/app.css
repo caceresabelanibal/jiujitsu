@@ -357,6 +357,15 @@ html[data-theme="light"] .art-fighters.tint-mono { opacity: .38; }
   .friends-track { animation: none; flex-wrap: wrap; justify-content: center; width: auto; }
 }
 
+/* Captcha (crear cuenta / inscripción pública) */
+.captcha-row { display: flex; align-items: center; gap: 10px; }
+.captcha-img { height: 46px; border: 1px solid var(--border); border-radius: 8px; flex-shrink: 0; }
+.captcha-row input { flex: 1; min-width: 0; }
+.captcha-reload { background: var(--card2); border: 1px solid var(--border); color: var(--text);
+  border-radius: 8px; padding: 9px 12px; font-size: 1.05rem; cursor: pointer; flex-shrink: 0;
+  transition: border-color .2s ease, transform .2s ease; }
+.captcha-reload:hover { border-color: var(--accent); transform: rotate(40deg); }
+
 /* Reveal on scroll */
 .reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s ease, transform .6s ease; }
 .reveal.in { opacity: 1; transform: none; }

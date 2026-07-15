@@ -53,6 +53,10 @@ return [
     'mail_verify_body' => 'Clique no botão para verificar seu email e ativar sua conta.',
     'mail_verify_button' => 'Verificar meu email',
     'mail_link_fallback' => 'O botão não funciona? Copie e cole este link no seu navegador:',
+    'captcha_label' => 'Código de segurança',
+    'captcha_placeholder' => 'Digite o código',
+    'captcha_reload' => 'Outra imagem',
+    'captcha_wrong' => 'O código de segurança não confere. Veja a nova imagem e tente de novo.',
 
     // Torneos
     'my_tournaments' => 'Meus torneios', 'create_tournament' => 'Criar torneio',

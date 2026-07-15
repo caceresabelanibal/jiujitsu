@@ -6,7 +6,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
     $email = strtolower(trim($_POST['email'] ?? ''));
     $pass = $_POST['password'] ?? '';
-    if (!$name || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    if (!captcha_check()) {
+        flash('error', t('captcha_wrong'));
+    } elseif (!$name || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         flash('error', t('invalid_credentials'));
     } elseif (strlen($pass) < 6) {
         flash('error', t('password_min'));
@@ -38,6 +40,7 @@ view_header(t('register_title'));
     <input type="email" name="email" required>
     <label><?= t('password') ?></label>
     <input type="password" name="password" minlength="6" required>
+    <?= captcha_field() ?>
     <button class="btn mt" style="width:100%"><?= t('nav_register') ?></button>
   </form>
 </div>

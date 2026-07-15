@@ -44,6 +44,7 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/helpers.php';
 require_once __DIR__ . '/i18n.php';
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/captcha.php';
 require_once __DIR__ . '/mail.php';
 require_once __DIR__ . '/bracket.php';
 require_once __DIR__ . '/ranking.php';

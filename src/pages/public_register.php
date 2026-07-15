@@ -28,6 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($t['status'] !== 'open') {
         flash('error', t('registration_closed'));
+    } elseif (!captcha_check()) {
+        flash('error', t('captcha_wrong'));
     } elseif ($count >= (int)$t['max_participants']) {
         flash('error', t('tournament_full'));
     } elseif (!$name || !filter_var($email, FILTER_VALIDATE_EMAIL) || !$birthdate || $weight <= 0 || !$beltId) {
@@ -138,7 +140,8 @@ view_header(t('register_for') . ' ' . $t['name']);
     <small class="muted"><?= t('compete_in_hint') ?></small>
     <small class="muted" id="abshint" style="display:none;color:var(--red)"><?= t('absolute_not_eligible') ?></small>
     <p class="muted"><?= t('your_category_auto') ?></p>
-    <button class="btn xl" style="width:100%"><?= t('submit_registration') ?></button>
+    <?= captcha_field() ?>
+    <button class="btn xl mt" style="width:100%"><?= t('submit_registration') ?></button>
   </form>
   <script>
   function filterProfs() {

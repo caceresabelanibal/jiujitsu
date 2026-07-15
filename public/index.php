@@ -10,6 +10,7 @@ $routes = [
     '#^/logout$#'                        => 'logout',
     '#^/register$#'                      => 'register',
     '#^/verify$#'                        => 'verify',
+    '#^/captcha\.png$#'                  => 'captcha',
     '#^/dashboard$#'                     => 'dashboard',
     '#^/tournaments$#'                   => 'tournaments',
     '#^/tournaments/create$#'            => 'tournament_create',

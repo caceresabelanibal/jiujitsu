@@ -53,6 +53,10 @@ return [
     'mail_verify_body' => 'Click the button to verify your email and activate your account.',
     'mail_verify_button' => 'Verify my email',
     'mail_link_fallback' => 'Button not working? Copy and paste this link into your browser:',
+    'captcha_label' => 'Security code',
+    'captcha_placeholder' => 'Type the code',
+    'captcha_reload' => 'New image',
+    'captcha_wrong' => 'The security code does not match. Check the new image and try again.',
 
     // Tournaments
     'my_tournaments' => 'My tournaments', 'create_tournament' => 'Create tournament',
