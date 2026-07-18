@@ -69,6 +69,8 @@ CREATE TABLE IF NOT EXISTS tournaments (
   discipline ENUM('gi','nogi') NOT NULL DEFAULT 'gi',
   logo VARCHAR(255) NULL,
   event_date DATE NULL,
+  reg_close_date DATE NULL, -- fecha de cierre de inscripciones (siempre <= event_date); al llegar ese dia el cron las cierra solo. NULL = abiertas hasta que arranque el torneo
+  regs_closed_at DATETIME NULL, -- cuando se cerraron efectivamente (boton "cerrar inscripciones" o cron registration_close); NULL = abiertas
   max_participants INT NOT NULL DEFAULT 200,
   default_duration_sec INT NOT NULL DEFAULT 300,
   status ENUM('draft','open','running','finished') NOT NULL DEFAULT 'open',

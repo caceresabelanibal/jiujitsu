@@ -52,6 +52,43 @@ view_header($t['name']);
 </div>
 <?php endif; ?>
 
+<?php // Inscripciones: estado + aviso de divisiones con un solo competidor
+$regsClosed = registrations_closed($t);
+$solos = in_array($t['status'], ['open', 'running'], true) ? solo_divisions($tid) : [];
+if ($t['status'] === 'open' && !$regsClosed): ?>
+<div class="card flex spread" style="gap:10px;flex-wrap:wrap">
+  <span><?= icon('users', 15) ?> <b><?= t('regs_open_label') ?></b>
+    <?= $t['reg_close_date'] ? '<span class="muted">— ' . sprintf(t('regs_closing_on'), date('d/m/Y', strtotime($t['reg_close_date']))) . '</span>' : '' ?></span>
+  <form method="post" action="<?= APP_URL ?>/tournament/<?= $tid ?>/close-regs" data-confirm="<?= e(t('confirm_close_regs')) ?>" style="margin:0">
+    <?= csrf_field() ?>
+    <button class="btn sm secondary"><?= icon('x', 13) ?> <?= t('close_registrations') ?></button>
+  </form>
+</div>
+<?php elseif ($regsClosed || $solos): ?>
+<div class="card" style="border-color:var(--accent2)">
+  <div class="flex spread" style="gap:10px;flex-wrap:wrap">
+    <span>
+      <?php if ($t['status'] === 'open'): ?><b><?= t('regs_closed_label') ?>.</b><?php endif; ?>
+      <?php if ($solos): ?>
+        <?= icon('flag', 15) ?> <?= sprintf(t('solo_divisions_notice'), count($solos)) ?>
+      <?php elseif ($t['status'] === 'open'): ?>
+        <span class="muted"><?= t('solo_divisions_none') ?></span>
+      <?php endif; ?>
+    </span>
+    <span class="flex" style="gap:8px;flex-wrap:wrap">
+      <a class="btn sm" href="<?= APP_URL ?>/tournament/<?= $tid ?>/reorganize"><?= icon('shuffle', 13) ?> <?= t('reorganize_brackets') ?></a>
+      <?php if ($t['status'] === 'open' && $regsClosed): ?>
+      <form method="post" action="<?= APP_URL ?>/tournament/<?= $tid ?>/close-regs" style="margin:0">
+        <?= csrf_field() ?>
+        <input type="hidden" name="do" value="reopen">
+        <button class="btn sm secondary"><?= t('reopen_registrations') ?></button>
+      </form>
+      <?php endif; ?>
+    </span>
+  </div>
+</div>
+<?php endif; ?>
+
 <div class="grid cols4 mb">
   <div class="stat"><div class="k"><?= icon('users', 14) ?> <?= t('participants') ?></div><div class="v"><?= $regs ?></div></div>
   <div class="stat"><div class="k"><?= icon('swords', 14) ?> <?= t('matches') ?></div><div class="v"><?= $fightsDone ?> <span class="muted" style="font-size:1rem">/ <?= $fightsDone + $fightsLeft ?></span></div><div class="sub"><?= $fightsLeft ?> <?= t('pending') ?></div></div>

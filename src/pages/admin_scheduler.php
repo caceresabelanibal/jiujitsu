@@ -6,6 +6,7 @@ $tasks = [
     'certificates'      => ['award', 'Genera los PDFs de certificados pendientes por lotes', '*/5 * * * *'],
     'rankings'          => ['chart', 'Recalcula el ranking global de competidores', '0 * * * *'],
     'tournament_status' => ['calendar', 'Pasa a "en curso" al llegar la fecha y a "finalizado" si ya no quedan luchas', '0,15,30,45 * * * *'],
+    'registration_close' => ['calendar', 'Cierra inscripciones al llegar la fecha de cierre y avisa al organizador por mail', '0,15,30,45 * * * *'],
     'cleanup'           => ['trash', 'Borra inscripciones no verificadas (>72h) y mails viejos', '0 4 * * *'],
     'delete_old_tournaments' => ['trash', 'Borra torneos mas viejos que la retencion configurada (deshabilitado si es 0)', '0 5 * * *'],
     'reset_demo'        => ['shuffle', 'Resetea los torneos de muestra al momento cero (mitad de luchas + certificados)', '0 6 * * *'],

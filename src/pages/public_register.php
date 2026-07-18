@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $inAbsolute = isset($_POST['compete_absolute']);
     $competesIn = $inCategory && $inAbsolute ? 'both' : ($inAbsolute ? 'absolute' : 'category');
 
-    if ($t['status'] !== 'open') {
+    if ($t['status'] !== 'open' || registrations_closed($t)) {
         flash('error', t('registration_closed'));
     } elseif (!captcha_check()) {
         flash('error', t('captcha_wrong'));
@@ -82,7 +82,7 @@ view_header(t('register_for') . ' ' . $t['name']);
       <?= $t['event_date'] ? '· ' . date('d/m/Y', strtotime($t['event_date'])) : '' ?></p>
     <p><?= help_link('inscribirse') ?></p>
   </div>
-  <?php if ($t['status'] !== 'open'): ?>
+  <?php if ($t['status'] !== 'open' || registrations_closed($t)): ?>
     <div class="flash flash-warning"><?= t('registration_closed') ?></div>
   <?php else: ?>
   <form method="post" enctype="multipart/form-data">

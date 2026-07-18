@@ -68,9 +68,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $wtInput = weight_order_sanitize($wtKeys);
         $wtCustom = $wtInput !== $weightOrderGlobal ? json_encode($wtInput, JSON_UNESCAPED_UNICODE) : null;
 
-        q('INSERT INTO tournaments (user_id, name, slug, type, discipline, logo, event_date, max_participants, default_duration_sec, belt_durations, age_thresholds, division_order, age_order, weight_order, nogi_tiers, nogi_division_order, nogi_tier_durations)
-           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
-            [$u['id'], $name, slug_token(10), $type, $discipline, $logo, $_POST['event_date'] ?? null ?: null,
+        // Cierre de inscripciones: siempre anterior (o igual) a la fecha del evento
+        $eventDate = $_POST['event_date'] ?? null ?: null;
+        $regClose = $_POST['reg_close_date'] ?? null ?: null;
+        if ($regClose && $eventDate && $regClose > $eventDate) $regClose = $eventDate;
+
+        q('INSERT INTO tournaments (user_id, name, slug, type, discipline, logo, event_date, reg_close_date, max_participants, default_duration_sec, belt_durations, age_thresholds, division_order, age_order, weight_order, nogi_tiers, nogi_division_order, nogi_tier_durations)
+           VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+            [$u['id'], $name, slug_token(10), $type, $discipline, $logo, $eventDate, $regClose,
              max(2, (int)($_POST['max_participants'] ?: 200)),
              max(60, (int)(($_POST['duration_min'] ?: 5)) * 60), $durCustom, $ageCustom, $divCustom, $ageOrdCustom, $wtCustom, $tierCustom, $nogiDivCustom, $nogiDurCustom]);
         $tid = (int)db()->lastInsertId();
@@ -104,6 +109,9 @@ view_header(t('create_tournament'));
     <input type="file" name="logo" accept="image/*">
     <label><?= t('event_date') ?></label>
     <input type="date" name="event_date">
+    <label><?= t('reg_close_date') ?></label>
+    <input type="date" name="reg_close_date">
+    <small class="muted"><?= t('reg_close_hint') ?></small>
     <label><?= t('max_participants') ?></label>
     <input type="number" name="max_participants" value="200" min="2">
     <label><?= t('fight_duration_default') ?></label>

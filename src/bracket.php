@@ -408,6 +408,80 @@ function division_podium(int $divisionId): array {
     return [$gold, $silver, $bronze];
 }
 
+/**
+ * ¿Las inscripciones de este torneo están cerradas?
+ * Cerradas si: se cerraron a mano/cron (regs_closed_at) o si la fecha de
+ * cierre configurada ya llegó (al comenzar ese día, aunque el cron todavía
+ * no haya corrido — así el form público no depende del cron para cortar).
+ */
+function registrations_closed(array $t): bool {
+    if (!empty($t['regs_closed_at'])) return true;
+    return !empty($t['reg_close_date']) && $t['reg_close_date'] <= date('Y-m-d');
+}
+
+/** ¿La división tiene al menos una lucha REAL terminada? (byes/wo de un solo competidor no cuentan) */
+function division_has_played_matches(int $divisionId): bool {
+    return (int)scalar('SELECT COUNT(*) FROM matches WHERE division_id=? AND status="done"
+                        AND red_reg_id IS NOT NULL AND blue_reg_id IS NOT NULL', [$divisionId]) > 0;
+}
+
+/**
+ * Divisiones "problema" del torneo: las que tienen UN solo competidor y
+ * todavía no fueron resueltas (sin luchas creadas — ni llave ni WO declarado).
+ * Devuelve [['division' => row, 'registrant' => row], ...].
+ */
+function solo_divisions(int $tournamentId): array {
+    $out = [];
+    foreach (rows('SELECT * FROM divisions WHERE tournament_id=?', [$tournamentId]) as $d) {
+        if ((int)scalar('SELECT COUNT(*) FROM matches WHERE division_id=?', [(int)$d['id']]) > 0) continue;
+        $regs = division_registrations((int)$d['id']);
+        if (count($regs) === 1) $out[] = ['division' => $d, 'registrant' => $regs[0]];
+    }
+    return $out;
+}
+
+/**
+ * Declara ganador automático (walkover) al único inscripto de una división:
+ * crea una "final" con un solo competidor y method='wo' (el mismo formato que
+ * los byes) y marca la división como terminada. division_podium() le da el
+ * oro, así que suma puntos de ranking completos y recibe su certificado de
+ * oro por la vía normal (check_division_done → certificates_send_all).
+ * Devuelve false si la división no tiene exactamente 1 inscripto o ya tiene
+ * alguna lucha real jugada.
+ */
+function declare_solo_winner(int $divisionId): bool {
+    $d = row('SELECT * FROM divisions WHERE id = ?', [$divisionId]);
+    if (!$d) return false;
+    if (division_has_played_matches($divisionId)) return false;
+    $regs = division_registrations($divisionId);
+    if (count($regs) !== 1) return false;
+    // limpiar restos de una llave sin jugar, si los hubiera
+    q('DELETE FROM matches WHERE division_id = ?', [$divisionId]);
+    $dur = (int)$d['duration_sec'];
+    q('INSERT INTO matches (tournament_id, division_id, round, slot, red_reg_id, winner_reg_id, method, status, duration_sec, timer_remaining)
+       VALUES (?,?,1,0,?,?,"wo","done",?,?)',
+        [$d['tournament_id'], $divisionId, (int)$regs[0]['id'], (int)$regs[0]['id'], $dur, $dur]);
+    check_division_done($divisionId);
+    return true;
+}
+
+/**
+ * Borra las divisiones del torneo que quedaron sin ningún inscripto Y sin
+ * ninguna lucha (p.ej. después de mover a su único competidor a otra llave).
+ * Las 'special' no se tocan (se curan a mano en division_manage).
+ */
+function prune_empty_divisions(int $tournamentId): int {
+    $pruned = 0;
+    foreach (rows("SELECT id FROM divisions WHERE tournament_id=? AND kind != 'special'", [$tournamentId]) as $d) {
+        $did = (int)$d['id'];
+        if ((int)scalar('SELECT COUNT(*) FROM matches WHERE division_id=?', [$did]) > 0) continue;
+        if (count(division_registrations($did)) > 0) continue;
+        q('DELETE FROM divisions WHERE id=?', [$did]);
+        $pruned++;
+    }
+    return $pruned;
+}
+
 /** Cantidad de luchas reales (sin byes) de un inscripto */
 function fights_count(int $regId): int {
     return (int)scalar('SELECT COUNT(*) FROM matches WHERE status="done" AND red_reg_id IS NOT NULL AND blue_reg_id IS NOT NULL

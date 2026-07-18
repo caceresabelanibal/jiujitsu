@@ -7,6 +7,7 @@
  *   0,15,30,45 * * * *  curl -s "https://tu-dominio/cron.php?task=tournament_status&key=CRON_KEY"
  *   0 5 * * *  curl -s "https://tu-dominio/cron.php?task=delete_old_tournaments&key=CRON_KEY"
  *   0 6 * * *  curl -s "https://tu-dominio/cron.php?task=reset_demo&key=CRON_KEY"
+ *   0,15,30,45 * * * *  curl -s "https://tu-dominio/cron.php?task=registration_close&key=CRON_KEY"
  */
 require_once dirname(__DIR__) . '/src/bootstrap.php';
 
@@ -63,6 +64,30 @@ switch ($task) {
         }
         if ($old) recompute_rankings();
         $detail = count($old) . " torneos eliminados (mas de $months meses)";
+        break;
+
+    case 'registration_close':
+        // Cierra las inscripciones de los torneos cuya fecha de cierre ya llegó
+        // y le avisa al organizador (con el detalle de divisiones con un solo
+        // competidor para que reorganice las llaves o declare ganadores).
+        $closed = 0;
+        foreach (rows("SELECT * FROM tournaments WHERE status = 'open' AND regs_closed_at IS NULL
+                       AND reg_close_date IS NOT NULL AND reg_close_date <= CURDATE()") as $tt) {
+            $ttid = (int)$tt['id'];
+            q('UPDATE tournaments SET regs_closed_at = NOW() WHERE id = ?', [$ttid]);
+            ensure_divisions($ttid);
+            $solos = solo_divisions($ttid);
+            $owner = row('SELECT * FROM users WHERE id = ?', [$tt['user_id']]);
+            if ($owner) {
+                queue_mail($owner['email'], $owner['name'], t('mail_regs_closed_subject') . ' - ' . $tt['name'],
+                    mail_layout(t('mail_regs_closed_subject'),
+                        mail_p(sprintf(t('mail_regs_closed_body1'), e($tt['name']))) .
+                        mail_p($solos ? sprintf(t('mail_regs_closed_body2'), count($solos)) : t('mail_regs_closed_body2_ok')) .
+                        mail_button(APP_URL . '/tournament/' . $ttid . '/reorganize', t('mail_regs_closed_button'))));
+            }
+            $closed++;
+        }
+        $detail = "$closed torneos con inscripciones cerradas";
         break;
 
     case 'reset_demo':

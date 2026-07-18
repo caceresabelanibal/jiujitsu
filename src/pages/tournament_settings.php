@@ -154,6 +154,9 @@ view_header(t('settings'));
       </select>
       <label><?= t('event_date') ?></label>
       <input type="date" name="event_date" value="<?= e($t['event_date'] ?? '') ?>">
+      <label><?= t('reg_close_date') ?></label>
+      <input type="date" name="reg_close_date" value="<?= e($t['reg_close_date'] ?? '') ?>">
+      <small class="muted"><?= t('reg_close_hint') ?></small>
       <label><?= t('max_participants') ?></label>
       <input type="number" name="max_participants" value="<?= (int)$t['max_participants'] ?>" min="2">
       <label><?= t('fight_duration_default') ?></label>
