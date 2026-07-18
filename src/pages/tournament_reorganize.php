@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($do === 'move') {
         $reg = row('SELECT * FROM registrations WHERE id = ? AND tournament_id = ? AND verified = 1', [(int)$_POST['reg_id'], $tid]);
         $target = row('SELECT * FROM divisions WHERE id = ? AND tournament_id = ? AND kind = "standard"', [(int)$_POST['target_id'], $tid]);
-        if (!$reg || !$target || $reg['gender'] !== $target['gender']) {
+        if (!$reg || !$target) {
             flash('error', t('forbidden'));
         } elseif (division_has_played_matches((int)$target['id'])) {
             flash('error', t('reorg_move_locked'));
@@ -59,8 +59,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $beltId = (int)$target['belt_id'];
                 } // belt y tier NULL (nogi infantil/juvenil): el cinturón real no cambia
 
-                q('UPDATE registrations SET belt_id=?, age_division_id=?, weight_class_id=? WHERE id=?',
-                    [$beltId, $target['age_division_id'], $target['weight_class_id'], (int)$reg['id']]);
+                // Sin restricción de género: el organizador decide la llave (a veces
+                // se arman llaves mixtas o "irrisorias" con tal de que todos luchen).
+                // Si la división destino es del otro género, el inscripto pasa a ella.
+                q('UPDATE registrations SET gender=?, belt_id=?, age_division_id=?, weight_class_id=? WHERE id=?',
+                    [$target['gender'], $beltId, $target['age_division_id'], $target['weight_class_id'], (int)$reg['id']]);
                 prune_empty_divisions($tid);
                 flash('success', t('reorg_moved'));
             }
@@ -97,11 +100,12 @@ foreach ($divs as $d) {
         'matches' => (int)scalar('SELECT COUNT(*) FROM matches WHERE division_id=?', [$did]),
     ];
 }
-// Destinos posibles por género: estándar y sin luchas jugadas
-$targetsByGender = ['M' => [], 'F' => []];
+// Destinos posibles: cualquier división estándar sin luchas jugadas (sin
+// restricción de género — el organizador arma la llave que quiera)
+$allTargets = [];
 foreach ($divs as $d) {
     if ($d['kind'] === 'standard' && !$info[(int)$d['id']]['played']) {
-        $targetsByGender[$d['gender']][] = $d;
+        $allTargets[] = $d;
     }
 }
 
@@ -141,7 +145,7 @@ view_header(t('reorganize_brackets'));
     <details <?= $solo ? 'open' : '' ?> style="margin-top:8px">
       <summary class="muted" style="cursor:pointer"><?= t('reorg_show_competitors') ?></summary>
       <?php foreach ($i['regs'] as $r):
-          $targets = array_filter($targetsByGender[$r['gender']], fn($td) => (int)$td['id'] !== $did); ?>
+          $targets = array_filter($allTargets, fn($td) => (int)$td['id'] !== $did); ?>
       <div class="flex spread" style="padding:8px 0;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap">
         <span><b><?= e($r['name']) ?></b> <span class="muted"><?= e($r['academy_name'] ?? '') ?></span></span>
         <form method="post" class="flex" style="margin:0;gap:8px" data-confirm="<?= e(t('confirm_move')) ?>">
