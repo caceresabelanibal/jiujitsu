@@ -20,8 +20,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $target = row('SELECT * FROM divisions WHERE id = ? AND tournament_id = ? AND kind = "standard"', [(int)$_POST['target_id'], $tid]);
         if (!$reg || !$target) {
             flash('error', t('forbidden'));
-        } elseif (division_has_played_matches((int)$target['id'])) {
-            flash('error', t('reorg_move_locked'));
         } else {
             // División estándar actual del inscripto (origen)
             $src = null;
@@ -31,10 +29,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($src && (int)$src['id'] === (int)$target['id']) {
                 flash('success', t('settings_saved'));
             } elseif ($src && division_has_played_matches((int)$src['id'])) {
+                // El competidor ya luchó en su llave actual: moverlo rompería
+                // esos resultados — este sí sigue bloqueado.
                 flash('error', t('reorg_move_locked'));
             } else {
-                // Descartar llaves sin resultados de origen y destino (se regeneran)
-                foreach (array_filter([$src ? (int)$src['id'] : null, (int)$target['id']]) as $did) {
+                // Descartar las llaves SIN resultados de origen y destino (se
+                // regeneran). Si el destino ya tiene luchas jugadas, su llave se
+                // deja intacta: el competidor entra a la división igual y el
+                // organizador decide si regenerarla (perdiendo esos resultados)
+                // desde la página de la división.
+                $targetPlayed = division_has_played_matches((int)$target['id']);
+                foreach (array_filter([$src ? (int)$src['id'] : null, $targetPlayed ? null : (int)$target['id']]) as $did) {
                     if ((int)scalar('SELECT COUNT(*) FROM matches WHERE division_id=?', [$did]) > 0) {
                         q('DELETE FROM matches WHERE division_id=?', [$did]);
                         q('UPDATE divisions SET status="pending" WHERE id=?', [$did]);
@@ -65,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 q('UPDATE registrations SET gender=?, belt_id=?, age_division_id=?, weight_class_id=? WHERE id=?',
                     [$target['gender'], $beltId, $target['age_division_id'], $target['weight_class_id'], (int)$reg['id']]);
                 prune_empty_divisions($tid);
-                flash('success', t('reorg_moved'));
+                flash($targetPlayed ? 'warning' : 'success', $targetPlayed ? t('reorg_moved_played') : t('reorg_moved'));
             }
         }
     } elseif ($do === 'declare') {
@@ -100,13 +105,12 @@ foreach ($divs as $d) {
         'matches' => (int)scalar('SELECT COUNT(*) FROM matches WHERE division_id=?', [$did]),
     ];
 }
-// Destinos posibles: cualquier división estándar sin luchas jugadas (sin
-// restricción de género — el organizador arma la llave que quiera)
+// Destinos posibles: TODAS las divisiones estándar, sin restricción de género
+// ni de estado — la elección es libre, la decide el organizador. Las que ya
+// tienen luchas jugadas se marcan en la etiqueta (su llave no se toca al mover).
 $allTargets = [];
 foreach ($divs as $d) {
-    if ($d['kind'] === 'standard' && !$info[(int)$d['id']]['played']) {
-        $allTargets[] = $d;
-    }
+    if ($d['kind'] === 'standard') $allTargets[] = $d;
 }
 
 view_header(t('reorganize_brackets'));
@@ -155,7 +159,7 @@ view_header(t('reorganize_brackets'));
           <?php if ($targets): ?>
           <select name="target_id" style="width:auto;max-width:320px">
             <?php foreach ($targets as $td): ?>
-            <option value="<?= (int)$td['id'] ?>"><?= e(division_label($td)) ?> (<?= count($info[(int)$td['id']]['regs']) ?>)</option>
+            <option value="<?= (int)$td['id'] ?>"><?= e(division_label($td)) ?> (<?= count($info[(int)$td['id']]['regs']) ?>)<?= $info[(int)$td['id']]['played'] ? ' — ' . e(t('reorg_locked')) : '' ?></option>
             <?php endforeach; ?>
           </select>
           <button class="btn sm secondary"><?= icon('arrow-right', 12) ?> <?= t('reorg_move_btn') ?></button>

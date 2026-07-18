@@ -175,6 +175,7 @@ return [
     'confirm_declare_winner' => '¿Declarar ganador sin luchar? Recibe el oro por walkover, suma puntos de ranking y su certificado.',
     'confirm_move' => '¿Mover al competidor a esa categoría? Las llaves de origen y destino se descartan (no tenían resultados) y hay que volver a generarlas.',
     'reorg_moved' => 'Competidor movido. Volvé a generar las llaves afectadas.',
+    'reorg_moved_played' => 'Competidor movido. La división destino ya tiene luchas jugadas: su llave quedó como estaba — si querés incluirlo, regenerála desde la división (se pierden esos resultados).',
     'reorg_declared' => 'Ganador por walkover declarado.',
     'reorg_move_locked' => 'Esa división ya tiene luchas jugadas: no se puede modificar.',
     'reorg_no_targets' => 'Sin división compatible',
