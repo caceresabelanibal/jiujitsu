@@ -175,6 +175,7 @@ return [
     'confirm_declare_winner' => 'Declare the winner without fighting? They get gold by walkover, ranking points and their certificate.',
     'confirm_move' => 'Move the competitor to that category? The source and target brackets are discarded (they had no results) and must be generated again.',
     'reorg_moved' => 'Competitor moved. Generate the affected brackets again.',
+    'bye_notice' => 'With %1$d competitors, %2$d advance(s) a round without fighting (bye) — with %3$d (or %4$d) entrants nobody skips a round.',
     'reorg_moved_played' => 'Competitor moved. The target division already has played matches: its bracket was left as is — to include them, regenerate it from the division page (those results are lost).',
     'reorg_declared' => 'Walkover winner declared.',
     'reorg_move_locked' => 'That division already has played matches: it cannot be modified.',

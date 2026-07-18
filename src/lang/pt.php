@@ -175,6 +175,7 @@ return [
     'confirm_declare_winner' => 'Declarar vencedor sem lutar? Ele recebe o ouro por walkover, soma pontos no ranking e seu certificado.',
     'confirm_move' => 'Mover o competidor para essa categoria? As chaves de origem e destino são descartadas (não tinham resultados) e precisam ser geradas de novo.',
     'reorg_moved' => 'Competidor movido. Gere novamente as chaves afetadas.',
+    'bye_notice' => 'Com %1$d competidores, %2$d passa(m) de fase sem lutar (bye) — com %3$d (ou %4$d) inscritos ninguém pula fase.',
     'reorg_moved_played' => 'Competidor movido. A divisão de destino já tem lutas jogadas: sua chave ficou como estava — para incluí-lo, gere-a novamente na página da divisão (esses resultados se perdem).',
     'reorg_declared' => 'Vencedor por walkover declarado.',
     'reorg_move_locked' => 'Essa divisão já tem lutas jogadas: não pode ser modificada.',

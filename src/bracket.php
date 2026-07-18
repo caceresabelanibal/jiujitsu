@@ -482,6 +482,20 @@ function prune_empty_divisions(int $tournamentId): int {
     return $pruned;
 }
 
+/**
+ * Aviso de byes para una división con $n competidores: cuántos pasan de ronda
+ * sin luchar porque la llave de eliminación se arma en potencia de 2. Devuelve
+ * el texto localizado, o null si no aplica (n < 2 o justo potencia de 2).
+ */
+function bye_notice(int $n): ?string {
+    if ($n < 2) return null;
+    $size = 2;
+    while ($size < $n) $size *= 2;
+    $byes = $size - $n;
+    if ($byes === 0) return null;
+    return sprintf(t('bye_notice'), $n, $byes, $size, (int)($size / 2));
+}
+
 /** Cantidad de luchas reales (sin byes) de un inscripto */
 function fights_count(int $regId): int {
     return (int)scalar('SELECT COUNT(*) FROM matches WHERE status="done" AND red_reg_id IS NOT NULL AND blue_reg_id IS NOT NULL

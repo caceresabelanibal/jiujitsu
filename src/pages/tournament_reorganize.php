@@ -141,6 +141,10 @@ view_header(t('reorganize_brackets'));
     <?php endif; ?>
   </div>
 
+  <?php if (!$i['played'] && ($byeMsg = bye_notice(count($i['regs'])))): ?>
+    <p class="muted" style="margin:8px 0 0"><?= icon('flag', 13) ?> <?= e($byeMsg) ?></p>
+  <?php endif; ?>
+
   <?php if ($i['played']): ?>
     <p class="muted" style="margin:8px 0 0"><?= t('reorg_move_locked') ?></p>
   <?php elseif ($d['kind'] !== 'standard'): ?>

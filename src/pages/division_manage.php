@@ -91,6 +91,9 @@ view_header(t('division'));
     <?php if (count($regs) < 2): ?>
       <p class="muted"><?= t('no_competitors') ?></p>
     <?php else: ?>
+    <?php if ($byeMsg = bye_notice(count($regs))): ?>
+      <p class="muted"><?= icon('flag', 13) ?> <?= e($byeMsg) ?></p>
+    <?php endif; ?>
     <p class="muted"><?= t('manual_order_hint') ?></p>
     <form method="post">
       <?= csrf_field() ?>
